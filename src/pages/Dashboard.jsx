@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from "react";
 import { User } from "@/entities/User";
 import { PracticeSession } from "@/entities/PracticeSession";
@@ -66,7 +65,21 @@ export default function Dashboard() {
   const [minutesToday, setMinutesToday] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showWelcomeBanner, setShowWelcomeBanner] = useState(false);
   const navigate = useNavigate();
+
+  // Check if welcome banner should be shown
+  useEffect(() => {
+    const hasSeenBanner = localStorage.getItem('has_seen_speech_listening_fix_banner');
+    if (!hasSeenBanner) {
+      setShowWelcomeBanner(true);
+    }
+  }, []);
+
+  const dismissWelcomeBanner = () => {
+    localStorage.setItem('has_seen_speech_listening_fix_banner', 'true');
+    setShowWelcomeBanner(false);
+  };
 
   const journeyData = useUserJourney(user);
 
@@ -516,6 +529,33 @@ export default function Dashboard() {
       <SafeRender>
         <div className="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
           <div className="max-w-7xl mx-auto p-4 md:p-8 space-y-8">
+            {/* Welcome Banner - Speech & Listening Fix */}
+            {showWelcomeBanner && (
+              <div className="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-300 rounded-xl p-6 shadow-lg">
+                <div className="flex items-start justify-between">
+                  <div className="flex items-start gap-4">
+                    <div className="p-3 bg-green-500 rounded-full">
+                      <Headphones className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-bold text-green-900 mb-2">
+                        🎉 Great News! Speech & Listening Features Are Now Fixed
+                      </h3>
+                      <p className="text-green-800 mb-3">
+                        We've resolved the issues with audio playback and speech recognition. You can now practice listening comprehension and speaking exercises without interruptions. Enjoy your improved learning experience!
+                      </p>
+                      <Button 
+                        onClick={dismissWelcomeBanner}
+                        className="bg-green-600 hover:bg-green-700 text-white"
+                      >
+                        Got it, thanks!
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Admin Notice */}
             {user.role === 'admin' && (
               <div className="bg-yellow-50 border-l-4 border-yellow-400 text-yellow-700 p-4" role="alert">
