@@ -79,10 +79,25 @@ const generateReadingContent = async (language, difficulty, fileUrls) => {
     // OPTIMIZED PROMPT - shorter and more focused
     const prompt = `You are a YKI Reading Practice Generator for ${difficulty} level learners in ${languageName}.
 
+CRITICAL: Use diverse, engaging topics. DO NOT repeat common themes like weekends, holidays, or typical daily routines. Choose from varied subjects:
+- Technology and innovation
+- Environmental issues
+- Cultural traditions and festivals
+- Health and sports
+- Arts and entertainment
+- Education systems
+- Work and professional life
+- Food culture and cuisine
+- Urban planning and architecture
+- Social issues
+- Science and nature
+- Historical events or figures
+
 Generate:
 1. A reading passage in ${languageName} (CEFR ${difficulty} level):
    - A1: 100–150 words | A2: 150–200 | B1: 150–200 | B2: 200–250
-   - Topic should be culturally relevant and use appropriate vocabulary/grammar for that level.
+   - Select ONE specific topic from the diverse list above
+   - Content should be interesting, culturally relevant, and use appropriate vocabulary/grammar
 
 2. 5 multiple-choice questions (in ${languageName}) that test comprehension:
    - Use this JSON format:

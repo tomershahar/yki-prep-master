@@ -1,4 +1,3 @@
-
 import { createClient } from 'npm:@base44/sdk@0.1.0';
 
 // Global base44 client - will be used for knowledge base access that is assumed to be
@@ -228,10 +227,26 @@ Deno.serve(async (req) => {
         // Step 1: Generate a writing task with OPTIMIZED PROMPT
         const taskGenerationPrompt = `Generate a realistic YKI writing task for ${difficulty} level in ${languageName}.
 
+CRITICAL: Use diverse topics. DO NOT repeat common topics like weekends, holidays, or hometowns. Choose from varied themes:
+- Daily routines and habits
+- Hobbies and interests (sports, arts, music, crafts)
+- Technology and social media
+- Education and learning experiences
+- Work and career plans
+- Environment and nature
+- Health and wellness
+- Food and cooking
+- Transportation and travel planning
+- Family and relationships
+- Cultural events and traditions
+- Future goals and dreams
+
+Select ONE specific, engaging topic from the list above.
+
 Create a JSON response:
 {
   "writing_task": {
-    "prompt": "A realistic writing task in ${languageName} (e.g., write about your hometown, describe your opinion on a topic, etc.)",
+    "prompt": "A specific, interesting writing task in ${languageName} that focuses on ONE of the diverse topics listed above",
     "expected_length": "appropriate word count for ${difficulty} level"
   }
 }`;
