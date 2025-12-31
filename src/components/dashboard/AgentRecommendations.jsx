@@ -38,12 +38,13 @@ export default function AgentRecommendations() {
         try {
             // Generate both types of recommendations
             await Promise.all([
-                getAdaptiveLearningRecommendations({}),
-                proactiveCoachCheck({})
+                getAdaptiveLearningRecommendations(),
+                proactiveCoachCheck()
             ]);
             await loadRecommendations();
         } catch (error) {
             console.error('Failed to generate recommendations:', error);
+            alert('Failed to generate recommendations. Please try again.');
         } finally {
             setIsGenerating(false);
         }
