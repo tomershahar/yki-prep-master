@@ -50,6 +50,19 @@ const fillMissingDates = (data, days = 7) => {
   return filledData;
 };
 
+// Safe date formatter to handle invalid dates
+const safeFormatDate = (dateStr, formatStr) => {
+  try {
+    if (!dateStr) return 'N/A';
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) return dateStr; // Return original if invalid
+    return format(date, formatStr);
+  } catch (error) {
+    console.warn('Invalid date format:', dateStr);
+    return dateStr;
+  }
+};
+
 export function VisitsChart({ data, isLoading }) {
   if (isLoading) {
     return (
@@ -89,11 +102,11 @@ export function VisitsChart({ data, isLoading }) {
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis 
               dataKey="date" 
-              tickFormatter={(str) => format(new Date(str), 'dd.MM')}
+              tickFormatter={(str) => safeFormatDate(str, 'dd.MM')}
             />
             <YAxis />
             <Tooltip 
-              labelFormatter={(label) => format(new Date(label), 'dd MMM yyyy')}
+              labelFormatter={(label) => safeFormatDate(label, 'dd MMM yyyy')}
             />
             <Bar dataKey="new" stackId="a" fill={CHART_COLORS.primary} name="New Visits" />
             <Bar dataKey="returning" stackId="a" fill={CHART_COLORS.secondary} name="Returning Visits" />
