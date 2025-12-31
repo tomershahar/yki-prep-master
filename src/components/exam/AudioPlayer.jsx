@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Play, Pause, RotateCcw, Volume2 } from "lucide-react";
@@ -12,6 +11,7 @@ export default function AudioPlayer({
   const [duration, setDuration] = useState(0);
   const [error, setError] = useState(null);
   const audioRef = useRef(null);
+  const blobUrlRef = useRef(null);
 
   // Effect to handle setting the audio source and resetting state
   useEffect(() => {
@@ -23,16 +23,45 @@ export default function AudioPlayer({
       setDuration(0);
       setError(null);
 
+      // Clean up previous blob URL if it exists
+      if (blobUrlRef.current) {
+        URL.revokeObjectURL(blobUrlRef.current);
+        blobUrlRef.current = null;
+      }
+
       if (audioBase64) {
-        // Set the new source. This will trigger 'loadedmetadata'.
-        audio.src = `data:audio/mp3;base64,${audioBase64}`;
-        audio.load(); // Explicitly load to fetch metadata
+        try {
+          // Convert base64 to Blob URL for better performance
+          const byteCharacters = atob(audioBase64);
+          const byteNumbers = new Array(byteCharacters.length);
+          for (let i = 0; i < byteCharacters.length; i++) {
+            byteNumbers[i] = byteCharacters.charCodeAt(i);
+          }
+          const byteArray = new Uint8Array(byteNumbers);
+          const blob = new Blob([byteArray], { type: 'audio/mp3' });
+          const blobUrl = URL.createObjectURL(blob);
+          
+          blobUrlRef.current = blobUrl;
+          audio.src = blobUrl;
+          audio.load();
+        } catch (err) {
+          console.error('Failed to convert audio:', err);
+          setError('Failed to load audio');
+        }
       } else {
         // If no audio, clear the source
         audio.removeAttribute('src');
         audio.load();
       }
     }
+
+    // Cleanup on unmount or when audioBase64 changes
+    return () => {
+      if (blobUrlRef.current) {
+        URL.revokeObjectURL(blobUrlRef.current);
+        blobUrlRef.current = null;
+      }
+    };
   }, [audioBase64]); // This effect runs whenever the audioBase64 prop changes
 
   // Effect to manage audio event listeners
