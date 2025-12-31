@@ -2,7 +2,7 @@ import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Trophy, TrendingUp } from 'lucide-react';
-import { scoreToYKILevel, ykiLevelToCEFR, getYKILevelColor, getYKILevelDescription } from '@/utils/ykiScoring';
+import { scoreToYKILevel, ykiLevelToCEFR, getYKILevelColor, getYKILevelDescription } from '../shared/ykiScoring';
 
 export default function YKIScoreBadge({ score, showDetails = false, size = 'default' }) {
     const ykiLevel = scoreToYKILevel(score);

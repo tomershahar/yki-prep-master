@@ -1,10 +1,10 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle, XCircle, Award, RefreshCw, LogOut, AlertTriangle } from "lucide-react";
 import InlineTranslator from '../shared/InlineTranslator';
+import YKIScoreBadge from './YKIScoreBadge';
 
 export default function ExamSummary({ section, examContent, answers, scoreData, aiFeedback, onRestart, onExit, isStaticPractice }) {
 
@@ -128,14 +128,15 @@ export default function ExamSummary({ section, examContent, answers, scoreData, 
         const scoreMessage = scoreData?.score >= 75 ? 'Great job!' : scoreData?.score >= 50 ? 'Good effort!' : 'Keep practicing!';
 
         return (
-            <div className="text-center mb-8">
-                <p className="text-lg text-gray-600">Your score:</p>
-                <p className={`text-7xl font-bold ${scoreColor}`}>{scoreData?.score ?? 0}%</p>
+            <div className="text-center mb-8 space-y-4">
+                <div className="flex justify-center">
+                    <YKIScoreBadge score={scoreData?.score ?? 0} showDetails={true} />
+                </div>
                 <p className="text-lg font-medium text-gray-700">{scoreMessage}</p>
                 {section.id !== 'writing' && section.id !== 'speaking' && (
                     <p className="text-gray-500 mt-1">{scoreData?.correct ?? 0} out of {scoreData?.total ?? 0} correct</p>
                 )}
-                {scoreData?.cefr_level && <p className="text-gray-500 mt-1">Estimated CEFR Level: <Badge>{scoreData.cefr_level}</Badge></p>}
+                <p className="text-sm text-gray-500">Raw score: {scoreData?.score ?? 0}%</p>
             </div>
         );
     };
