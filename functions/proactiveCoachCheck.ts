@@ -112,18 +112,25 @@ Provide a coaching message in JSON format:
 
 Tone: Friendly, encouraging, understanding. Avoid being pushy.`;
 
-        const aiResponse = await base44.integrations.Core.InvokeLLM({
-            prompt: fullPrompt,
-            response_json_schema: {
-                type: "object",
-                properties: {
-                    title: { type: "string" },
-                    message: { type: "string" },
-                    priority: { type: "number" },
-                    action_text: { type: "string" }
+        console.log('Calling LLM for coaching message...');
+        const aiResponse = await Promise.race([
+            base44.integrations.Core.InvokeLLM({
+                prompt: fullPrompt,
+                response_json_schema: {
+                    type: "object",
+                    properties: {
+                        title: { type: "string" },
+                        message: { type: "string" },
+                        priority: { type: "number" },
+                        action_text: { type: "string" }
+                    }
                 }
-            }
-        });
+            }),
+            new Promise((_, reject) => 
+                setTimeout(() => reject(new Error('LLM timeout after 30s')), 30000)
+            )
+        ]);
+        console.log('LLM response received:', aiResponse);
 
         // Create recommendation
         const recommendation = await base44.entities.AgentRecommendation.create({

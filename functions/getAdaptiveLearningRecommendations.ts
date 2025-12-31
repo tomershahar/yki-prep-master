@@ -94,19 +94,26 @@ Provide a recommendation in JSON format:
 
 Be encouraging but honest. Focus on one clear action.`;
 
-        const aiResponse = await base44.integrations.Core.InvokeLLM({
-            prompt: analysisPrompt,
-            response_json_schema: {
-                type: "object",
-                properties: {
-                    title: { type: "string" },
-                    message: { type: "string" },
-                    priority: { type: "number" },
-                    suggested_section: { type: "string" },
-                    suggested_difficulty: { type: "string" }
+        console.log('Calling LLM for adaptive learning recommendation...');
+        const aiResponse = await Promise.race([
+            base44.integrations.Core.InvokeLLM({
+                prompt: analysisPrompt,
+                response_json_schema: {
+                    type: "object",
+                    properties: {
+                        title: { type: "string" },
+                        message: { type: "string" },
+                        priority: { type: "number" },
+                        suggested_section: { type: "string" },
+                        suggested_difficulty: { type: "string" }
+                    }
                 }
-            }
-        });
+            }),
+            new Promise((_, reject) => 
+                setTimeout(() => reject(new Error('LLM timeout after 30s')), 30000)
+            )
+        ]);
+        console.log('LLM response received:', aiResponse);
 
         // Create recommendation entity
         const recommendation = await base44.entities.AgentRecommendation.create({
