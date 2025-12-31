@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Feedback } from '@/entities/Feedback';
 import { Card, CardContent } from '@/components/ui/card';
@@ -27,6 +26,27 @@ export default function ChangelogPage() {
 
     // Recent improvements from the last 2 weeks
     const recentImprovements = [
+        {
+            date: 'December 31, 2025',
+            type: 'improvement',
+            title: 'Analytics Dashboard Enhancements',
+            description: 'Implemented 10 major improvements to the Analytics Dashboard including formatted date axes, granular loading states for each chart, trend indicators showing percentage changes, responsive aspect ratios for mobile, missing date filling for continuous data, and enhanced tooltips with time formatting (hours/minutes).',
+            icon: Sparkles
+        },
+        {
+            date: 'December 31, 2025',
+            type: 'fix',
+            title: 'Fixed Invalid Date Errors in Analytics',
+            description: 'Resolved critical "Invalid time value" errors in analytics charts by implementing safe date formatting that gracefully handles null or invalid date values, preventing chart crashes.',
+            icon: Bug
+        },
+        {
+            date: 'December 30, 2025',
+            type: 'improvement',
+            title: 'Streamlined Dashboard Experience',
+            description: 'Removed the AI-Powered Recommendations feature from the dashboard to improve stability and simplify the user experience. Focus remains on core practice and progress tracking features.',
+            icon: Zap
+        },
         {
             date: 'August 15, 2025',
             type: 'fix',
@@ -276,4 +296,3 @@ export default function ChangelogPage() {
         </div>
     );
 }
-
