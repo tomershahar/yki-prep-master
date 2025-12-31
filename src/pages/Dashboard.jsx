@@ -17,7 +17,7 @@ import KpiCard from "../components/dashboard/KpiCard";
 import ErrorBoundary from "../components/dashboard/ErrorBoundary";
 import { SafeRender, safeText, safeNumber } from "../components/dashboard/SafeRender";
 import { UserVisit } from "@/entities/UserVisit"; // Import UserVisit entity
-import AgentRecommendations from "../components/dashboard/AgentRecommendations";
+
 
 const difficultyLevels = ["A1", "A2", "B1", "B2"];
 
@@ -644,10 +644,7 @@ export default function Dashboard() {
               </ErrorBoundary>
             </div>
 
-            {/* AI Agent Recommendations */}
-            <ErrorBoundary>
-              <AgentRecommendations />
-            </ErrorBoundary>
+
 
             {/* Practice Sections and Progress */}
             <div className="grid md:grid-cols-2 gap-6">
