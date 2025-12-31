@@ -37,12 +37,12 @@ export default function AgentRecommendations() {
         setIsGenerating(true);
         try {
             // Generate both types of recommendations
-            const results = await Promise.all([
-                getAdaptiveLearningRecommendations(),
-                proactiveCoachCheck()
+            const [learningRec, coachRec] = await Promise.all([
+                getAdaptiveLearningRecommendations({}),
+                proactiveCoachCheck({})
             ]);
             
-            console.log('Generated recommendations:', results);
+            console.log('Generated recommendations:', learningRec, coachRec);
             
             // Reload recommendations from database
             await loadRecommendations();
