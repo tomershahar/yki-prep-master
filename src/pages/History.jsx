@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { User } from "@/entities/User";
 import { PracticeSession } from "@/entities/PracticeSession";
@@ -9,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { History as HistoryIcon, BookOpen, Headphones, Mic, PenTool, Clock, CheckCircle, XCircle, MessageSquare, Calendar } from "lucide-react";
 import { Loader2 } from "lucide-react";
+import YKIScoreBadge from "../components/exam/YKIScoreBadge";
 
 const sectionIcons = {
   reading: BookOpen,
@@ -117,11 +117,11 @@ export default function HistoryPage() {
               <div className="bg-gray-50 p-4 rounded-lg">
                 <h3 className="font-semibold mb-2">Session Summary</h3>
                 <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div>
+                  <div className="col-span-2 mb-2">
                     <span className="text-gray-600">Score:</span>
-                    <span className={`ml-2 font-medium ${getPassingStatus(session.score) ? 'text-green-600' : 'text-red-600'}`}>
-                      {session.score}%
-                    </span>
+                    <div className="mt-2">
+                      <YKIScoreBadge score={session.score} />
+                    </div>
                   </div>
                   <div>
                     <span className="text-gray-600">Level:</span>
@@ -325,23 +325,8 @@ export default function HistoryPage() {
                     
                     <div className="flex items-center gap-4">
                       <div className="text-right">
-                        <div className={`text-2xl font-bold ${isPassing ? 'text-green-600' : 'text-red-600'}`}>
-                          {session.score}%
-                        </div>
-                        <div className="flex items-center gap-1 text-sm">
-                          {isPassing ? (
-                            <>
-                              <CheckCircle className="w-4 h-4 text-green-600" />
-                              <span className="text-green-600">Passed</span>
-                            </>
-                          ) : (
-                            <>
-                              <XCircle className="w-4 h-4 text-red-600" />
-                              <span className="text-red-600">Failed</span>
-                            </>
-                          )}
-                        </div>
-                        <div className="text-xs text-gray-500 mt-1">
+                        <YKIScoreBadge score={session.score} />
+                        <div className="text-xs text-gray-500 mt-2">
                           {session.questions_correct}/{session.questions_attempted} correct
                         </div>
                       </div>
