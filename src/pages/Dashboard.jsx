@@ -17,6 +17,7 @@ import KpiCard from "../components/dashboard/KpiCard";
 import ErrorBoundary from "../components/dashboard/ErrorBoundary";
 import { SafeRender, safeText, safeNumber } from "../components/dashboard/SafeRender";
 import { UserVisit } from "@/entities/UserVisit"; // Import UserVisit entity
+import AgentRecommendations from "../components/dashboard/AgentRecommendations";
 
 const difficultyLevels = ["A1", "A2", "B1", "B2"];
 
@@ -643,27 +644,9 @@ export default function Dashboard() {
               </ErrorBoundary>
             </div>
 
-            {/* Next Up Recommendation */}
+            {/* AI Agent Recommendations */}
             <ErrorBoundary>
-              <Card className="bg-gradient-to-r from-green-50 to-blue-50 border-green-200">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="text-xl font-bold text-gray-900 mb-2">
-                        {motivationalContent.title}
-                      </h3>
-                      <p className="text-gray-600 mb-4">
-                        {motivationalContent.message}
-                      </p>
-                    </div>
-                    <Link to={motivationalContent.actionUrl}>
-                      <Button className="bg-green-600 hover:bg-green-700">
-                        {motivationalContent.action}
-                      </Button>
-                    </Link>
-                  </div>
-                </CardContent>
-              </Card>
+              <AgentRecommendations />
             </ErrorBoundary>
 
             {/* Practice Sections and Progress */}
