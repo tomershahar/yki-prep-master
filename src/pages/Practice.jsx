@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { User } from "@/entities/User";
 import { PracticeSession } from "@/entities/PracticeSession";
@@ -14,6 +13,7 @@ import { BookOpen, Headphones, Mic, PenTool, Play, Loader2, Clock, X, Lightbulb,
 import QuickPracticeSession from "../components/exam/QuickPracticeSession";
 import { staticContent } from "../components/exam/StaticPracticeContent";
 import AIGrammarTips from "../components/practice/AIGrammarTips";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
 const difficultyLevels = ["A1", "A2", "B1", "B2"];
 
@@ -25,6 +25,7 @@ export default function Practice() {
   const [practiceReady, setPracticeReady] = useState(false); // New state for two-stage loading
   const [isCompleting, setIsCompleting] = useState(false); // Safeguard state
   const [showGrammarTips, setShowGrammarTips] = useState(true); // New state for showing/hiding grammar tips
+  const [completionDialog, setCompletionDialog] = useState(null); // For completion message dialog
 
   useEffect(() => {
     loadUserData();
@@ -726,21 +727,26 @@ Would you like to advance to level ${newLevel}?`)) {
       }
 
       // Success message
-      let message = `Practice completed! Your score is ${sessionData.score}%.`;
+      let message = `Your score is ${sessionData.score}%.`;
       const passedText = practiceId && shouldMarkAsPassed ? "This practice has been marked as completed and won't appear again." : "Keep practicing to improve your score!";
       message += ` ${passedText}`;
 
       const finalCurrentLevel = currentUser[`${sessionData.section}_level`] || 'A1';
+      let bonusMessage = '';
       if (sessionData.score >= 90) {
         const currentIndex = difficultyLevels.indexOf(finalCurrentLevel);
         if (currentIndex < difficultyLevels.length - 1) {
-          message += `\n\nExcellent! You're doing great at level ${finalCurrentLevel}. If you feel ready for a bigger challenge, you can change your level in the Settings page.`;
+          bonusMessage = `Excellent! You're doing great at level ${finalCurrentLevel}. If you feel ready for a bigger challenge, you can change your level in the Settings page.`;
         } else {
-          message += `\n\nPerfect score! You're already at the highest level (${finalCurrentLevel}) for this section!`;
+          bonusMessage = `Perfect score! You're already at the highest level (${finalCurrentLevel}) for this section!`;
         }
       }
 
-      alert(message);
+      setCompletionDialog({
+        score: sessionData.score,
+        message,
+        bonusMessage
+      });
 
       setActiveExam(null);
       setActiveSection(null);
@@ -869,53 +875,88 @@ Would you like to advance to level ${newLevel}?`)) {
   }
 
   return (
-    <div className="bg-lime-700 mx-auto p-4 md:p-8 max-w-7xl space-y-8">
-      <div className="text-center space-y-4">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Quick Practice</h1>
-        <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">Build your skills with focused, untimed practice sessions. Each practice has 4-6 questions tailored to your level.</p>
-        <div className="flex items-center justify-center gap-4">
-          <Badge variant="secondary" className="text-sm">Language: {user?.target_language === 'finnish' ? 'Finnish' : 'Swedish'}</Badge>
-          <Badge variant="outline" className="text-sm flex items-center gap-1">
-            <Clock className="w-3 h-3" />
-            Untimed Practice
-          </Badge>
+    <>
+      <div className="bg-lime-700 mx-auto p-4 md:p-8 max-w-7xl space-y-8">
+        <div className="text-center space-y-4">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Quick Practice</h1>
+          <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">Build your skills with focused, untimed practice sessions. Each practice has 4-6 questions tailored to your level.</p>
+          <div className="flex items-center justify-center gap-4">
+            <Badge variant="secondary" className="text-sm">Language: {user?.target_language === 'finnish' ? 'Finnish' : 'Swedish'}</Badge>
+            <Badge variant="outline" className="text-sm flex items-center gap-1">
+              <Clock className="w-3 h-3" />
+              Untimed Practice
+            </Badge>
+          </div>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-6">
+          {practiceSections.map((section) => {
+            const userLevel = user ? user[`${section.id}_level`] : 'A1';
+            return (
+              <Card key={section.id} className="relative overflow-hidden border-0 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer group">
+                <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${section.color} opacity-10 rounded-full transform translate-x-12 -translate-y-12 group-hover:scale-110 transition-transform`}></div>
+                <CardHeader className="relative">
+                  <div className="flex items-center gap-4">
+                    <div className={`p-3 bg-gradient-to-br ${section.color} rounded-xl`}>
+                      <section.icon className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-xl">{section.title}</CardTitle>
+                      <div className="flex items-center gap-2 mt-1">
+                        <Badge variant="secondary" className="text-xs">Level {userLevel}</Badge>
+                        <Badge variant="outline" className="text-xs">{section.questions}</Badge>
+                      </div>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-gray-600 dark:text-gray-400 mb-4">Practice your {section.title.toLowerCase()} skills with targeted exercises designed for your current level.</p>
+                  <Button
+                    onClick={() => startPractice(section)}
+                    className={`w-full bg-gradient-to-r ${section.color} hover:opacity-90 text-white shadow-lg group-hover:scale-105 transition-transform`}
+                    disabled={isLoadingExam}>
+                    <Play className="w-4 h-4 mr-2" />
+                    Start Practice
+                  </Button>
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-6">
-        {practiceSections.map((section) => {
-          const userLevel = user ? user[`${section.id}_level`] : 'A1';
-          return (
-            <Card key={section.id} className="relative overflow-hidden border-0 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer group">
-              <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${section.color} opacity-10 rounded-full transform translate-x-12 -translate-y-12 group-hover:scale-110 transition-transform`}></div>
-              <CardHeader className="relative">
-                <div className="flex items-center gap-4">
-                  <div className={`p-3 bg-gradient-to-br ${section.color} rounded-xl`}>
-                    <section.icon className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <CardTitle className="text-xl">{section.title}</CardTitle>
-                    <div className="flex items-center gap-2 mt-1">
-                      <Badge variant="secondary" className="text-xs">Level {userLevel}</Badge>
-                      <Badge variant="outline" className="text-xs">{section.questions}</Badge>
-                    </div>
-                  </div>
+      {/* Completion Dialog */}
+      <Dialog open={!!completionDialog} onOpenChange={(open) => !open && setCompletionDialog(null)}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold flex items-center gap-2">
+              <Check className="w-6 h-6 text-green-600" />
+              Practice Completed!
+            </DialogTitle>
+          </DialogHeader>
+          {completionDialog && (
+            <div className="space-y-4">
+              <div className="text-center py-4">
+                <div className="text-5xl font-bold text-blue-600 mb-2">
+                  {completionDialog.score}%
                 </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-600 dark:text-gray-400 mb-4">Practice your {section.title.toLowerCase()} skills with targeted exercises designed for your current level.</p>
-                <Button
-                  onClick={() => startPractice(section)}
-                  className={`w-full bg-gradient-to-r ${section.color} hover:opacity-90 text-white shadow-lg group-hover:scale-105 transition-transform`}
-                  disabled={isLoadingExam}>
-                  <Play className="w-4 h-4 mr-2" />
-                  Start Practice
-                </Button>
-              </CardContent>
-            </Card>
-          );
-        })}
-      </div>
-    </div>
+                <p className="text-gray-600">{completionDialog.message}</p>
+              </div>
+              {completionDialog.bonusMessage && (
+                <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                  <p className="text-sm text-amber-800">{completionDialog.bonusMessage}</p>
+                </div>
+              )}
+              <Button 
+                onClick={() => setCompletionDialog(null)} 
+                className="w-full bg-green-600 hover:bg-green-700"
+              >
+                Continue
+              </Button>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
