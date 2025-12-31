@@ -10,12 +10,60 @@ import {
   ResponsiveContainer
 } from 'recharts';
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow, format } from 'date-fns';
+import { Loader2 } from 'lucide-react';
 
-const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff7300'];
+// Theme colors - easily customizable
+const CHART_COLORS = {
+  primary: '#3b82f6',    // blue-500
+  secondary: '#10b981',  // green-500
+  tertiary: '#f59e0b',   // amber-500
+  quaternary: '#ef4444'  // red-500
+};
 
-// Individual chart components remain the same
-export function VisitsChart({ data }) {
+const COLORS = [CHART_COLORS.primary, CHART_COLORS.secondary, CHART_COLORS.tertiary, CHART_COLORS.quaternary];
+
+// Utility to convert minutes to hours and minutes
+const formatMinutes = (minutes) => {
+  if (!minutes || minutes < 60) return `${Math.round(minutes)} min`;
+  const hours = Math.floor(minutes / 60);
+  const mins = Math.round(minutes % 60);
+  return mins > 0 ? `${hours}h ${mins}m` : `${hours}h`;
+};
+
+// Utility to fill missing dates with zero values
+const fillMissingDates = (data, days = 7) => {
+  if (!data || data.length === 0) return [];
+  
+  const filledData = [];
+  const today = new Date();
+  
+  for (let i = days - 1; i >= 0; i--) {
+    const date = new Date(today);
+    date.setDate(today.getDate() - i);
+    const dateKey = format(date, 'yyyy-MM-dd');
+    
+    const existingData = data.find(d => d.date === dateKey);
+    filledData.push(existingData || { date: dateKey, new: 0, returning: 0 });
+  }
+  
+  return filledData;
+};
+
+export function VisitsChart({ data, isLoading }) {
+  if (isLoading) {
+    return (
+      <Card>
+        <CardHeader><CardTitle>Daily Visits (Last 7 Days)</CardTitle></CardHeader>
+        <CardContent>
+          <div className="h-[300px] flex items-center justify-center">
+            <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   if (!data || data.length === 0) {
     return (
       <Card>
@@ -29,18 +77,26 @@ export function VisitsChart({ data }) {
     );
   }
 
+  // Fill missing dates with zeros
+  const filledData = fillMissingDates(data, 7);
+
   return (
     <Card>
       <CardHeader><CardTitle>Daily Visits (Last 7 Days)</CardTitle></CardHeader>
       <CardContent>
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={data}>
+        <ResponsiveContainer width="100%" aspect={2}>
+          <BarChart data={filledData}>
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="date" />
+            <XAxis 
+              dataKey="date" 
+              tickFormatter={(str) => format(new Date(str), 'dd.MM')}
+            />
             <YAxis />
-            <Tooltip />
-            <Bar dataKey="new" stackId="a" fill="#8884d8" name="New Visits" />
-            <Bar dataKey="returning" stackId="a" fill="#82ca9d" name="Returning Visits" />
+            <Tooltip 
+              labelFormatter={(label) => format(new Date(label), 'dd MMM yyyy')}
+            />
+            <Bar dataKey="new" stackId="a" fill={CHART_COLORS.primary} name="New Visits" />
+            <Bar dataKey="returning" stackId="a" fill={CHART_COLORS.secondary} name="Returning Visits" />
           </BarChart>
         </ResponsiveContainer>
       </CardContent>
@@ -48,7 +104,20 @@ export function VisitsChart({ data }) {
   );
 }
 
-export function EngagementDistributionChart({ data }) {
+export function EngagementDistributionChart({ data, isLoading }) {
+  if (isLoading) {
+    return (
+      <Card>
+        <CardHeader><CardTitle>Average Daily Engagement</CardTitle></CardHeader>
+        <CardContent>
+          <div className="h-[400px] flex items-center justify-center">
+            <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   if (!data || data.length === 0) {
     return (
       <Card>
@@ -71,21 +140,22 @@ export function EngagementDistributionChart({ data }) {
         </p>
       </CardHeader>
       <CardContent>
-        <ResponsiveContainer width="100%" height={400}>
+        <ResponsiveContainer width="100%" aspect={2}>
           <BarChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis 
               dataKey="date" 
               label={{ value: 'Date', position: 'insideBottom', offset: -5 }}
+              tickFormatter={(str) => format(new Date(str), 'dd.MM')}
             />
             <YAxis 
-              label={{ value: 'Average Minutes', angle: -90, position: 'insideLeft' }}
+              label={{ value: 'Average Time', angle: -90, position: 'insideLeft' }}
             />
             <Tooltip 
-              formatter={(value) => [`${value} min`, 'Avg Time']}
-              labelFormatter={(label) => `Date: ${label}`}
+              formatter={(value) => [formatMinutes(value), 'Avg. Practice Time']}
+              labelFormatter={(label) => format(new Date(label), 'dd MMM yyyy')}
             />
-            <Bar dataKey="averageMinutes" fill="#3b82f6" name="averageMinutes" />
+            <Bar dataKey="averageMinutes" fill={CHART_COLORS.primary} name="averageMinutes" />
           </BarChart>
         </ResponsiveContainer>
       </CardContent>
@@ -93,7 +163,20 @@ export function EngagementDistributionChart({ data }) {
   );
 }
 
-export function TimeSpentChart({ data, moduleStats }) {
+export function TimeSpentChart({ data, moduleStats, isLoading }) {
+  if (isLoading) {
+    return (
+      <Card>
+        <CardHeader><CardTitle>Time Analytics</CardTitle></CardHeader>
+        <CardContent>
+          <div className="h-[300px] flex items-center justify-center">
+            <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   if (!data || data.length === 0) {
     return (
       <Card>
@@ -111,13 +194,13 @@ export function TimeSpentChart({ data, moduleStats }) {
     <Card>
       <CardHeader><CardTitle>Total Time Spent by Module</CardTitle></CardHeader>
       <CardContent>
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={data}>
+        <ResponsiveContainer width="100%" aspect={2}>
+          <BarChart data={data || []}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="module" />
-            <YAxis label={{ value: 'Minutes', angle: -90, position: 'insideLeft' }} />
-            <Tooltip formatter={(value) => [`${value} minutes`, "Total Time"]} />
-            <Bar dataKey="totalMinutes" fill="#8884d8" name="Total Time" />
+            <YAxis label={{ value: 'Time', angle: -90, position: 'insideLeft' }} />
+            <Tooltip formatter={(value) => [formatMinutes(value), "Total Time"]} />
+            <Bar dataKey="totalMinutes" fill={CHART_COLORS.primary} name="Total Time" />
           </BarChart>
         </ResponsiveContainer>
         
@@ -126,9 +209,9 @@ export function TimeSpentChart({ data, moduleStats }) {
             {Object.entries(moduleStats).map(([module, stats]) => (
               <div key={module} className="text-center p-3 bg-gray-50 rounded-lg">
                 <h4 className="font-semibold capitalize">{module}</h4>
-                <p className="text-2xl font-bold text-blue-600">{stats.totalMinutes} min</p>
+                <p className="text-2xl font-bold text-blue-600">{formatMinutes(stats.totalMinutes)}</p>
                 <p className="text-xs text-gray-600">{stats.totalSessions} sessions</p>
-                <p className="text-xs text-gray-500">{stats.avgPerSession} min/session</p>
+                <p className="text-xs text-gray-500">{formatMinutes(stats.avgPerSession)}/session</p>
               </div>
             ))}
           </div>
@@ -138,7 +221,20 @@ export function TimeSpentChart({ data, moduleStats }) {
   );
 }
 
-function RecentActivity({ data }) {
+function RecentActivity({ data, isLoading }) {
+    if (isLoading) {
+        return (
+          <Card>
+            <CardHeader><CardTitle>Recent Activity</CardTitle></CardHeader>
+            <CardContent>
+              <div className="h-[300px] flex items-center justify-center">
+                <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+              </div>
+            </CardContent>
+          </Card>
+        );
+    }
+
     if (!data || data.length === 0) {
         return (
           <Card>
@@ -179,27 +275,42 @@ function RecentActivity({ data }) {
     );
 }
 
-// ** THE FIX: Create a default export that renders all the charts **
-export default function AnalyticsCharts({ chartData, moduleStats, recentActivity }) {
-    if (!chartData) {
-        return (
-          <div className="text-center py-10">
-            <p className="text-gray-500">Waiting for chart data...</p>
-          </div>
-        );
-    }
+export default function AnalyticsCharts({ 
+    chartData, 
+    moduleStats, 
+    recentActivity, 
+    isLoading = false,
+    loadingStates = {}
+}) {
+    // Individual loading states for each chart
+    const {
+        visitsLoading = isLoading,
+        engagementLoading = isLoading,
+        timeSpentLoading = isLoading,
+        activityLoading = isLoading
+    } = loadingStates;
     
     return (
         <div className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <VisitsChart data={chartData.visitsChart} />
-                <EngagementDistributionChart data={chartData.engagementDistribution} />
+                <VisitsChart 
+                    data={chartData?.visitsChart || []} 
+                    isLoading={visitsLoading}
+                />
+                <EngagementDistributionChart 
+                    data={chartData?.engagementDistribution || []} 
+                    isLoading={engagementLoading}
+                />
             </div>
-            <TimeSpentChart data={chartData.timeSpent} moduleStats={moduleStats} />
-            <RecentActivity data={recentActivity} />
+            <TimeSpentChart 
+                data={chartData?.timeSpent || []} 
+                moduleStats={moduleStats} 
+                isLoading={timeSpentLoading}
+            />
+            <RecentActivity 
+                data={recentActivity || []} 
+                isLoading={activityLoading}
+            />
         </div>
     );
 }
-
-// Other exported chart functions are kept below for modularity, no changes needed for them.
-// ... (VisitsChart, EngagementDistributionChart, etc. code is unchanged)
