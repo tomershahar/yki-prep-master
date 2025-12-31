@@ -159,14 +159,14 @@ export function EngagementDistributionChart({ data, isLoading }) {
             <XAxis 
               dataKey="date" 
               label={{ value: 'Date', position: 'insideBottom', offset: -5 }}
-              tickFormatter={(str) => format(new Date(str), 'dd.MM')}
+              tickFormatter={(str) => safeFormatDate(str, 'dd.MM')}
             />
             <YAxis 
               label={{ value: 'Average Time', angle: -90, position: 'insideLeft' }}
             />
             <Tooltip 
               formatter={(value) => [formatMinutes(value), 'Avg. Practice Time']}
-              labelFormatter={(label) => format(new Date(label), 'dd MMM yyyy')}
+              labelFormatter={(label) => safeFormatDate(label, 'dd MMM yyyy')}
             />
             <Bar dataKey="averageMinutes" fill={CHART_COLORS.primary} name="averageMinutes" />
           </BarChart>
