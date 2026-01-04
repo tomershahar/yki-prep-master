@@ -901,10 +901,10 @@ Would you like to advance to level ${newLevel}?`)) {
                       <section.icon className="w-6 h-6 text-white" />
                     </div>
                     <div>
-                      <CardTitle className="text-xl">{section.title}</CardTitle>
+                      <CardTitle className="text-xl">{String(section.title)}</CardTitle>
                       <div className="flex items-center gap-2 mt-1">
-                        <Badge variant="secondary" className="text-xs">Level {userLevel}</Badge>
-                        <Badge variant="outline" className="text-xs">{section.questions}</Badge>
+                        <Badge variant="secondary" className="text-xs">Level {String(userLevel)}</Badge>
+                        <Badge variant="outline" className="text-xs">{String(section.questions)}</Badge>
                       </div>
                     </div>
                   </div>
