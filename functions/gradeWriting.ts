@@ -1,4 +1,3 @@
-
 import { createClient } from 'npm:@base44/sdk@0.1.0';
 
 // Placeholder for callOpenAI function, assuming it interacts with an OpenAI-compatible API
@@ -17,10 +16,14 @@ const callOpenAI = async (prompt: string, responseSchema: any, timeout: number =
     };
 
     const body = JSON.stringify({
-        model: MODEL,
-        messages: [{ role: 'user', content: prompt }],
+        model: 'gpt-4o',
+        messages: [
+            { role: 'system', content: 'You are an expert YKI writing evaluator providing detailed, actionable feedback. Respond with valid JSON only.' },
+            { role: 'user', content: prompt }
+        ],
         response_format: { type: "json_object" }, 
-        temperature: 0.7,
+        temperature: 0.3,
+        max_tokens: 2000,
     });
 
     const controller = new AbortController();
