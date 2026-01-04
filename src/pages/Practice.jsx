@@ -938,9 +938,9 @@ Would you like to advance to level ${newLevel}?`)) {
             <div className="space-y-4">
               <div className="text-center py-4">
                 <div className="text-5xl font-bold text-blue-600 mb-2">
-                  {completionDialog.score}%
+                  {String(completionDialog.score)}%
                 </div>
-                <p className="text-gray-600">{String(completionDialog.message)}</p>
+                <p className="text-gray-600">{String(completionDialog.message || '')}</p>
               </div>
               {completionDialog.bonusMessage && (
                 <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
