@@ -882,10 +882,10 @@ Would you like to advance to level ${newLevel}?`)) {
           <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">Build your skills with focused, untimed practice sessions. Each practice has 4-6 questions tailored to your level.</p>
           <div className="flex items-center justify-center gap-4">
             <Badge variant="secondary" className="text-sm">Language: {String(user?.target_language === 'finnish' ? 'Finnish' : 'Swedish')}</Badge>
-            <Badge variant="outline" className="text-sm flex items-center gap-1">
-              <Clock className="w-3 h-3" />
-              Untimed Practice
-            </Badge>
+            <div className="flex items-center gap-1">
+              <Clock className="w-3 h-3 text-gray-500" />
+              <Badge variant="outline" className="text-sm">Untimed Practice</Badge>
+            </div>
           </div>
         </div>
 
@@ -929,10 +929,10 @@ Would you like to advance to level ${newLevel}?`)) {
       <Dialog open={!!completionDialog} onOpenChange={(open) => !open && setCompletionDialog(null)}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-bold flex items-center gap-2">
+            <div className="flex items-center gap-2 mb-2">
               <Check className="w-6 h-6 text-green-600" />
-              Practice Completed!
-            </DialogTitle>
+              <DialogTitle className="text-2xl font-bold">Practice Completed!</DialogTitle>
+            </div>
             <DialogDescription>
               Review your practice results below.
             </DialogDescription>
