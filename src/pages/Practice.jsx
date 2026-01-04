@@ -910,7 +910,7 @@ Would you like to advance to level ${newLevel}?`)) {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-gray-600 dark:text-gray-400 mb-4">Practice your {section.title.toLowerCase()} skills with targeted exercises designed for your current level.</p>
+                  <p className="text-gray-600 dark:text-gray-400 mb-4">Practice your {String(section.title).toLowerCase()} skills with targeted exercises designed for your current level.</p>
                   <Button
                     onClick={() => startPractice(section)}
                     className={`w-full bg-gradient-to-r ${section.color} hover:opacity-90 text-white shadow-lg group-hover:scale-105 transition-transform`}
