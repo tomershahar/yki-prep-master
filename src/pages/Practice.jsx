@@ -727,13 +727,14 @@ Would you like to advance to level ${newLevel}?`)) {
       }
 
       // Success message
-      let message = `Your score is ${sessionData.score}%.`;
+      const scoreValue = typeof sessionData.score === 'number' ? sessionData.score : 0;
+      let message = `Your score is ${scoreValue}%.`;
       const passedText = practiceId && shouldMarkAsPassed ? "This practice has been marked as completed and won't appear again." : "Keep practicing to improve your score!";
       message += ` ${passedText}`;
 
       const finalCurrentLevel = currentUser[`${sessionData.section}_level`] || 'A1';
       let bonusMessage = '';
-      if (sessionData.score >= 90) {
+      if (scoreValue >= 90) {
         const currentIndex = difficultyLevels.indexOf(finalCurrentLevel);
         if (currentIndex < difficultyLevels.length - 1) {
           bonusMessage = `Excellent! You're doing great at level ${finalCurrentLevel}. If you feel ready for a bigger challenge, you can change your level in the Settings page.`;
@@ -743,9 +744,9 @@ Would you like to advance to level ${newLevel}?`)) {
       }
 
       setCompletionDialog({
-        score: sessionData.score,
-        message,
-        bonusMessage
+        score: scoreValue,
+        message: String(message),
+        bonusMessage: String(bonusMessage)
       });
 
       setActiveExam(null);
