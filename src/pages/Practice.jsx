@@ -876,7 +876,7 @@ Would you like to advance to level ${newLevel}?`)) {
 
   return (
     <>
-      <div className="bg-lime-700 mx-auto p-4 md:p-8 max-w-7xl space-y-8">
+      <div className="mx-auto p-4 md:p-8 max-w-7xl space-y-8">
         <div className="text-center space-y-4">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Quick Practice</h1>
           <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">Build your skills with focused, untimed practice sessions. Each practice has 4-6 questions tailored to your level.</p>
