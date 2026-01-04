@@ -1,16 +1,100 @@
+
 import { createClient } from 'npm:@base44/sdk@0.1.0';
 
-const callOpenAI = async (prompt, responseSchema, timeout = 45000) => {
-// ... keep existing code (callOpenAI function) ...
+// Placeholder for callOpenAI function, assuming it interacts with an OpenAI-compatible API
+const callOpenAI = async (prompt: string, responseSchema: any, timeout: number = 45000): Promise<any> => {
+    const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
+    const OPENAI_API_URL = Deno.env.get('OPENAI_API_URL') || 'https://api.openai.com/v1/chat/completions';
+    const MODEL = Deno.env.get('OPENAI_MODEL') || 'gpt-4o-mini'; 
+
+    if (!OPENAI_API_KEY) {
+        throw new Error('OPENAI_API_KEY environment variable is not set.');
+    }
+
+    const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${OPENAI_API_KEY}`,
+    };
+
+    const body = JSON.stringify({
+        model: MODEL,
+        messages: [{ role: 'user', content: prompt }],
+        response_format: { type: "json_object" }, 
+        temperature: 0.7,
+    });
+
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), timeout);
+
+    try {
+        const response = await fetch(OPENAI_API_URL, {
+            method: 'POST',
+            headers: headers,
+            body: body,
+            signal: controller.signal,
+        });
+
+        clearTimeout(id);
+
+        if (!response.ok) {
+            const errorBody = await response.text();
+            throw new Error(`OpenAI API error: ${response.status} ${response.statusText} - ${errorBody}`);
+        }
+
+        const data = await response.json();
+        const content = data.choices[0]?.message?.content;
+
+        if (!content) {
+            throw new Error('No content received from OpenAI API.');
+        }
+
+        try {
+            return JSON.parse(content);
+        } catch (jsonError) {
+            console.error('Failed to parse AI response as JSON:', content);
+            throw new Error('AI response was not valid JSON.');
+        }
+
+    } catch (error) {
+        clearTimeout(id);
+        if (error.name === 'AbortError') {
+            throw new Error(`OpenAI API request timed out after ${timeout / 1000} seconds.`);
+        }
+        throw error;
+    }
 };
 
 Deno.serve(async (req) => {
-// ... keep existing code (CORS and initial setup) ...
+    // Set CORS headers
+    const corsHeaders = {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "POST, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization",
+    };
+
+    // Handle CORS preflight requests
+    if (req.method === "OPTIONS") {
+        return new Response(null, { status: 204, headers: corsHeaders });
+    }
 
     try {
         const base44 = createClient({ appId: Deno.env.get('BASE44_APP_ID') });
         
-// ... keep existing code (auth logic) ...
+        // Auth logic
+        // Get the Authorization header
+        const authHeader = req.headers.get("Authorization");
+        if (!authHeader) {
+            return new Response('Unauthorized', { status: 401, headers: corsHeaders });
+        }
+
+        // Extract the token (assuming "Bearer TOKEN")
+        const token = authHeader.split(" ")[1];
+        if (!token) {
+            return new Response('Unauthorized', { status: 401, headers: corsHeaders });
+        }
+
+        // Set the token in the base44 client
+        base44.auth.setToken(token);
         
         const user = await base44.auth.me();
         if (!user) {
@@ -35,7 +119,7 @@ Deno.serve(async (req) => {
 Task: "${task.prompt}"
 Student's response: "${userResponse}"
 
-Evaluate the student's response based on the task and level. Provide your feedback ONLY in the following JSON format:
+Evaluate the student's response comprehensively. Provide detailed, actionable feedback in the following JSON format:
 
 {
   "scores": {
@@ -46,8 +130,14 @@ Evaluate the student's response based on the task and level. Provide your feedba
   },
   "total_score": <4-32, sum of scores>,
   "feedback": {
-    "strengths": "Provide a concise, 1-2 sentence summary of what the student did well, focusing on positive reinforcement.",
-    "weaknesses": "Provide a concise, 1-2 sentence summary of the main areas for improvement. Then, on a new line, add a 'Focus Areas' section with a bulleted list of 2-3 specific, actionable topics the student should work on (e.g., \\n\\n**Focus Areas:**\\n- Use of conjunctions to connect ideas\\n- Review past tense verb conjugations\\n- Sentence structure variety)."
+    "strengths": "2-3 sentences highlighting what the student did well, with specific examples from their response.",
+    "weaknesses": "2-3 sentences explaining main areas for improvement with specific examples.",
+    "grammar_analysis": "Detailed analysis: identify 2-3 grammar patterns that need work (e.g., 'Incorrect verb conjugation in past tense: \\"minä menin\\" should be used instead of \\"minä meni\\"'), explain the rules, and suggest practice topics.",
+    "vocabulary_style": "Analyze word choice sophistication, suggest 3-5 better alternatives for basic words used, comment on register appropriateness (formal/informal), and recommend vocabulary themes to study.",
+    "structure_tips": "Evaluate paragraph organization, transition word usage, sentence variety. Provide 2-3 specific structural improvements.",
+    "examples": "Give 1-2 concrete examples of how to rewrite weak sentences from the response, showing before and after.",
+    "focus_areas": ["3-5 specific, prioritized learning topics with brief explanations"],
+    "study_resources": "Suggest 2-3 specific grammar topics or resources to study next (e.g., 'Review conditional sentences (jos-clauses)', 'Practice using temporal conjunctions', 'Study formal letter conventions')"
   },
   "cefr_level": "<A1/A2/B1/B2, estimate the CEFR level of the response>"
 }`;
