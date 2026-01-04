@@ -881,7 +881,7 @@ Would you like to advance to level ${newLevel}?`)) {
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Quick Practice</h1>
           <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">Build your skills with focused, untimed practice sessions. Each practice has 4-6 questions tailored to your level.</p>
           <div className="flex items-center justify-center gap-4">
-            <Badge variant="secondary" className="text-sm">Language: {user?.target_language === 'finnish' ? 'Finnish' : 'Swedish'}</Badge>
+            <Badge variant="secondary" className="text-sm">Language: {String(user?.target_language === 'finnish' ? 'Finnish' : 'Swedish')}</Badge>
             <Badge variant="outline" className="text-sm flex items-center gap-1">
               <Clock className="w-3 h-3" />
               Untimed Practice
