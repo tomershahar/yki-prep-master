@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -913,7 +912,7 @@ Provide specific feedback and estimate CEFR level.`,
                                         )}
                                         <div className="p-3 bg-blue-50 border border-blue-200 rounded">
                                             <p className="text-blue-800 font-medium">Explanation:</p>
-                                            <p className="text-blue-700 text-sm mt-1"><InlineTranslator sourceLanguage={exam.language}>{question.explanation}</InlineTranslator></p>
+                                            <p className="text-blue-700 text-sm mt-1"><InlineTranslator sourceLanguage={exam.language}>{String(question.explanation || 'No explanation available')}</InlineTranslator></p>
                                         </div>
                                         {question.text_reference && (
                                             <div className="p-3 bg-amber-50 border border-amber-200 rounded">
@@ -957,7 +956,7 @@ Provide specific feedback and estimate CEFR level.`,
                                 Show example answer
                             </summary>
                             <div className="mt-3 text-gray-800 text-sm">
-                                <ReactMarkdown><InlineTranslator sourceLanguage={exam.language}>{task.sample_answer}</InlineTranslator></ReactMarkdown>
+                               <ReactMarkdown>{String(task.sample_answer || '')}</ReactMarkdown>
                                 {task.comments && (
                                     <p className="text-xs text-gray-600 mt-2">
                                         <strong>Assessment:</strong> <InlineTranslator sourceLanguage={exam.language}>{task.comments}</InlineTranslator>
