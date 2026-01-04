@@ -944,7 +944,7 @@ Would you like to advance to level ${newLevel}?`)) {
               </div>
               {completionDialog.bonusMessage && (
                 <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
-                  <p className="text-sm text-amber-800">{String(completionDialog.bonusMessage)}</p>
+                  <p className="text-sm text-amber-800">{String(completionDialog.bonusMessage || '')}</p>
                 </div>
               )}
               <Button 
