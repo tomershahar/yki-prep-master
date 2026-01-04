@@ -933,18 +933,23 @@ Would you like to advance to level ${newLevel}?`)) {
               <Check className="w-6 h-6 text-green-600" />
               Practice Completed!
             </DialogTitle>
+            <DialogDescription>
+              Review your practice results below.
+            </DialogDescription>
           </DialogHeader>
           {completionDialog && (
             <div className="space-y-4">
               <div className="text-center py-4">
                 <div className="text-5xl font-bold text-blue-600 mb-2">
-                  {String(completionDialog.score)}%
+                  {typeof completionDialog.score === 'number' ? completionDialog.score : 0}%
                 </div>
-                <p className="text-gray-600">{String(completionDialog.message || '')}</p>
+                <p className="text-gray-600">
+                  {typeof completionDialog.message === 'string' ? completionDialog.message : 'Practice completed!'}
+                </p>
               </div>
-              {completionDialog.bonusMessage && (
+              {completionDialog.bonusMessage && typeof completionDialog.bonusMessage === 'string' && (
                 <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
-                  <p className="text-sm text-amber-800">{String(completionDialog.bonusMessage || '')}</p>
+                  <p className="text-sm text-amber-800">{completionDialog.bonusMessage}</p>
                 </div>
               )}
               <Button 
