@@ -27,6 +27,13 @@ export default function ChangelogPage() {
     // Recent improvements from the last 2 weeks
     const recentImprovements = [
         {
+            date: 'January 4, 2026',
+            type: 'improvement',
+            title: 'Upgraded Writing AI Agent',
+            description: 'Enhanced the Writing AI Agent with more accurate feedback, better grammar analysis, and improved CEFR level assessment. The agent now provides more detailed and actionable suggestions to help you improve your writing skills.',
+            icon: Sparkles
+        },
+        {
             date: 'December 31, 2025',
             type: 'improvement',
             title: 'Analytics Dashboard Enhancements',
