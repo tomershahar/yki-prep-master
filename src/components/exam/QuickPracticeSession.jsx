@@ -16,7 +16,8 @@ import ExamSummary from './ExamSummary';
 import AudioPlayer from './AudioPlayer';
 import { transcribeAudio } from '@/functions/transcribeAudio';
 import InlineTranslator from '../shared/InlineTranslator';
-import { gradeSpeaking } from "@/functions/gradeSpeaking"; // Import the new backend function
+import { gradeSpeaking } from "@/functions/gradeSpeaking";
+import { gradeWriting } from "@/functions/gradeWriting";
 
 // Speaking Task Component
 const SpeakingTask = ({ task, taskIndex, onAnswerSubmit, isSubmitting, language, difficulty }) => {
@@ -278,6 +279,7 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
     const [scoreData, setScoreData] = useState(null);
     const [isGrading, setIsGrading] = useState(false);
     const [aiFeedback, setAiFeedback] = useState({});
+    const [writingWeakSpots, setWritingWeakSpots] = useState(null);
 
     // Effect for initial exam content loading
     useEffect(() => {
@@ -290,7 +292,12 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
                 setExamContent(null);
             }
         }
-    }, [exam]);
+        
+        // Load weak spots for writing
+        if (section.id === 'writing' && exam.weak_spots) {
+            setWritingWeakSpots(exam.weak_spots);
+        }
+    }, [exam, section.id]);
 
     // Effect for iOS Chrome microphone warning
     useEffect(() => {
@@ -335,58 +342,37 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
     };
 
     const gradeWritingWithAI = async (task, userAnswer, difficulty, chosenPrompt) => {
-        const knowledgeFiles = await KnowledgeBaseContent.list();
-        const fileUrls = knowledgeFiles.map(file => file.file_url);
-
         try {
-            // Add timeout wrapper
-            const timeoutPromise = new Promise((_, reject) => {
-                setTimeout(() => reject(new Error('AI grading timeout (60s)')), 60000);
+            console.log('Calling backend writing grading function...');
+            const response = await gradeWriting({
+                task,
+                userResponse: userAnswer,
+                difficulty,
+                language: exam.language,
+                weakSpots: writingWeakSpots?.weakSpots || []
             });
 
-            const gradingPromise = InvokeLLM({
-                prompt: `You are evaluating a YKI ${exam.language === 'finnish' ? 'Finnish' : 'Swedish'} writing task at level ${difficulty}.
+            console.log('Raw backend response:', response);
 
-Task prompt: "${chosenPrompt || task.prompt}"
-Student's response: "${userAnswer}"
-
-Evaluate this response on a scale of 1-8 for each criterion:
-- Communicative ability (task completion)
-- Coherence and cohesion
-- Vocabulary and expressions
-- Grammar
-
-Provide specific feedback and estimate CEFR level.`,
-                file_urls: fileUrls,
-                response_json_schema: {
-                    type: "object",
-                    properties: {
-                        scores: {
-                            type: "object",
-                            properties: {
-                                communicative_ability: { type: "number", minimum: 1, maximum: 8 },
-                                coherence: { type: "number", minimum: 1, maximum: 8 },
-                                vocabulary: { type: "number", minimum: 1, maximum: 8 },
-                                grammar: { type: "number", minimum: 1, maximum: 8 }
-                            },
-                            required: ["communicative_ability", "coherence", "vocabulary", "grammar"]
-                        },
-                        total_score: { type: "number", minimum: 4, maximum: 32 },
-                        feedback: {
-                            type: "object",
-                            properties: {
-                                strengths: { type: "string" },
-                                weaknesses: { type: "string" }
-                            },
-                            required: ["strengths", "weaknesses"]
-                        },
-                        cefr_level: { type: "string" }
-                    },
-                    required: ["scores", "total_score", "feedback", "cefr_level"]
+            let result;
+            if (response && response.data) {
+                if (response.error) {
+                    throw new Error(response.error.message || 'Backend grading failed');
                 }
-            });
+                result = response.data;
+            } else if (response && response.scores) {
+                result = response;
+            } else {
+                throw new Error('Invalid response format from backend');
+            }
 
-            const result = await Promise.race([gradingPromise, timeoutPromise]);
+            // Validate the result structure
+            if (!result.scores || typeof result.total_score !== 'number' || !result.feedback || typeof result.cefr_level !== 'string') {
+                console.error('Invalid result structure received:', result);
+                throw new Error('Backend returned invalid grading structure');
+            }
+
+            console.log('Backend writing grading completed successfully:', result);
             return result;
         } catch (error) {
             console.error("Writing grading error:", error);

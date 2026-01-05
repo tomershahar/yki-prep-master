@@ -104,7 +104,7 @@ Deno.serve(async (req) => {
             return new Response('Unauthorized', { status: 401, headers: corsHeaders });
         }
 
-        const { task, userResponse, difficulty, language } = await req.json();
+        const { task, userResponse, difficulty, language, weakSpots } = await req.json();
         
         if (!task || !userResponse || !difficulty || !language) {
             return new Response(JSON.stringify({ 
@@ -117,10 +117,19 @@ Deno.serve(async (req) => {
 
         const languageName = language === 'finnish' ? 'Finnish' : 'Swedish';
         
+        // Build weak spots context
+        let weakSpotsContext = '';
+        if (weakSpots && weakSpots.length > 0) {
+            weakSpotsContext = `\n\nIMPORTANT - Known weak areas for this student based on past performance:
+${weakSpots.map(ws => `- ${ws.description} (occurred in ${ws.occurrences} recent sessions)`).join('\n')}
+
+Pay special attention to these areas when evaluating. Check if the student is making progress or still struggling with these issues.`;
+        }
+        
         const prompt = `You are an expert YKI ${languageName} writing evaluator at the ${difficulty} CEFR level.
 
 Task: "${task.prompt}"
-Student's response: "${userResponse}"
+Student's response: "${userResponse}"${weakSpotsContext}
 
 Evaluate the student's response comprehensively. Provide detailed, actionable feedback in the following JSON format:
 

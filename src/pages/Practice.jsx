@@ -14,6 +14,7 @@ import QuickPracticeSession from "../components/exam/QuickPracticeSession";
 import { staticContent } from "../components/exam/StaticPracticeContent";
 import AIGrammarTips from "../components/practice/AIGrammarTips";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { getWritingWeakSpots } from '@/functions/getWritingWeakSpots';
 
 const difficultyLevels = ["A1", "A2", "B1", "B2"];
 
@@ -66,12 +67,23 @@ export default function Practice() {
   ];
 
 
-  const getAIPrompt = (section, language, difficulty) => {
+  const getAIPrompt = (section, language, difficulty, weakSpotsData = null) => {
     const languageName = language === 'finnish' ? 'Finnish' : 'Swedish';
+
+    // Build weak spots context for writing
+    let weakSpotsContext = '';
+    if (section.id === 'writing' && weakSpotsData && weakSpotsData.weakSpots && weakSpotsData.weakSpots.length > 0) {
+      weakSpotsContext = `\n\n**IMPORTANT - Target Student's Weak Areas:**
+This student has shown recurring difficulties in:
+${weakSpotsData.weakSpots.map(ws => `- ${ws.description}`).join('\n')}
+${weakSpotsData.specificIssues && weakSpotsData.specificIssues.length > 0 ? `\nSpecific issues: ${weakSpotsData.specificIssues.join(', ')}` : ''}
+
+**Create prompts that will naturally require the student to use these challenging areas.** For example, if they struggle with past tense, create a prompt about describing a past event. If they have vocabulary issues, create a prompt requiring specific vocabulary domains they've struggled with.`;
+    }
 
     const baseSystemInstruction = `You are a YKI Practice Generator. Your task is to generate high-quality practice content for CEFR level ${difficulty} in ${languageName}. Ensure all content is culturally relevant, natural, and grammatically correct. Respond in the specified JSON format.
 
-**Use the provided Knowledge Base documents, especially any file defining CEFR levels, as your primary source of truth for level-specific requirements.**`;
+**Use the provided Knowledge Base documents, especially any file defining CEFR levels, as your primary source of truth for level-specific requirements.**${weakSpotsContext}`;
 
     switch (section.id) {
       case 'reading':
@@ -223,8 +235,21 @@ INSTRUCTIONS:
       const knowledgeFiles = await KnowledgeBaseContent.list();
       const fileUrls = knowledgeFiles.map((file) => file.file_url);
 
+      // Fetch writing weak spots if this is a writing practice
+      let weakSpotsData = null;
+      if (section.id === 'writing') {
+        try {
+          const { data } = await getWritingWeakSpots();
+          if (data && data.weakSpots) {
+            weakSpotsData = data;
+          }
+        } catch (error) {
+          console.log('Could not fetch weak spots, continuing without:', error);
+        }
+      }
+
       // OPTIMIZED PROMPT - shorter and more focused
-      const prompt = getAIPrompt(section, language, difficulty);
+      const prompt = getAIPrompt(section, language, difficulty, weakSpotsData);
 
       let responseSchema;
       if (section.id === 'reading') {
@@ -455,7 +480,8 @@ INSTRUCTIONS:
             content: JSON.stringify(generatedContent),
             is_practice: true,
             source: 'ai',
-            practiceId: null
+            practiceId: null,
+            weak_spots: weakSpotsData || null
           });
           setPracticeReady(true);
         } else {
