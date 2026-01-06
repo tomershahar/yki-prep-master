@@ -437,6 +437,7 @@ INSTRUCTIONS:
       let currentUser = await User.me();
       const language = currentUser.target_language;
       const difficulty = currentUser[`${section.id}_level`] || 'A1';
+      let weakSpotsData = null; // Define here for all sections
 
       // Add loading timeout alert for speaking
       let timeoutAlert = null;
@@ -444,6 +445,18 @@ INSTRUCTIONS:
         timeoutAlert = setTimeout(() => {
           console.log("Speaking practice is taking longer than expected, still generating...");
         }, 20000); // Show message after 20 seconds
+      }
+
+      // Fetch weak spots for writing section
+      if (section.id === 'writing') {
+        try {
+          const { data } = await getWritingWeakSpots();
+          if (data && data.weakSpots) {
+            weakSpotsData = data;
+          }
+        } catch (error) {
+          console.log('Could not fetch weak spots for writing, continuing without:', error);
+        }
       }
 
       try {
