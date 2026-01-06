@@ -493,7 +493,13 @@ INSTRUCTIONS:
 
         alert("We couldn't generate a unique AI practice for you at this moment. Don't worry, here is a pre-made practice session instead!");
 
-        const staticPractice = getStaticPractice(section, language, difficulty, currentUser.passed_practices || []);
+        let staticPractice = getStaticPractice(section, language, difficulty, currentUser.passed_practices || []);
+
+        // If no static practice available (all completed), try without filtering by passed practices
+        if (!staticPractice) {
+          console.log("No unpassed static practices found, trying to reuse completed ones...");
+          staticPractice = getStaticPractice(section, language, difficulty, []);
+        }
 
         if (staticPractice) {
           console.log("Successfully fell back to static practice:", staticPractice.practiceId);
@@ -525,7 +531,8 @@ INSTRUCTIONS:
           setPracticeReady(true);
         } else {
           console.error("Fallback to static practice also failed (no content available).");
-          alert("Sorry, we couldn't prepare a practice session for you, not even a pre-made one. Please try again later.");
+          const errorDetails = `\n\nDetails:\n- Section: ${section.id}\n- Language: ${language}\n- Level: ${difficulty}\n\nPlease try:\n1. Refreshing the page\n2. Trying a different practice section\n3. Checking your internet connection\n4. Contacting support if this persists`;
+          alert(`Sorry, we couldn't prepare a practice session for you.${errorDetails}`);
           setActiveSection(null);
           setIsLoadingExam(false);
         }
