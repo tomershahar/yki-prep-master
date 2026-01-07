@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -40,7 +39,8 @@ export default function Layout({ children, currentPageName }) {
 
   useEffect(() => {
     loadUser();
-  }, []);
+    updateSEOTags(currentPageName);
+  }, [currentPageName]);
 
   const loadUser = async () => {
     try {
@@ -56,6 +56,40 @@ export default function Layout({ children, currentPageName }) {
     } catch (error) {
       // User not logged in or error occurred
     }
+  };
+
+  const updateSEOTags = (pageName) => {
+    const pageTitles = {
+      Dashboard: "Dashboard - YKI Prep Master",
+      Practice: "Quick Practice - YKI Exam Preparation",
+      FullExam: "Full Exam Simulation - YKI Prep Master",
+      History: "Practice History - YKI Prep Master",
+      Achievements: "Achievements - YKI Prep Master",
+      WordBank: "Word Bank - YKI Prep Master",
+      Settings: "Settings - YKI Prep Master",
+      Landing: "YKI Prep Master - Finnish & Swedish Exam Preparation"
+    };
+
+    const pageDescriptions = {
+      Dashboard: "Track your YKI exam preparation progress with personalized insights and recommendations.",
+      Practice: "Practice YKI exam questions for reading, listening, speaking, and writing with AI feedback.",
+      FullExam: "Take a complete YKI practice exam under realistic conditions.",
+      History: "Review your past YKI practice sessions and track improvement over time.",
+      Achievements: "See your earned achievements and milestones in YKI exam preparation.",
+      WordBank: "Build your Finnish/Swedish vocabulary with personalized word lists.",
+      Settings: "Customize your YKI exam preparation settings and preferences.",
+      Landing: "Ace your YKI Finnish or Swedish exam with AI-powered practice and instant feedback."
+    };
+
+    document.title = pageTitles[pageName] || "YKI Prep Master - Finnish & Swedish Exam Preparation";
+    
+    let metaDescription = document.querySelector('meta[name="description"]');
+    if (!metaDescription) {
+      metaDescription = document.createElement('meta');
+      metaDescription.name = 'description';
+      document.head.appendChild(metaDescription);
+    }
+    metaDescription.content = pageDescriptions[pageName] || "Master the YKI Finnish or Swedish language exam with personalized AI practice.";
   };
 
   const navigationItems = [

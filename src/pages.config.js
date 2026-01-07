@@ -17,6 +17,7 @@ import Practice from './pages/Practice';
 import Settings from './pages/Settings';
 import TestBetaReset from './pages/TestBetaReset';
 import WordBank from './pages/WordBank';
+import Landing from './pages/Landing';
 import __Layout from './Layout.jsx';
 
 
@@ -40,6 +41,7 @@ export const PAGES = {
     "Settings": Settings,
     "TestBetaReset": TestBetaReset,
     "WordBank": WordBank,
+    "Landing": Landing,
 }
 
 export const pagesConfig = {
