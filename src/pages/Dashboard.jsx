@@ -229,7 +229,7 @@ export default function Dashboard() {
     }
   }, []); // No external dependencies that change across renders, localStorage is stable.
 
-  const loadDashboardData = useCallback(async () => {
+  const fetchDashboardData = useCallback(async (isInitialLoad = false) => {
     try {
       const currentUser = await User.me();
       
@@ -237,14 +237,17 @@ export default function Dashboard() {
         throw new Error('No user found');
       }
       
-      if (!currentUser.has_agreed_to_beta_terms) {
-        navigate(createPageUrl("BetaDisclaimer"));
-        return;
-      }
-      
-      if (!currentUser.has_completed_onboarding) {
-        navigate(createPageUrl("Onboarding"));
-        return;
+      // Only check redirects on initial load
+      if (isInitialLoad) {
+        if (!currentUser.has_agreed_to_beta_terms) {
+          navigate(createPageUrl("BetaDisclaimer"));
+          return;
+        }
+        
+        if (!currentUser.has_completed_onboarding) {
+          navigate(createPageUrl("Onboarding"));
+          return;
+        }
       }
 
       setUser(currentUser);
@@ -256,21 +259,27 @@ export default function Dashboard() {
       );
       setRecentSessions(sessions || []);
       
-      const allAchievements = await Achievement.list();
-      setAchievements(allAchievements || []);
+      // Only fetch achievements on initial load
+      if (isInitialLoad) {
+        const allAchievements = await Achievement.list();
+        setAchievements(allAchievements || []);
+      }
       
       calculateSectionProgress(sessions || [], currentUser);
       calculateStreak(sessions || []);
       calculateMinutesToday(sessions || []);
     } catch (err) {
       console.error("Error loading dashboard data:", err);
-      setError('Failed to load dashboard data: ' + err.message);
+      if (isInitialLoad) {
+        setError('Failed to load dashboard data: ' + err.message);
+      }
     } finally {
-      setIsLoading(false);
+      if (isInitialLoad) {
+        setIsLoading(false);
+      }
     }
   }, [
     navigate, 
-    createPageUrl, 
     setUser, 
     setRecentSessions, 
     setAchievements, 
@@ -281,31 +290,8 @@ export default function Dashboard() {
     calculateMinutesToday
   ]);
 
-  const refreshDashboard = useCallback(async () => {
-    try {
-      const currentUser = await User.me();
-      setUser(currentUser);
-      
-      const sessions = await PracticeSession.filter(
-        { created_by: currentUser.email },
-        '-created_date',
-        365
-      );
-      setRecentSessions(sessions || []);
-      
-      calculateSectionProgress(sessions || [], currentUser);
-      calculateStreak(sessions || []);
-      calculateMinutesToday(sessions || []);
-    } catch (error) {
-      console.error("Error refreshing dashboard:", error);
-    }
-  }, [
-    setUser, 
-    setRecentSessions, 
-    calculateSectionProgress, 
-    calculateStreak, 
-    calculateMinutesToday
-  ]);
+  const loadDashboardData = useCallback(() => fetchDashboardData(true), [fetchDashboardData]);
+  const refreshDashboard = useCallback(() => fetchDashboardData(false), [fetchDashboardData]);
 
   useEffect(() => {
     loadDashboardData();

@@ -11,13 +11,13 @@ import Flashcards from './pages/Flashcards';
 import FullExam from './pages/FullExam';
 import History from './pages/History';
 import KnowledgeBase from './pages/KnowledgeBase';
+import Landing from './pages/Landing';
 import ModelEvaluation from './pages/ModelEvaluation';
 import Onboarding from './pages/Onboarding';
 import Practice from './pages/Practice';
 import Settings from './pages/Settings';
 import TestBetaReset from './pages/TestBetaReset';
 import WordBank from './pages/WordBank';
-import Landing from './pages/Landing';
 import __Layout from './Layout.jsx';
 
 
@@ -35,13 +35,13 @@ export const PAGES = {
     "FullExam": FullExam,
     "History": History,
     "KnowledgeBase": KnowledgeBase,
+    "Landing": Landing,
     "ModelEvaluation": ModelEvaluation,
     "Onboarding": Onboarding,
     "Practice": Practice,
     "Settings": Settings,
     "TestBetaReset": TestBetaReset,
     "WordBank": WordBank,
-    "Landing": Landing,
 }
 
 export const pagesConfig = {
