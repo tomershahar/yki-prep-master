@@ -1,4 +1,4 @@
-mport { defineConfig, devices } from '@playwright/test';
+import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
   // Tell Playwright to look in your "test" folder
