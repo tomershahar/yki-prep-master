@@ -81,27 +81,14 @@ Deno.serve(async (req) => {
     }
 
     try {
-        const base44 = createClient({ appId: Deno.env.get('BASE44_APP_ID') });
-        
-        // Auth logic
-        // Get the Authorization header
-        const authHeader = req.headers.get("Authorization");
-        if (!authHeader) {
-            return new Response('Unauthorized', { status: 401, headers: corsHeaders });
-        }
-
-        // Extract the token (assuming "Bearer TOKEN")
-        const token = authHeader.split(" ")[1];
-        if (!token) {
-            return new Response('Unauthorized', { status: 401, headers: corsHeaders });
-        }
-
-        // Set the token in the base44 client
-        base44.auth.setToken(token);
-        
+        const base44 = createClientFromRequest(req);
         const user = await base44.auth.me();
+        
         if (!user) {
-            return new Response('Unauthorized', { status: 401, headers: corsHeaders });
+            return new Response(JSON.stringify({ error: 'Unauthorized' }), { 
+                status: 401, 
+                headers: { "Content-Type": "application/json", ...corsHeaders }
+            });
         }
 
         const { task, userResponse, difficulty, language, weakSpots } = await req.json();
