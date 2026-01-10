@@ -1,4 +1,4 @@
-import { createClient } from 'npm:@base44/sdk@0.1.0';
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.6';
 
 // Placeholder for callOpenAI function, assuming it interacts with an OpenAI-compatible API
 const callOpenAI = async (prompt: string, responseSchema: any, timeout: number = 45000): Promise<any> => {

@@ -93,7 +93,19 @@ TASK: Create a complete reading comprehension exercise for level ${difficulty} i
 
 INSTRUCTIONS:
 1. Generate a short reading text ENTIRELY in ${languageName}.
-   - Topic must be culturally relevant for adult learners in Finland/Sweden (e.g., daily routines, work, public services, culture).
+   - Topic must be culturally relevant for adult learners in Finland/Sweden
+   - USE DIVERSE TOPICS: Choose from various themes such as:
+     * Work & Career (job applications, workplace situations, professional emails)
+     * Daily Life (shopping, transportation, housing, health services)
+     * Education & Learning (school systems, courses, studying abroad)
+     * Culture & Society (festivals, traditions, social customs, history)
+     * Nature & Environment (seasons, outdoor activities, sustainability)
+     * Technology & Media (social media, digital services, online communication)
+     * Food & Dining (restaurants, recipes, food culture)
+     * Travel & Tourism (hotels, attractions, travel planning)
+     * Government & Public Services (immigration, healthcare, civic duties)
+     * Hobbies & Leisure (sports, arts, entertainment, social activities)
+   - AVOID repeating the same topic - vary themes to keep practice interesting
 
 2. Match the CEFR level expectations **exactly**:
    - A1: 100–120 words. Very simple vocabulary. Basic sentence structures.
@@ -126,7 +138,16 @@ TASK: Create a complete listening comprehension exercise for level ${difficulty}
 
 INSTRUCTIONS:
 1. Generate a short audio script (150-200 words max) for a single speaker ENTIRELY in ${languageName}.
-   - Choose a realistic scenario: News Report, Personal Story, Narrative, or Announcement.
+   - USE VARIED REALISTIC SCENARIOS from diverse contexts:
+     * News Reports (local events, weather, cultural news, sports updates)
+     * Personal Stories (travel experiences, life events, memories, achievements)
+     * Announcements (public transport, store/museum announcements, event notices)
+     * Phone Messages (voicemails about appointments, invitations, updates)
+     * Podcast Excerpts (language tips, cultural insights, lifestyle topics)
+     * Instructions (how-to guides, recipe directions, assembly steps)
+     * Interviews (brief Q&A about hobbies, work, experiences)
+     * Advertisements (services, products, events in Finland/Sweden)
+   - VARY THE CONTEXT: Don't repeat the same scenario type - keep content fresh and engaging
 
 2. Match the CEFR level expectations **exactly** for spoken language.
 
@@ -155,9 +176,18 @@ INSTRUCTIONS:
 TASK: Create a complete writing exercise with two distinct tasks for level ${difficulty} in ${languageName}.
 
 INSTRUCTIONS:
-1. Generate two writing tasks:
-   - Task 1: An Informal Message (e.g., email to a friend).
-   - Task 2: A Formal Message or Opinion Piece (e.g., official email, short essay).
+1. Generate two writing tasks with VARIED TOPICS AND CONTEXTS:
+   - Task 1: An Informal Message - choose from diverse scenarios:
+     * Email to friend about: weekend plans, travel, new hobby, restaurant recommendation
+     * Text message: inviting someone, canceling plans, sharing news, asking advice
+     * Social media post: event recap, photo description, personal achievement
+     * Note: thank you message, birthday wishes, apology, congratulations
+   - Task 2: A Formal Message or Opinion Piece - vary the purpose:
+     * Official emails: complaint to service, job inquiry, course registration, appointment request
+     * Letters: application letter, recommendation request, inquiry to authority
+     * Opinion pieces: essay on education, environment, technology, work-life balance
+     * Formal reports: incident report, feedback form, proposal summary
+   - SELECT DIFFERENT THEMES: work, education, health, environment, culture, technology, community
 
 2. Match the CEFR level expectations **exactly** for prompts and word counts:
    - A1: 30-50 words per task.
@@ -193,9 +223,20 @@ INSTRUCTIONS:
 TASK: Create a complete speaking exercise with two distinct tasks for level ${difficulty} in ${languageName}.
 
 INSTRUCTIONS:
-1. Generate two speaking tasks:
-   - Task 1: A Simple Situational Response (target ~30 seconds).
-   - Task 2: A Short Monologue or Description (target 1-2 minutes).
+1. Generate two speaking tasks with DIVERSE PROMPTS AND CONTEXTS:
+   - Task 1: A Situational Response (~30 seconds) - vary scenarios:
+     * Introduce yourself at: job interview, language course, social event, volunteer group
+     * Give directions to: tourist, new neighbor, delivery person, visitor
+     * Make a phone call: book appointment, order food, ask about service, cancel reservation
+     * Respond to invitation: accept/decline party invite, suggest alternative, ask details
+     * Handle situation: return item to store, ask for help, explain problem, make complaint
+   - Task 2: A Monologue/Description (1-2 minutes) - varied themes:
+     * Describe: favorite place, memorable trip, daily routine, hometown, dream home
+     * Narrate: learning experience, funny story, childhood memory, achievement
+     * Explain: hobby, tradition, recipe, job responsibilities, future plans
+     * Compare: two cities, past vs present, seasons, education systems
+     * Give opinion on: technology, environment, work culture, social media, education
+   - USE FRESH TOPICS: Avoid repetition - select from work, family, travel, hobbies, culture, education, environment
 
 2. Match the CEFR level expectations **exactly** for prompts:
    - A1: Simple personal questions.
