@@ -130,7 +130,7 @@ export default function ExamSummary({ section, examContent, answers, scoreData, 
         return (
             <div className="text-center mb-8 space-y-4">
                 <div className="flex justify-center">
-                    <YKIScoreBadge score={scoreData?.score ?? 0} showDetails={true} />
+                    <YKIScoreBadge score={scoreData?.score ?? 0} showDetails={true} practiceDifficulty={practiceDifficulty} />
                 </div>
                 <p className="text-lg font-medium text-gray-700">{scoreMessage}</p>
                 {section.id !== 'writing' && section.id !== 'speaking' && (
@@ -141,13 +141,16 @@ export default function ExamSummary({ section, examContent, answers, scoreData, 
         );
     };
 
+    // Get practice difficulty from examContent
+    const practiceDifficulty = examContent?.difficulty || 'A1';
+
     return (
         <div className="max-w-4xl mx-auto p-4 md:p-8 bg-gray-50 rounded-lg shadow-inner">
             <Card className="border-0 shadow-xl">
                 <CardHeader className="text-center bg-gradient-to-br from-blue-500 to-indigo-600 text-white p-8 rounded-t-lg">
                     <Award className="w-16 h-16 mx-auto mb-4 text-amber-300" />
                     <CardTitle className="text-3xl font-bold">Practice Complete!</CardTitle>
-                    <CardDescription className="text-blue-100 text-lg">{section.title}</CardDescription>
+                    <CardDescription className="text-blue-100 text-lg">{section.title} - Level {practiceDifficulty}</CardDescription>
                 </CardHeader>
                 <CardContent className="p-6 md:p-8">
                     {renderScoreSection()}
