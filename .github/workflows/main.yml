@@ -11,9 +11,9 @@ jobs:
     
     # 🔴 THIS IS THE CRITICAL FIX 🔴
     # This tells GitHub to "cd" into your folder before doing anything
-    defaults:
-      run:
-        working-directory: ./yki-prep-master
+    #defaults:
+     # run:
+#        working-directory: ./yki-prep-master
 
     steps:
     - uses: actions/checkout@v4
