@@ -14,7 +14,8 @@ jobs:
     #defaults:
      # run:
 #        working-directory: ./yki-prep-master
-
+    env:
+      BASE44_LEGACY_SDK_IMPORTS: 'true'
     steps:
     - uses: actions/checkout@v4
     
