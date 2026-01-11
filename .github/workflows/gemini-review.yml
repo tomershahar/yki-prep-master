@@ -1,0 +1,30 @@
+name: Gemini YKI Code Review
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Gemini AI Review
+        uses: google-github-actions/run-gemini-cli@v1
+        with:
+          gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
+          # This is the "prompt" that tells Gemini what to look for
+          prompt: |
+            You are a Senior Developer and YKI Exam expert. 
+            Review the latest changes in this YKI simulator app.
+            Check for:
+            1. Logic errors in exam scoring or timers.
+            2. Proper handling of Finnish characters (ä, ö).
+            3. Ensure the code follows clean architecture.
+            Please provide the review in a concise list.
