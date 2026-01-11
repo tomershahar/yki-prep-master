@@ -21,10 +21,7 @@ jobs:
           gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
           # This is the "prompt" that tells Gemini what to look for
           prompt: |
-            You are a Senior Developer and YKI Exam expert. 
-            Review the latest changes in this YKI simulator app.
-            Check for:
-            1. Logic errors in exam scoring or timers.
-            2. Proper handling of Finnish characters (ä, ö).
-            3. Ensure the code follows clean architecture.
-            Please provide the review in a concise list.
+            Review these changes using the standards defined in GEMINI.md.
+            Focus on logic, Finnish language accuracy, and YKI exam rules.
+            Provide your review as a concise list.
+            
