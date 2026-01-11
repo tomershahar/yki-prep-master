@@ -1,55 +1,51 @@
 /**
- * YKI Official Scoring System (Levels 1-6)
+ * YKI Practice Level Assessment
+ * Returns the CEFR level demonstrated by the score within the practice difficulty
  * 
- * Level 1: Below A2 (0-40%)
- * Level 2: A2 (41-55%)
- * Level 3: B1.1 (56-70%)
- * Level 4: B1.2 (71-82%)
- * Level 5: B2 (83-92%)
- * Level 6: Above B2/C1 (93-100%)
+ * This assesses mastery WITHIN the current level:
+ * - 0-49%: Below current level
+ * - 50-74%: At current level (basic)
+ * - 75-89%: At current level (proficient)
+ * - 90-100%: At current level (mastery)
  */
 
-export const scoreToYKILevel = (score) => {
-    if (score <= 40) return 1;
-    if (score <= 55) return 2;
-    if (score <= 70) return 3;
-    if (score <= 82) return 4;
-    if (score <= 92) return 5;
-    return 6;
+export const scoreToYKILevel = (score, practiceDifficulty = 'A1') => {
+    // Map practice difficulty to base CEFR levels
+    const difficultyMap = {
+        'A1': 'A1',
+        'A2': 'A2', 
+        'B1': 'B1',
+        'B2': 'B2'
+    };
+    
+    const currentLevel = difficultyMap[practiceDifficulty] || 'A1';
+    
+    // Return the current level they're practicing at - 
+    // high scores mean mastery of THAT level, not promotion to next level
+    if (score < 50) return `Below ${currentLevel}`;
+    if (score < 75) return `${currentLevel} (Basic)`;
+    if (score < 90) return `${currentLevel} (Proficient)`;
+    return `${currentLevel} (Mastery)`;
 };
 
 export const ykiLevelToCEFR = (level) => {
-    const mapping = {
-        1: 'Below A2',
-        2: 'A2',
-        3: 'B1.1',
-        4: 'B1.2',
-        5: 'B2',
-        6: 'C1'
-    };
-    return mapping[level] || 'Unknown';
+    // Level is now a string like "A2 (Mastery)" so just return it
+    return level;
 };
 
 export const getYKILevelColor = (level) => {
-    const colors = {
-        1: 'text-red-600 bg-red-50 border-red-200',
-        2: 'text-orange-600 bg-orange-50 border-orange-200',
-        3: 'text-yellow-600 bg-yellow-50 border-yellow-200',
-        4: 'text-blue-600 bg-blue-50 border-blue-200',
-        5: 'text-green-600 bg-green-50 border-green-200',
-        6: 'text-purple-600 bg-purple-50 border-purple-200'
-    };
-    return colors[level] || 'text-gray-600 bg-gray-50 border-gray-200';
+    // Extract base level from string like "A2 (Mastery)"
+    if (level.includes('Below')) return 'text-red-600 bg-red-50 border-red-200';
+    if (level.includes('Basic')) return 'text-orange-600 bg-orange-50 border-orange-200';
+    if (level.includes('Proficient')) return 'text-blue-600 bg-blue-50 border-blue-200';
+    if (level.includes('Mastery')) return 'text-green-600 bg-green-50 border-green-200';
+    return 'text-gray-600 bg-gray-50 border-gray-200';
 };
 
 export const getYKILevelDescription = (level) => {
-    const descriptions = {
-        1: 'Developing skills - Keep practicing basic communication',
-        2: 'Basic proficiency - Can handle simple everyday situations',
-        3: 'Independent user - Can deal with most situations',
-        4: 'Proficient user - Can interact with fluency',
-        5: 'Advanced user - Can use language flexibly and effectively',
-        6: 'Mastery level - Can express ideas fluently and precisely'
-    };
-    return descriptions[level] || '';
+    if (level.includes('Below')) return 'Keep practicing - Review fundamentals at this level';
+    if (level.includes('Basic')) return 'Good start - Developing proficiency at this level';
+    if (level.includes('Proficient')) return 'Well done - Solid understanding at this level';
+    if (level.includes('Mastery')) return 'Excellent - Strong mastery at this level';
+    return '';
 };
