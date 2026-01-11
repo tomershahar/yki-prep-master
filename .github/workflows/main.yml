@@ -21,9 +21,7 @@ jobs:
     - uses: actions/setup-node@v4
       with:
         node-version: 18
-        # We also need to tell the cache where the lockfile is
-        cache: 'npm'
-        cache-dependency-path: yki-prep-master/package-lock.json
+   
 
     - name: Install dependencies
       # 'npm ci' is safer and faster for CI than 'npm install'
