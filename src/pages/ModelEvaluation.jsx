@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from "react";
-//import { User } from "@/entities/User";
+import { User } from "@/entities/User";
 import { EvaluationReport } from "@/entities/EvaluationReport";
 import { evaluateReadingModel } from "@/functions/evaluateReadingModel";
 import { evaluateWritingModel } from "@/functions/evaluateWritingModel";
