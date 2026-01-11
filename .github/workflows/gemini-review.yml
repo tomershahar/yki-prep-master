@@ -16,6 +16,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Gemini AI Review
+        id: gemini_call # This ID must match the one used in the next step
         uses: google-github-actions/run-gemini-cli@main
         with:
           gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
@@ -27,6 +28,7 @@ jobs:
 
             # THIS STEP makes the reply visible as a summary in GitHub
       - name: Show Review Summary
+        if: steps.gemini_call.outputs.summary != ''
         run: |
           echo "### 🇫🇮 YKI Exam Simulator Review" >> $GITHUB_STEP_SUMMARY
           echo "${{ steps.gemini_call.outputs.output }}" >> $GITHUB_STEP_SUMMARY
