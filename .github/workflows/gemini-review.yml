@@ -24,4 +24,10 @@ jobs:
             Review these changes using the standards defined in GEMINI.md.
             Focus on logic, Finnish language accuracy, and YKI exam rules.
             Provide your review as a concise list.
+
+            # THIS STEP makes the reply visible as a summary in GitHub
+      - name: Show Review Summary
+        run: |
+          echo "### 🇫🇮 YKI Exam Simulator Review" >> $GITHUB_STEP_SUMMARY
+          echo "${{ steps.gemini_call.outputs.output }}" >> $GITHUB_STEP_SUMMARY
             
