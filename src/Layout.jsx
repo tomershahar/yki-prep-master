@@ -81,15 +81,15 @@ export default function Layout({ children, currentPageName }) {
       Landing: "Ace your YKI Finnish or Swedish exam with AI-powered practice and instant feedback."
     };
 
-    document.title = pageTitles[pageName] || "YKI Prep Master - Finnish & Swedish Exam Preparation";
-    
+    document.title = pageTitles[pageName] || "YKI Master - Pass the Finnish YKI Test";
+
     let metaDescription = document.querySelector('meta[name="description"]');
     if (!metaDescription) {
       metaDescription = document.createElement('meta');
       metaDescription.name = 'description';
       document.head.appendChild(metaDescription);
     }
-    metaDescription.content = pageDescriptions[pageName] || "Master the YKI Finnish or Swedish language exam with personalized AI practice.";
+    metaDescription.content = pageDescriptions[pageName] || "Ace your Finnish or Swedish YKI language proficiency test with AI-powered practice courses. Get instant feedback on reading, writing, listening, and speaking skills with personalized study plans tailored to your level.";
   };
 
   const navigationItems = [
