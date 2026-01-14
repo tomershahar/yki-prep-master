@@ -373,10 +373,25 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
                 throw new Error('Invalid response format from backend');
             }
 
-            // Validate the result structure
+            // Validate the result structure and score ranges
             if (!result.scores || typeof result.total_score !== 'number' || !result.feedback || typeof result.cefr_level !== 'string') {
                 console.error('Invalid result structure received:', result);
                 throw new Error('Backend returned invalid grading structure');
+            }
+            
+            // Validate score ranges (each criterion 1-8, total 4-32)
+            const scores = result.scores;
+            const scoreKeys = Object.keys(scores);
+            for (const key of scoreKeys) {
+                if (typeof scores[key] !== 'number' || scores[key] < 1 || scores[key] > 8) {
+                    console.error(`Invalid score for ${key}: ${scores[key]}`);
+                    throw new Error(`Invalid score range for ${key}: must be between 1-8`);
+                }
+            }
+            
+            if (result.total_score < 4 || result.total_score > 32) {
+                console.error(`Invalid total_score: ${result.total_score}`);
+                throw new Error('Invalid total_score: must be between 4-32');
             }
 
             console.log('Backend writing grading completed successfully:', result);
