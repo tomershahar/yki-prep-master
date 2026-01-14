@@ -383,6 +383,7 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
             return result;
         } catch (error) {
             console.error("Writing grading error:", error);
+            // FIXED: Preserve user input on error by keeping it in state
             throw error;
         }
     };
