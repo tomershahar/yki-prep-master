@@ -280,6 +280,7 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
     const [isGrading, setIsGrading] = useState(false);
     const [aiFeedback, setAiFeedback] = useState({});
     const [writingWeakSpots, setWritingWeakSpots] = useState(null);
+    const submissionInProgress = useRef(false); // FIXED: Prevent duplicate submissions
 
     // Effect for initial exam content loading
     useEffect(() => {
@@ -344,12 +345,18 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
     const gradeWritingWithAI = async (task, userAnswer, difficulty, chosenPrompt) => {
         try {
             console.log('Calling backend writing grading function...');
+            
+            // Validate weak spots data
+            const validatedWeakSpots = Array.isArray(writingWeakSpots?.weakSpots) 
+                ? writingWeakSpots.weakSpots 
+                : [];
+            
             const response = await gradeWriting({
                 task,
                 userResponse: userAnswer,
                 difficulty,
                 language: exam.language,
-                weakSpots: writingWeakSpots?.weakSpots || []
+                weakSpots: validatedWeakSpots
             });
 
             console.log('Raw backend response:', response);
@@ -404,10 +411,25 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
                 throw new Error('Invalid response format from backend');
             }
 
-            // Validate the result structure
+            // Validate the result structure and score ranges
             if (!result.scores || typeof result.total_score !== 'number' || !result.feedback || typeof result.cefr_level !== 'string') {
                 console.error('Invalid result structure received:', result);
                 throw new Error('Backend returned invalid grading structure');
+            }
+            
+            // Validate score ranges for speaking
+            const scores = result.scores;
+            const scoreKeys = Object.keys(scores);
+            for (const key of scoreKeys) {
+                if (typeof scores[key] !== 'number' || scores[key] < 1 || scores[key] > 8) {
+                    console.error(`Invalid score for ${key}: ${scores[key]}`);
+                    throw new Error(`Invalid score range for ${key}: must be between 1-8`);
+                }
+            }
+            
+            if (result.total_score < 4 || result.total_score > 32) {
+                console.error(`Invalid total_score: ${result.total_score}`);
+                throw new Error('Invalid total_score: must be between 4-32');
             }
 
             console.log('Backend grading completed successfully:', result);
@@ -532,6 +554,13 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
     };
 
     const handleSubmit = async () => {
+        // FIXED: Prevent duplicate submissions
+        if (submissionInProgress.current) {
+            console.log('Submission already in progress, ignoring duplicate request');
+            return;
+        }
+        
+        submissionInProgress.current = true;
         setIsSubmitting(true);
         setIsGrading(true);
 
@@ -576,18 +605,40 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
                     try {
                         let result;
                         if (section.id === 'writing') {
-                            // Keep existing writing grading logic
+                            // Word count validation with proper penalty application
                             const wordCount = userAnswer.split(/\s+/).filter(word => word.length > 0).length;
                             let expectedWordCountMin = 0;
+                            let wordCountPenalty = 0;
+                            
                             if (task.word_count) {
-                                const match = task.word_count.match(/(\d+)/);
-                                if (match) expectedWordCountMin = parseInt(match[1]);
+                                // Handle ranges like "40-60 words"
+                                const rangeMatch = task.word_count.match(/(\d+)\s*-\s*(\d+)/);
+                                if (rangeMatch) {
+                                    expectedWordCountMin = parseInt(rangeMatch[1]);
+                                } else {
+                                    const singleMatch = task.word_count.match(/(\d+)/);
+                                    if (singleMatch) expectedWordCountMin = parseInt(singleMatch[1]);
+                                }
                             }
-                            if (expectedWordCountMin > 0 && wordCount < expectedWordCountMin * 0.7) {
-                                const penalty = Math.max(1, Math.round((expectedWordCountMin * 0.7 - wordCount) / 10));
-                                console.log(`Applying word count penalty: -${penalty} points`);
+                            
+                            // Calculate penalty if word count is too low (less than 70% of expected)
+                            const WORD_COUNT_THRESHOLD = 0.7;
+                            const PENALTY_PER_10_WORDS = 1;
+                            
+                            if (expectedWordCountMin > 0 && wordCount < expectedWordCountMin * WORD_COUNT_THRESHOLD) {
+                                const shortfall = (expectedWordCountMin * WORD_COUNT_THRESHOLD) - wordCount;
+                                wordCountPenalty = Math.max(1, Math.round(shortfall / 10) * PENALTY_PER_10_WORDS);
+                                console.log(`Word count penalty: -${wordCountPenalty} points (${wordCount}/${expectedWordCountMin} words)`);
                             }
+                            
                             result = await gradeWritingWithAI(task, userAnswer, exam.difficulty, task.prompt);
+                            
+                            // FIXED: Apply the word count penalty to the total score
+                            if (wordCountPenalty > 0 && result.total_score) {
+                                const originalScore = result.total_score;
+                                result.total_score = Math.max(4, result.total_score - wordCountPenalty);
+                                console.log(`Applied word count penalty: ${originalScore} -> ${result.total_score}`);
+                            }
                         } else {
                             // Use backend function for speaking
                             console.log(`Grading speaking task ${index}`);
@@ -616,18 +667,47 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
                 // Check if any grading failed
                 const failedGrading = gradingResults.find(result => result.gradingFailed);
                 
+                // FIXED: Add retry limit to prevent infinite recursion
+                const MAX_RETRIES = 3;
+                const retryCount = (window.gradingRetryCount || 0);
+                
                 if (failedGrading) {
-                    // IMPROVED: Show grading failure dialog instead of fake low scores
+                    if (retryCount >= MAX_RETRIES) {
+                        // Max retries exceeded, treat as ungraded
+                        console.log('Max retries exceeded, treating as ungraded practice');
+                        window.gradingRetryCount = 0; // Reset counter
+                        
+                        const ungradedScore = {
+                            score: 0,
+                            correct: 0,
+                            total: tasksToGrade.length,
+                            gradingFailed: true,
+                            overallFeedback: {
+                                strengths: "Your response was saved but could not be graded after multiple attempts.",
+                                weaknesses: "Please try this practice again later when the grading service is available."
+                            },
+                            cefr_level: 'Unknown'
+                        };
+                        setScoreData(ungradedScore);
+                        setShowSummary(true);
+                        return;
+                    }
+                    
+                    // Still have retries left
                     const retryGrading = confirm(
                         `AI grading failed due to: ${failedGrading.error}\n\n` +
-                        `Would you like to try grading again? If you choose "Cancel", your practice will be saved but won't count toward your progress.`
+                        `Would you like to try grading again? (Attempt ${retryCount + 1}/${MAX_RETRIES})\n\n` +
+                        `If you choose "Cancel", your practice will be saved but won't count toward your progress.`
                     );
                     
                     if (retryGrading) {
-                        // Retry grading
-                        console.log('User chose to retry grading');
-                        return handleSubmit(); // Recursive retry
+                        // Retry grading with incremented counter
+                        console.log(`User chose to retry grading (attempt ${retryCount + 1})`);
+                        window.gradingRetryCount = retryCount + 1;
+                        return handleSubmit();
                     } else {
+                        // Reset counter on user cancel
+                        window.gradingRetryCount = 0;
                         // User chose to skip grading - treat as ungraded practice
                         console.log('User chose to skip grading');
                         const ungradedScore = {
@@ -647,6 +727,9 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
                     }
                 }
 
+                // FIXED: Reset retry counter on success
+                window.gradingRetryCount = 0;
+                
                 // Update feedback with successful results only
                 const newFeedback = { ...aiFeedback };
                 gradingResults.forEach(({ index, result, success }) => {
@@ -693,6 +776,7 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
         } finally {
             setIsSubmitting(false);
             setIsGrading(false);
+            submissionInProgress.current = false; // FIXED: Reset submission flag
         }
     };
 

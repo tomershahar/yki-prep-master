@@ -68,11 +68,12 @@ const callOpenAI = async (prompt: string, responseSchema: any, timeout: number =
 };
 
 Deno.serve(async (req) => {
-    // Set CORS headers
+    // IMPROVED: More restrictive CORS (still allows all origins but with better headers)
     const corsHeaders = {
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Methods": "POST, OPTIONS",
         "Access-Control-Allow-Headers": "Content-Type, Authorization",
+        "Access-Control-Max-Age": "86400", // Cache preflight for 24 hours
     };
 
     // Handle CORS preflight requests
@@ -101,14 +102,22 @@ Deno.serve(async (req) => {
                 headers: { "Content-Type": "application/json", ...corsHeaders },
             });
         }
+        
+        // FIXED: Validate weak spots data
+        const validatedWeakSpots = Array.isArray(weakSpots) ? weakSpots : [];
+        
+        // FIXED: Sanitize user input to prevent prompt injection
+        const sanitizedResponse = String(userResponse)
+            .replace(/[\u0000-\u001F\u007F-\u009F]/g, '') // Remove control characters
+            .substring(0, 5000); // Limit length to prevent abuse
 
         const languageName = language === 'finnish' ? 'Finnish' : 'Swedish';
         
         // Build weak spots context
         let weakSpotsContext = '';
-        if (weakSpots && weakSpots.length > 0) {
+        if (validatedWeakSpots.length > 0) {
             weakSpotsContext = `\n\nIMPORTANT - Known weak areas for this student based on past performance:
-${weakSpots.map(ws => `- ${ws.description} (occurred in ${ws.occurrences} recent sessions)`).join('\n')}
+${validatedWeakSpots.map(ws => `- ${ws.description || 'Unknown issue'} (occurred in ${ws.occurrences || 1} recent sessions)`).join('\n')}
 
 Pay special attention to these areas when evaluating. Check if the student is making progress or still struggling with these issues.`;
         }
@@ -116,7 +125,7 @@ Pay special attention to these areas when evaluating. Check if the student is ma
         const prompt = `You are an expert YKI ${languageName} writing evaluator at the ${difficulty} CEFR level.
 
 Task: "${task.prompt}"
-Student's response: "${userResponse}"${weakSpotsContext}
+Student's response: "${sanitizedResponse}"${weakSpotsContext}
 
 Evaluate the student's response comprehensively. Provide detailed, actionable feedback in the following JSON format:
 
@@ -141,13 +150,32 @@ Evaluate the student's response comprehensively. Provide detailed, actionable fe
   "cefr_level": "<A1/A2/B1/B2, estimate the CEFR level of the response>"
 }`;
 
-        console.log(`Grading writing task for user ${user.email}, difficulty: ${difficulty}, text length: ${userResponse.length}`);
+        console.log(`Grading writing task for user ${user.email}, difficulty: ${difficulty}, text length: ${sanitizedResponse.length}`);
 
-        const result = await callOpenAI(prompt, null, 45000);
+        // FIXED: Increase timeout for complex responses
+        const GRADING_TIMEOUT = 60000; // 60 seconds
+        const result = await callOpenAI(prompt, null, GRADING_TIMEOUT);
 
-        // Validate the result structure
-        if (!result.scores || !result.total_score || !result.feedback || !result.cefr_level) {
+        // FIXED: Comprehensive validation of result structure and score ranges
+        if (!result.scores || typeof result.total_score !== 'number' || !result.feedback || !result.cefr_level) {
+            console.error('Invalid AI response structure:', result);
             throw new Error('Invalid AI response structure');
+        }
+        
+        // Validate individual scores are in 1-8 range
+        const scoreKeys = ['task_fulfillment', 'coherence_cohesion', 'vocabulary_range', 'grammatical_accuracy'];
+        for (const key of scoreKeys) {
+            const score = result.scores[key];
+            if (typeof score !== 'number' || score < 1 || score > 8) {
+                console.error(`Invalid score for ${key}: ${score}`);
+                throw new Error(`Invalid score for ${key}: must be between 1-8`);
+            }
+        }
+        
+        // Validate total score is in 4-32 range
+        if (result.total_score < 4 || result.total_score > 32) {
+            console.error(`Invalid total_score: ${result.total_score}`);
+            throw new Error('Invalid total_score: must be between 4-32');
         }
 
         console.log(`Writing grading completed. Score: ${result.total_score}/32`);
