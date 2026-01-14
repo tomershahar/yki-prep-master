@@ -7,8 +7,9 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { CheckCircle, ArrowRight, ArrowLeft, Check, X, Sparkles, Loader2, Mic, Square, RefreshCw, Send } from "lucide-react";
+import { CheckCircle, ArrowRight, ArrowLeft, Check, X, Sparkles, Loader2, Mic, Square, RefreshCw, Send, AlertCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import ReactMarkdown from 'react-markdown';
 import { InvokeLLM, UploadFile } from "@/integrations/Core";
 import { KnowledgeBaseContent } from "@/entities/KnowledgeBaseContent";
@@ -282,6 +283,7 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
     const [aiFeedback, setAiFeedback] = useState({});
     const [writingWeakSpots, setWritingWeakSpots] = useState(null);
     const submissionInProgress = useRef(false); // FIXED: Prevent duplicate submissions
+    const [gradingErrorDialog, setGradingErrorDialog] = useState(null); // For grading error modal
 
     // Effect for initial exam content loading
     useEffect(() => {
@@ -726,38 +728,13 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
                         return;
                     }
                     
-                    // Still have retries left
-                    const retryGrading = confirm(
-                        `AI grading failed due to: ${failedGrading.error}\n\n` +
-                        `Would you like to try grading again? (Attempt ${retryCount + 1}/${MAX_RETRIES})\n\n` +
-                        `If you choose "Cancel", your practice will be saved but won't count toward your progress.`
-                    );
-                    
-                    if (retryGrading) {
-                        // Retry grading with incremented counter
-                        console.log(`User chose to retry grading (attempt ${retryCount + 1})`);
-                        window.gradingRetryCount = retryCount + 1;
-                        return handleSubmit();
-                    } else {
-                        // Reset counter on user cancel
-                        window.gradingRetryCount = 0;
-                        // User chose to skip grading - treat as ungraded practice
-                        console.log('User chose to skip grading');
-                        const ungradedScore = {
-                            score: 0, // Set to 0 if an actual number is expected, otherwise null
-                            correct: 0,
-                            total: tasksToGrade.length,
-                            gradingFailed: true,
-                            overallFeedback: {
-                                strengths: "Your response was saved but could not be graded due to a technical issue.",
-                                weaknesses: "You can try this practice again later when the grading service is available."
-                            },
-                            cefr_level: 'Unknown' // Add CEFR for consistency in scoreData
-                        };
-                        setScoreData(ungradedScore);
-                        setShowSummary(true);
-                        return;
-                    }
+                    // Still have retries left - show modal instead of confirm()
+                    setGradingErrorDialog({
+                        error: failedGrading.error,
+                        retryCount: retryCount + 1,
+                        maxRetries: MAX_RETRIES
+                    });
+                    return; // Wait for user action via modal
                 }
 
                 // FIXED: Reset retry counter on success
@@ -878,6 +855,34 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
         setShowSummary(false);
         setScoreData(null);
         setAiFeedback({});
+    };
+
+    const handleRetryGrading = () => {
+        console.log(`User chose to retry grading (attempt ${gradingErrorDialog.retryCount})`);
+        window.gradingRetryCount = gradingErrorDialog.retryCount;
+        setGradingErrorDialog(null);
+        handleSubmit();
+    };
+
+    const handleCancelRetry = () => {
+        console.log('User chose to skip grading');
+        window.gradingRetryCount = 0;
+        setGradingErrorDialog(null);
+        
+        // User chose to skip grading - treat as ungraded practice
+        const ungradedScore = {
+            score: 0,
+            correct: 0,
+            total: examContent?.tasks?.length || examContent?.questions?.length || 1,
+            gradingFailed: true,
+            overallFeedback: {
+                strengths: "Your response was saved but could not be graded due to a technical issue.",
+                weaknesses: "You can try this practice again later when the grading service is available."
+            },
+            cefr_level: 'Unknown'
+        };
+        setScoreData(ungradedScore);
+        setShowSummary(true);
     };
 
     // Show summary page
@@ -1237,7 +1242,52 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
     );
 
     return (
-        <div className="max-w-7xl mx-auto p-4">
+        <>
+            {/* Grading Error Dialog */}
+            <Dialog open={!!gradingErrorDialog} onOpenChange={(open) => !open && handleCancelRetry()}>
+                <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                        <div className="flex items-center gap-2 mb-2">
+                            <AlertCircle className="w-6 h-6 text-red-600" />
+                            <DialogTitle className="text-xl font-bold">Grading Failed</DialogTitle>
+                        </div>
+                        <DialogDescription>
+                            {gradingErrorDialog && (
+                                <>
+                                    <p className="mb-2">AI grading encountered an error:</p>
+                                    <code className="block bg-red-50 text-red-800 p-2 rounded text-sm mb-3">
+                                        {gradingErrorDialog.error}
+                                    </code>
+                                    <p className="text-sm">
+                                        Attempt {gradingErrorDialog.retryCount}/{gradingErrorDialog.maxRetries}
+                                    </p>
+                                </>
+                            )}
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter className="flex-col sm:flex-row gap-2">
+                        <Button
+                            variant="outline"
+                            onClick={handleCancelRetry}
+                            className="w-full sm:w-auto"
+                        >
+                            Cancel & Save Without Grade
+                        </Button>
+                        <Button
+                            onClick={handleRetryGrading}
+                            className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700"
+                        >
+                            <RefreshCw className="w-4 h-4 mr-2" />
+                            Try Again
+                        </Button>
+                    </DialogFooter>
+                    <p className="text-xs text-gray-500 text-center mt-2">
+                        If you cancel, your practice will be saved but won't count toward your progress.
+                    </p>
+                </DialogContent>
+            </Dialog>
+
+            <div className="max-w-7xl mx-auto p-4">
             {section.id === 'reading' && examContent.text ? (
                 <div className="flex flex-col gap-6">
                     <Card className="border-0 shadow-lg">
@@ -1395,6 +1445,7 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
                     {QuestionCardContent}
                 </div>
             )}
-        </div>
+            </div>
+        </>
     );
 }
