@@ -279,7 +279,6 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
     const [showSummary, setShowSummary] = useState(false);
     const [scoreData, setScoreData] = useState(null);
     const [isGrading, setIsGrading] = useState(false);
-    const [gradingProgress, setGradingProgress] = useState({ current: 0, total: 0, taskName: '' });
     const [aiFeedback, setAiFeedback] = useState({});
     const [writingWeakSpots, setWritingWeakSpots] = useState(null);
     const submissionInProgress = useRef(false); // FIXED: Prevent duplicate submissions
@@ -616,18 +615,9 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
                 }
 
                 console.log(`Starting to grade ${tasksToGrade.length} tasks`);
-                
-                // Initialize progress tracking
-                setGradingProgress({ current: 0, total: tasksToGrade.length, taskName: '' });
 
-                // Create grading promises with enhanced error handling and progress tracking
+                // Create grading promises with enhanced error handling
                 const gradingPromises = tasksToGrade.map(async ({ task, index }, arrayIndex) => {
-                    // Update progress before grading this task
-                    setGradingProgress({ 
-                        current: arrayIndex, 
-                        total: tasksToGrade.length, 
-                        taskName: task.task_type || `Task ${index + 1}`
-                    });
                     const userAnswer = answers[index]?.answer || answers[index] || "";
 
                     try {
@@ -674,12 +664,6 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
                         }
 
                         console.log(`Task ${index} graded successfully:`, result);
-                        
-                        // Update progress after successful grading
-                        setGradingProgress(prev => ({ 
-                            ...prev, 
-                            current: Math.min(prev.current + 1, prev.total)
-                        }));
                         
                         return { index, result, success: true };
                     } catch (error) {
@@ -1090,27 +1074,10 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
 
                     {isGrading && (
                         <div className="p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200">
-                            <div className="flex items-center justify-between mb-2">
-                                <div className="flex items-center gap-2 text-gray-700">
-                                    <Loader2 className="w-5 h-5 animate-spin text-blue-600" />
-                                    <span className="font-medium">
-                                        {gradingProgress.total > 1 
-                                            ? `Grading ${gradingProgress.taskName}...`
-                                            : 'Assessing your response with AI...'}
-                                    </span>
-                                </div>
-                                {gradingProgress.total > 1 && (
-                                    <span className="text-sm text-gray-600 font-medium">
-                                        {gradingProgress.current + 1}/{gradingProgress.total}
-                                    </span>
-                                )}
+                            <div className="flex items-center gap-2 text-gray-700">
+                                <Loader2 className="w-5 h-5 animate-spin text-blue-600" />
+                                <span className="font-medium">Assessing your response with AI...</span>
                             </div>
-                            {gradingProgress.total > 1 && (
-                                <Progress 
-                                    value={((gradingProgress.current + 1) / gradingProgress.total) * 100} 
-                                    className="h-2"
-                                />
-                            )}
                         </div>
                     )}
 
@@ -1407,23 +1374,12 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
                                     difficulty={exam.difficulty}
                                 />
                             ))}
-                            {isGrading && gradingProgress.total > 0 && (
+                            {isGrading && (
                                 <div className="p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200">
-                                    <div className="flex items-center justify-between mb-2">
-                                        <div className="flex items-center gap-2 text-gray-700">
-                                            <Loader2 className="w-5 h-5 animate-spin text-blue-600" />
-                                            <span className="font-medium">
-                                                Grading {gradingProgress.taskName}...
-                                            </span>
-                                        </div>
-                                        <span className="text-sm text-gray-600 font-medium">
-                                            {gradingProgress.current + 1}/{gradingProgress.total}
-                                        </span>
+                                    <div className="flex items-center gap-2 text-gray-700">
+                                        <Loader2 className="w-5 h-5 animate-spin text-blue-600" />
+                                        <span className="font-medium">Assessing your responses with AI...</span>
                                     </div>
-                                    <Progress 
-                                        value={((gradingProgress.current + 1) / gradingProgress.total) * 100} 
-                                        className="h-2"
-                                    />
                                 </div>
                             )}
                             <div className="flex justify-end pt-6">
@@ -1434,7 +1390,7 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
                                     size="lg"
                                 >
                                     <CheckCircle className="w-5 h-5 mr-2" />
-                                    {isSubmitting || isGrading ? `Grading... ${gradingProgress.current}/${gradingProgress.total}` : 'Submit All & Get Feedback'}
+                                    {isSubmitting || isGrading ? 'Grading...' : 'Submit All & Get Feedback'}
                                 </Button>
                             </div>
                         </CardContent>
