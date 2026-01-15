@@ -106,19 +106,21 @@ Pay special attention to these areas when evaluating.`;
 Task: "${task.prompt}"
 Student's response: "${sanitizedResponse}"${weakSpotsContext}
 
+CRITICAL: First check if the student's response actually addresses ALL requirements in the task prompt. If they missed key elements or answered a different question, give very low scores (1-2) for communicative_ability and explain clearly what was missed.
+
 Evaluate the student's response comprehensively. Provide detailed, actionable feedback in the following JSON format:
 
 {
   "scores": {
-    "task_fulfillment": <1-8, how well they completed the task>,
-    "coherence_cohesion": <1-8, structure and flow>, 
-    "vocabulary_range": <1-8, word choice and idiomatic language>,
-    "grammatical_accuracy": <1-8, grammar and spelling>
+    "communicative_ability": <1-8, how well they completed the task - BE STRICT: if they didn't answer the prompt correctly, score 1-2>,
+    "coherence": <1-8, structure and flow>, 
+    "vocabulary": <1-8, word choice and idiomatic language>,
+    "grammar": <1-8, grammar and spelling>
   },
   "total_score": <4-32, sum of scores>,
   "feedback": {
     "strengths": "2-3 sentences highlighting what the student did well, with specific examples.",
-    "weaknesses": "2-3 sentences explaining main areas for improvement with specific examples.",
+    "weaknesses": "2-3 sentences explaining main areas for improvement. If task wasn't completed correctly, mention EXACTLY what was missing from the prompt.",
     "grammar_analysis": "Detailed analysis: identify 2-3 grammar patterns that need work, explain the rules, and suggest practice topics.",
     "vocabulary_style": "Analyze word choice sophistication, suggest 3-5 better alternatives for basic words used, comment on register appropriateness.",
     "structure_tips": "Evaluate paragraph organization, transition word usage, sentence variety. Provide 2-3 specific improvements.",
@@ -140,7 +142,7 @@ Evaluate the student's response comprehensively. Provide detailed, actionable fe
         }
         
         // Validate individual scores
-        const scoreKeys = ['task_fulfillment', 'coherence_cohesion', 'vocabulary_range', 'grammatical_accuracy'];
+        const scoreKeys = ['communicative_ability', 'coherence', 'vocabulary', 'grammar'];
         for (const key of scoreKeys) {
             const score = result.scores[key];
             if (typeof score !== 'number' || score < 1 || score > 8) {
