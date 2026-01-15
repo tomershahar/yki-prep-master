@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import html2canvas from 'html2canvas';
 import { Button } from "@/components/ui/button";
@@ -110,14 +109,14 @@ export default function FeedbackButton() {
         <>
             <Button
                 onClick={handleOpen}
-                className="fixed bottom-5 right-5 rounded-full h-14 w-14 shadow-lg bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white"
+                className="fixed bottom-5 right-5 rounded-full h-14 w-14 shadow-lg bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white z-40"
                 aria-label="Send Feedback"
             >
                 <MessageSquare className="w-6 h-6" />
             </Button>
 
             <Dialog open={isOpen} onOpenChange={setIsOpen}>
-                <DialogContent>
+                <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
                         <DialogTitle>{isSuccess ? "Feedback Sent!" : "Send Us Your Feedback"}</DialogTitle>
                     </DialogHeader>
