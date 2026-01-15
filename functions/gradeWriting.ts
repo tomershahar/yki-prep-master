@@ -3,8 +3,8 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.6';
 // Placeholder for callOpenAI function, assuming it interacts with an OpenAI-compatible API
 const callOpenAI = async (prompt: string, responseSchema: any, timeout: number = 45000): Promise<any> => {
     const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
-    const OPENAI_API_URL = Deno.env.get('OPENAI_API_URL') || 'https://api.openai.com/v1/chat/completions';
-    const MODEL = Deno.env.get('OPENAI_MODEL') || 'gpt-4o-mini'; 
+    const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
+    const MODEL = 'gpt-4o'; 
 
     if (!OPENAI_API_KEY) {
         throw new Error('OPENAI_API_KEY environment variable is not set.');
