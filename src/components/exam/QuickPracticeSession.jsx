@@ -1226,17 +1226,17 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
                             <AlertCircle className="w-6 h-6 text-red-600" />
                             <DialogTitle className="text-xl font-bold">Grading Failed</DialogTitle>
                         </div>
-                        <DialogDescription>
+                        <DialogDescription asChild>
                             {gradingErrorDialog && (
-                                <>
-                                    <p className="mb-2">AI grading encountered an error:</p>
+                                <div>
+                                    <div className="mb-2">AI grading encountered an error:</div>
                                     <code className="block bg-red-50 text-red-800 p-2 rounded text-sm mb-3">
                                         {gradingErrorDialog.error}
                                     </code>
-                                    <p className="text-sm">
+                                    <div className="text-sm">
                                         Attempt {gradingErrorDialog.retryCount}/{gradingErrorDialog.maxRetries}
-                                    </p>
-                                </>
+                                    </div>
+                                </div>
                             )}
                         </DialogDescription>
                     </DialogHeader>
