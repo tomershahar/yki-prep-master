@@ -363,15 +363,19 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
 
             console.log('Raw backend response:', response);
 
+            // Handle different response formats
             let result;
-            if (response && response.data) {
-                if (response.error) {
-                    throw new Error(response.error.message || 'Backend grading failed');
-                }
+            if (response.error) {
+                throw new Error(response.error.message || response.error || 'Backend grading failed');
+            }
+            
+            // Response is directly the data (not wrapped in { data, error })
+            if (response.data) {
                 result = response.data;
-            } else if (response && response.scores) {
+            } else if (response.scores) {
                 result = response;
             } else {
+                console.error('Unexpected response format:', response);
                 throw new Error('Invalid response format from backend');
             }
 
@@ -417,15 +421,19 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
 
             console.log('Raw backend response:', response);
 
+            // Handle different response formats
             let result;
-            if (response && response.data) { // Check if it's { data, error } format
-                if (response.error) {
-                    throw new Error(response.error.message || 'Backend grading failed (response.error)');
-                }
+            if (response.error) {
+                throw new Error(response.error.message || response.error || 'Backend grading failed');
+            }
+            
+            // Response is directly the data (not wrapped in { data, error })
+            if (response.data) {
                 result = response.data;
-            } else if (response && response.scores) { // Direct result format
+            } else if (response.scores) {
                 result = response;
             } else {
+                console.error('Unexpected response format:', response);
                 throw new Error('Invalid response format from backend');
             }
 
