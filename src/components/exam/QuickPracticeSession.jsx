@@ -951,23 +951,23 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
             }
 
             return (
-                <div className="space-y-4 mb-6 p-4 rounded-lg border bg-white">
-                    <div className={`p-4 rounded-lg border-2 ${showResults ? (isCorrect ? 'border-green-500 bg-green-50' : isWrong ? 'border-red-500 bg-red-50' : 'border-gray-200') : 'border-gray-200'}`}>
-                        <div className="flex items-start gap-3">
+                <div className="space-y-3 mb-4 md:mb-6 p-3 md:p-4 rounded-lg border bg-white">
+                    <div className={`p-3 md:p-4 rounded-lg border-2 ${showResults ? (isCorrect ? 'border-green-500 bg-green-50' : isWrong ? 'border-red-500 bg-red-50' : 'border-gray-200') : 'border-gray-200'}`}>
+                        <div className="flex items-start gap-2 md:gap-3">
                             {showResults && (
-                                <div className="mt-1">
-                                    {isCorrect ? <Check className="w-5 h-5 text-green-600" /> : isWrong ? <X className="w-5 h-5 text-red-600" /> : <div className="w-5 h-5 rounded-full bg-gray-300" />}
+                                <div className="mt-1 flex-shrink-0">
+                                    {isCorrect ? <Check className="w-4 h-4 md:w-5 md:h-5 text-green-600" /> : isWrong ? <X className="w-4 h-4 md:w-5 md:h-5 text-red-600" /> : <div className="w-4 h-4 md:w-5 md:h-5 rounded-full bg-gray-300" />}
                                 </div>
                             )}
-                            <div className="flex-1">
-                                <div className="flex items-center justify-between mb-3">
-                                    <p className="font-semibold text-lg">{index + 1}. <InlineTranslator sourceLanguage={exam.language}>{question.question}</InlineTranslator></p>
+                            <div className="flex-1 min-w-0">
+                                <div className="flex items-center justify-between mb-2 md:mb-3">
+                                    <p className="font-semibold text-base md:text-lg break-words">{index + 1}. <InlineTranslator sourceLanguage={exam.language}>{question.question}</InlineTranslator></p>
                                 </div>
                                 {question.question_type === 'multiple_choice' ? (
                                     <RadioGroup value={answers[index] || ''} onValueChange={(value) => handleAnswerChange(index, value)} disabled={showResults}>
                                         {question.options?.map((option, optionIndex) => {
                                             const optionLetter = String.fromCharCode(65 + optionIndex);
-                                            
+
                                             // Determine if this specific option is the correct one for display
                                             let isThisOptionCorrect = false;
                                             if (question.correct_answer) {
@@ -984,11 +984,11 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
                                             const isOptionSelected = showResults && normalizeString(option) === normalizeString(answers[index]);
 
                                             return (
-                                                <div key={optionIndex} className={`flex items-center space-x-2 p-2 rounded ${showResults && isThisOptionCorrect ? 'bg-green-100 border border-green-300' : isOptionSelected && !isThisOptionCorrect ? 'bg-red-100 border border-red-300' : ''}`}>
-                                                    <RadioGroupItem value={option} id={`q${index}_${optionIndex}`} />
-                                                    <Label htmlFor={`q${index}_${optionIndex}`} className="cursor-pointer flex-1">
+                                                <div key={optionIndex} className={`flex items-start space-x-2 p-2 md:p-3 rounded ${showResults && isThisOptionCorrect ? 'bg-green-100 border border-green-300' : isOptionSelected && !isThisOptionCorrect ? 'bg-red-100 border border-red-300' : ''}`}>
+                                                    <RadioGroupItem value={option} id={`q${index}_${optionIndex}`} className="mt-1 flex-shrink-0" />
+                                                    <Label htmlFor={`q${index}_${optionIndex}`} className="cursor-pointer flex-1 text-sm md:text-base leading-relaxed">
                                                         <InlineTranslator sourceLanguage={exam.language}>{option}</InlineTranslator>
-                                                        {showResults && isThisOptionCorrect && <Check className="w-4 h-4 text-green-600 inline ml-2" />}
+                                                        {showResults && isThisOptionCorrect && <Check className="w-3 h-3 md:w-4 md:h-4 text-green-600 inline ml-2" />}
                                                     </Label>
                                                 </div>
                                             );
@@ -1287,58 +1287,58 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
                     {QuestionCardContent}
                 </div>
             ) : section.id === 'listening' && examContent.audio_script ? (
-                <div className="space-y-6">
+                <div className="space-y-4 md:space-y-6">
                     <Card className="border-0 shadow-lg">
-                        <CardHeader>
-                            <div className="flex justify-between items-center">
+                        <CardHeader className="p-4 md:p-6">
+                            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                                 <div>
-                                    <CardTitle className="text-2xl font-bold flex items-center gap-2">
+                                    <CardTitle className="text-xl md:text-2xl font-bold flex items-center gap-2">
                                         Listening Comprehension
                                     </CardTitle>
                                     <Badge variant="secondary" className="mt-2">
                                         {exam.language === 'finnish' ? 'Finnish' : 'Swedish'} - {exam.difficulty}
                                     </Badge>
                                 </div>
-                                <Button variant="outline" onClick={onCancel}>Exit Practice</Button>
+                                <Button variant="outline" onClick={onCancel} size="sm" className="w-full sm:w-auto">Exit Practice</Button>
                             </div>
                         </CardHeader>
-                        <CardContent>
-                            <div className="p-4 bg-blue-50 rounded-lg mb-6">
-                                <h3 className="font-semibold mb-2">Listening Scenario:</h3>
-                                <p className="text-sm text-gray-600 mb-3"><InlineTranslator sourceLanguage={exam.language}>{examContent.scenario_description}</InlineTranslator></p>
-                                <div className="flex items-center gap-4">
+                        <CardContent className="p-4 md:p-6">
+                            <div className="p-3 md:p-4 bg-blue-50 rounded-lg mb-4 md:mb-6">
+                                <h3 className="font-semibold mb-2 text-sm md:text-base">Listening Scenario:</h3>
+                                <p className="text-xs md:text-sm text-gray-600 mb-3"><InlineTranslator sourceLanguage={exam.language}>{examContent.scenario_description}</InlineTranslator></p>
+                                <div className="flex flex-col gap-3">
                                     <AudioPlayer
                                         audioBase64={examContent.audio_base64}
                                         dialogueSegments={examContent.dialogue_segments}
                                         isDialogue={examContent.scenario_description?.toLowerCase().includes('dialogue')}
-                                        className="text-lg"
+                                        className="text-base md:text-lg w-full"
                                     />
-                                    <span className="text-sm text-gray-500">
+                                    <span className="text-xs md:text-sm text-gray-500 text-center">
                                         {examContent.scenario_description?.toLowerCase().includes('dialogue') ?
-                                            "Click to hear the dialogue with different voices" :
-                                            "Click to hear the audio"
+                                            "Listen to the dialogue with different voices" :
+                                            "Listen to the audio"
                                         }
                                     </span>
                                 </div>
-                                <details className="mt-3 bg-white p-3 rounded border">
-                                    <summary className="text-sm text-gray-500 cursor-pointer hover:text-gray-700">
+                                <details className="mt-3 bg-white p-2 md:p-3 rounded border">
+                                    <summary className="text-xs md:text-sm text-gray-500 cursor-pointer hover:text-gray-700">
                                         Show transcript (click to expand)
                                     </summary>
-                                    <p className="font-mono text-sm italic text-gray-600 mt-2"><InlineTranslator sourceLanguage={exam.language}>{examContent.audio_script}</InlineTranslator></p>
+                                    <p className="font-mono text-xs md:text-sm italic text-gray-600 mt-2"><InlineTranslator sourceLanguage={exam.language}>{examContent.audio_script}</InlineTranslator></p>
                                 </details>
                             </div>
 
-                            <h3 className="text-lg font-bold mb-4">Questions</h3>
-                            <Progress value={progress} className="mb-6 h-2" />
-                            <div className="space-y-0 bg-gray-50 p-2 rounded-lg max-h-[60vh] overflow-y-auto">
+                            <h3 className="text-base md:text-lg font-bold mb-3 md:mb-4">Questions</h3>
+                            <Progress value={progress} className="mb-4 md:mb-6 h-2" />
+                            <div className="space-y-0 bg-gray-50 p-2 md:p-3 rounded-lg max-h-[50vh] md:max-h-[60vh] overflow-y-auto">
                                 {examContent.questions.map((question, index) => renderQuestion(question, index))}
                             </div>
 
-                            <div className="flex justify-end mt-6">
+                            <div className="flex justify-stretch md:justify-end mt-4 md:mt-6">
                                 <Button
                                     onClick={handleSubmit}
                                     disabled={isSubmitting || answeredQuestionsCount < totalQuestions}
-                                    className="bg-green-600 hover:bg-green-700"
+                                    className="bg-green-600 hover:bg-green-700 w-full md:w-auto"
                                     size="lg"
                                 >
                                     <CheckCircle className="w-5 h-5 mr-2" />
