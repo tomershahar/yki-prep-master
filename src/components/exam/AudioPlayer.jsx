@@ -31,8 +31,15 @@ export default function AudioPlayer({
 
       if (audioBase64) {
         try {
+          // Handle both data URI and raw base64
+          let base64Data = audioBase64;
+          if (audioBase64.includes('data:audio')) {
+            // Extract base64 data after the comma
+            base64Data = audioBase64.split(',')[1];
+          }
+          
           // Convert base64 to Blob URL for better performance
-          const byteCharacters = atob(audioBase64);
+          const byteCharacters = atob(base64Data);
           const byteNumbers = new Array(byteCharacters.length);
           for (let i = 0; i < byteCharacters.length; i++) {
             byteNumbers[i] = byteCharacters.charCodeAt(i);
