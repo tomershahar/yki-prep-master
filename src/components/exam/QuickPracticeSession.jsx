@@ -99,6 +99,8 @@ const SpeakingTask = ({ task, taskIndex, onAnswerSubmit, isSubmitting, language,
         setTaskState('transcribing');
         setError(null);
         try {
+            console.log('Audio blob captured:', audioBlob.size, 'bytes, type:', audioBlob.type);
+
             // Keep a local base64 version for the audio player
             const reader = new FileReader();
             reader.readAsDataURL(audioBlob);
@@ -111,11 +113,15 @@ const SpeakingTask = ({ task, taskIndex, onAnswerSubmit, isSubmitting, language,
                 type: 'audio/webm'
             });
 
+            console.log('Uploading audio file...');
             // Upload the file to get a URL for the backend function
             const { file_url, error: uploadError } = await UploadFile({ file: audioFile });
             if (uploadError || !file_url) {
                 throw new Error(uploadError?.message || "File upload failed, please try again.");
             }
+
+            console.log('Audio uploaded successfully, URL:', file_url);
+            console.log('Sending to transcription service with language:', language);
 
             // Call the backend function with the file URL
             const { data, error: transcribeError } = await transcribeAudio({
@@ -123,11 +129,14 @@ const SpeakingTask = ({ task, taskIndex, onAnswerSubmit, isSubmitting, language,
                 language: language,
             });
 
+            console.log('Transcription response:', data);
+
             if (transcribeError || (data && data.error)) {
                 throw new Error(transcribeError?.message || data?.error || "Transcription failed.");
             }
 
             if (data.transcription !== undefined) {
+                console.log('Transcription received:', data.transcription);
                 setTranscribedText(data.transcription);
                 setTaskState('reviewing');
             } else {
