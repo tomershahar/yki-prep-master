@@ -131,11 +131,18 @@ Deno.serve(async (req) => {
             });
         }
         
-        console.log(`Transcription completed successfully, length: ${result.text?.length || 0} chars`);
+        console.log(`Transcription completed successfully`);
+        console.log(`Result text: "${result.text}"`);
+        console.log(`Text length: ${result.text?.length || 0} chars`);
         
         return new Response(JSON.stringify({ 
             status: "success", 
-            transcription: result.text || "" 
+            transcription: result.text || "",
+            debug_info: {
+                language_requested: language,
+                audio_size: audioBlob.size,
+                transcription_length: result.text?.length || 0
+            }
         }), {
             status: 200,
             headers: { ...corsHeaders, "Content-Type": "application/json" },
