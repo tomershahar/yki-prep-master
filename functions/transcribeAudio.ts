@@ -76,7 +76,7 @@ Deno.serve(async (req) => {
         }
         
         const audioBlob = await audioResponse.blob();
-        console.log(`Audio file downloaded, size: ${audioBlob.size} bytes`);
+        console.log(`Audio file downloaded, size: ${audioBlob.size} bytes, type: ${audioBlob.type}`);
 
         // Prepare form data for OpenAI Whisper
         const formData = new FormData();
@@ -84,10 +84,12 @@ Deno.serve(async (req) => {
         formData.append("model", "whisper-1");
         
         // Add language hint for better accuracy
-        if (language === 'finnish') {
-            formData.append("language", "fi");
-        } else if (language === 'swedish') {
-            formData.append("language", "sv");
+        const languageCode = language === 'finnish' ? 'fi' : language === 'swedish' ? 'sv' : null;
+        if (languageCode) {
+            formData.append("language", languageCode);
+            console.log(`Using language code: ${languageCode} for ${language}`);
+        } else {
+            console.log(`No language code set, language param was: ${language}`);
         }
 
         console.log(`Sending to OpenAI Whisper API for ${language} transcription...`);
