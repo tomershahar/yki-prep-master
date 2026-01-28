@@ -34,9 +34,9 @@ export default function FeedbackPage() {
 
             let items;
             if (currentUser.role === 'admin') {
-                items = await Feedback.list('-created_date');
+                items = await Feedback.list('-created_date', 100);
             } else {
-                items = await Feedback.filter({ created_by: currentUser.email }, '-created_date');
+                items = await Feedback.filter({ created_by: currentUser.email }, '-created_date', 100);
             }
             // Sort for admins to see 'new' items first
             if (currentUser.role === 'admin') {
