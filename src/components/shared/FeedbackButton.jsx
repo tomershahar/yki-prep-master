@@ -84,18 +84,21 @@ export default function FeedbackButton() {
                 screenshotUrl = file_url;
             }
 
-            await Feedback.create({
+            const newFeedback = await Feedback.create({
                 feedback_text: feedbackText,
                 screenshot_url: screenshotUrl,
                 page_context: window.location.pathname,
             });
+
+            console.log("Feedback submitted successfully:", newFeedback);
 
             await awardFeedbackAchievement();
 
             setIsSuccess(true);
             setTimeout(() => {
                 setIsOpen(false);
-            }, 2000);
+                alert(`✅ Feedback saved! ID: ${newFeedback.id}\n\nYou can view it on the Feedback page.`);
+            }, 1500);
 
         } catch (error) {
             console.error("Error submitting feedback:", error);
