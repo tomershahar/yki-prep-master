@@ -19,6 +19,7 @@ import { transcribeAudio } from '@/functions/transcribeAudio';
 import InlineTranslator from '../shared/InlineTranslator';
 import { gradeSpeaking } from "@/functions/gradeSpeaking";
 import { gradeWriting } from "@/functions/gradeWriting";
+import ChaosControl from '../practice/ChaosControl';
 
 // Speaking Task Component
 const SpeakingTask = ({ task, taskIndex, onAnswerSubmit, isSubmitting, language, difficulty }) => {
@@ -304,7 +305,7 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
                 setExamContent(null);
             }
         }
-        
+
         // Load weak spots for writing
         if (section.id === 'writing' && exam.weak_spots) {
             setWritingWeakSpots(exam.weak_spots);
@@ -356,12 +357,12 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
     const gradeWritingWithAI = async (task, userAnswer, difficulty, chosenPrompt) => {
         try {
             console.log('Calling backend writing grading function...');
-            
+
             // Validate weak spots data
-            const validatedWeakSpots = Array.isArray(writingWeakSpots?.weakSpots) 
-                ? writingWeakSpots.weakSpots 
+            const validatedWeakSpots = Array.isArray(writingWeakSpots?.weakSpots)
+                ? writingWeakSpots.weakSpots
                 : [];
-            
+
             const response = await gradeWriting({
                 task,
                 userResponse: userAnswer,
@@ -377,7 +378,7 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
             if (response.error) {
                 throw new Error(response.error.message || response.error || 'Backend grading failed');
             }
-            
+
             // Response is directly the data (not wrapped in { data, error })
             if (response.data) {
                 result = response.data;
@@ -393,7 +394,7 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
                 console.error('Invalid result structure received:', result);
                 throw new Error('Backend returned invalid grading structure');
             }
-            
+
             // Validate score ranges (each criterion 1-8, total 4-32)
             const scores = result.scores;
             const scoreKeys = Object.keys(scores);
@@ -403,7 +404,7 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
                     throw new Error(`Invalid score range for ${key}: must be between 1-8`);
                 }
             }
-            
+
             if (result.total_score < 4 || result.total_score > 32) {
                 console.error(`Invalid total_score: ${result.total_score}`);
                 throw new Error('Invalid total_score: must be between 4-32');
@@ -435,7 +436,7 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
             if (response.error) {
                 throw new Error(response.error.message || response.error || 'Backend grading failed');
             }
-            
+
             // Response is directly the data (not wrapped in { data, error })
             if (response.data) {
                 result = response.data;
@@ -451,7 +452,7 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
                 console.error('Invalid result structure received:', result);
                 throw new Error('Backend returned invalid grading structure');
             }
-            
+
             // Validate score ranges for speaking
             const scores = result.scores;
             const scoreKeys = Object.keys(scores);
@@ -461,7 +462,7 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
                     throw new Error(`Invalid score range for ${key}: must be between 1-8`);
                 }
             }
-            
+
             if (result.total_score < 4 || result.total_score > 32) {
                 console.error(`Invalid total_score: ${result.total_score}`);
                 throw new Error('Invalid total_score: must be between 4-32');
@@ -594,7 +595,7 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
             console.log('Submission already in progress, ignoring duplicate request');
             return;
         }
-        
+
         submissionInProgress.current = true;
         setIsSubmitting(true);
         setIsGrading(true);
@@ -644,7 +645,7 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
                             const wordCount = userAnswer.split(/\s+/).filter(word => word.length > 0).length;
                             let expectedWordCountMin = 0;
                             let wordCountPenalty = 0;
-                            
+
                             if (task.word_count) {
                                 // Handle ranges like "40-60 words"
                                 const rangeMatch = task.word_count.match(/(\d+)\s*-\s*(\d+)/);
@@ -655,19 +656,19 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
                                     if (singleMatch) expectedWordCountMin = parseInt(singleMatch[1]);
                                 }
                             }
-                            
+
                             // Calculate penalty if word count is too low (less than 70% of expected)
                             const WORD_COUNT_THRESHOLD = 0.7;
                             const PENALTY_PER_10_WORDS = 1;
-                            
+
                             if (expectedWordCountMin > 0 && wordCount < expectedWordCountMin * WORD_COUNT_THRESHOLD) {
                                 const shortfall = (expectedWordCountMin * WORD_COUNT_THRESHOLD) - wordCount;
                                 wordCountPenalty = Math.max(1, Math.round(shortfall / 10) * PENALTY_PER_10_WORDS);
                                 console.log(`Word count penalty: -${wordCountPenalty} points (${wordCount}/${expectedWordCountMin} words)`);
                             }
-                            
+
                             result = await gradeWritingWithAI(task, userAnswer, exam.difficulty, task.prompt);
-                            
+
                             // FIXED: Apply the word count penalty to the total score
                             if (wordCountPenalty > 0 && result.total_score) {
                                 const originalScore = result.total_score;
@@ -681,11 +682,11 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
                         }
 
                         console.log(`Task ${index} graded successfully:`, result);
-                        
+
                         return { index, result, success: true };
                     } catch (error) {
                         console.error(`Grading failed for task ${index}:`, error);
-                        
+
                         // IMPROVED: Instead of providing fake low scores, return a grading failure
                         return {
                             index,
@@ -702,17 +703,17 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
 
                 // Check if any grading failed
                 const failedGrading = gradingResults.find(result => result.gradingFailed);
-                
+
                 // FIXED: Add retry limit to prevent infinite recursion
                 const MAX_RETRIES = 3;
                 const retryCount = (window.gradingRetryCount || 0);
-                
+
                 if (failedGrading) {
                     if (retryCount >= MAX_RETRIES) {
                         // Max retries exceeded, treat as ungraded
                         console.log('Max retries exceeded, treating as ungraded practice');
                         window.gradingRetryCount = 0; // Reset counter
-                        
+
                         const ungradedScore = {
                             score: 0,
                             correct: 0,
@@ -728,7 +729,7 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
                         setShowSummary(true);
                         return;
                     }
-                    
+
                     // Still have retries left - show modal instead of confirm()
                     setGradingErrorDialog({
                         error: failedGrading.error,
@@ -740,7 +741,7 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
 
                 // FIXED: Reset retry counter on success
                 window.gradingRetryCount = 0;
-                
+
                 // Update feedback with successful results only
                 const newFeedback = { ...aiFeedback };
                 gradingResults.forEach(({ index, result, success }) => {
@@ -813,7 +814,7 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
                     detailed_feedback: null,
                     cefr_level: scoreData.cefr_level || 'Unknown' // Use 'Unknown' for CEFR
                 };
-                
+
                 // Don't mark as completed since grading failed
                 onComplete(sessionData, exam.practiceId, false);
                 return;
@@ -869,7 +870,7 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
         console.log('User chose to skip grading');
         window.gradingRetryCount = 0;
         setGradingErrorDialog(null);
-        
+
         // User chose to skip grading - treat as ungraded practice
         const ungradedScore = {
             score: 0,
@@ -1065,7 +1066,7 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
                                 Show example answer
                             </summary>
                             <div className="mt-3 text-gray-800 text-sm">
-                               <ReactMarkdown>{String(task.sample_answer || '')}</ReactMarkdown>
+                                <ReactMarkdown>{String(task.sample_answer || '')}</ReactMarkdown>
                                 {task.comments && (
                                     <p className="text-xs text-gray-600 mt-2">
                                         <strong>Assessment:</strong> <InlineTranslator sourceLanguage={exam.language}>{task.comments}</InlineTranslator>
@@ -1272,152 +1273,154 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
             </Dialog>
 
             <div className="max-w-7xl mx-auto p-4">
-            {section.id === 'reading' && examContent.text ? (
-                <div className="flex flex-col gap-6">
-                    <Card className="border-0 shadow-lg">
-                        <CardHeader>
-                            <div className="flex items-center justify-between">
-                                <CardTitle className="text-lg font-bold flex items-center gap-2">
-                                    <Badge variant="outline">{exam.difficulty}</Badge>
-                                    Read the text
-                                </CardTitle>
-                            </div>
-                        </CardHeader>
-                        <CardContent>
-                            <InlineTranslator sourceLanguage={exam.language}>
-                                <div className="prose max-w-none text-lg leading-relaxed text-gray-700">
-                                    {examContent.text.split('\n').map((paragraph, index) => (
-                                        <p key={index}>{paragraph}</p>
-                                    ))}
-                                </div>
-                            </InlineTranslator>
-                        </CardContent>
-                    </Card>
-                    {QuestionCardContent}
-                </div>
-            ) : section.id === 'listening' && examContent.audio_script ? (
-                <div className="space-y-4 md:space-y-6">
-                    <Card className="border-0 shadow-lg">
-                        <CardHeader className="p-4 md:p-6">
-                            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                                <div>
-                                    <CardTitle className="text-xl md:text-2xl font-bold flex items-center gap-2">
-                                        Listening Comprehension
+                {section.id === 'reading' && examContent.text ? (
+                    <div className="flex flex-col gap-6">
+                        <Card className="border-0 shadow-lg">
+                            <CardHeader>
+                                <div className="flex items-center justify-between">
+                                    <CardTitle className="text-lg font-bold flex items-center gap-2">
+                                        <Badge variant="outline">{exam.difficulty}</Badge>
+                                        Read the text
                                     </CardTitle>
-                                    <Badge variant="secondary" className="mt-2">
-                                        {exam.language === 'finnish' ? 'Finnish' : 'Swedish'} - {exam.difficulty}
-                                    </Badge>
                                 </div>
-                                <Button variant="outline" onClick={onCancel} size="sm" className="w-full sm:w-auto">Exit Practice</Button>
-                            </div>
-                        </CardHeader>
-                        <CardContent className="p-4 md:p-6">
-                            <div className="p-3 md:p-4 bg-blue-50 rounded-lg mb-4 md:mb-6">
-                                <h3 className="font-semibold mb-2 text-sm md:text-base">Listening Scenario:</h3>
-                                <p className="text-xs md:text-sm text-gray-600 mb-3"><InlineTranslator sourceLanguage={exam.language}>{examContent.scenario_description}</InlineTranslator></p>
-                                <div className="flex flex-col gap-3">
-                                    <AudioPlayer
-                                        audioBase64={examContent.audio_base64}
-                                        dialogueSegments={examContent.dialogue_segments}
-                                        isDialogue={examContent.scenario_description?.toLowerCase().includes('dialogue')}
-                                        className="text-base md:text-lg w-full"
-                                    />
-                                    <span className="text-xs md:text-sm text-gray-500 text-center">
-                                        {examContent.scenario_description?.toLowerCase().includes('dialogue') ?
-                                            "Listen to the dialogue with different voices" :
-                                            "Listen to the audio"
-                                        }
-                                    </span>
+                            </CardHeader>
+                            <CardContent>
+                                <InlineTranslator sourceLanguage={exam.language}>
+                                    <div className="prose max-w-none text-lg leading-relaxed text-gray-700">
+                                        {examContent.text.split('\n').map((paragraph, index) => (
+                                            <p key={index}>{paragraph}</p>
+                                        ))}
+                                    </div>
+                                </InlineTranslator>
+                            </CardContent>
+                        </Card>
+                        {QuestionCardContent}
+                    </div>
+                ) : section.id === 'listening' && examContent.audio_script ? (
+                    <div className="space-y-4 md:space-y-6">
+                        <Card className="border-0 shadow-lg">
+                            <CardHeader className="p-4 md:p-6">
+                                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                                    <div>
+                                        <CardTitle className="text-xl md:text-2xl font-bold flex items-center gap-2">
+                                            Listening Comprehension
+                                        </CardTitle>
+                                        <Badge variant="secondary" className="mt-2">
+                                            {exam.language === 'finnish' ? 'Finnish' : 'Swedish'} - {exam.difficulty}
+                                        </Badge>
+                                    </div>
+                                    <Button variant="outline" onClick={onCancel} size="sm" className="w-full sm:w-auto">Exit Practice</Button>
                                 </div>
-                                <details className="mt-3 bg-white p-2 md:p-3 rounded border">
-                                    <summary className="text-xs md:text-sm text-gray-500 cursor-pointer hover:text-gray-700">
-                                        Show transcript (click to expand)
-                                    </summary>
-                                    <p className="font-mono text-xs md:text-sm italic text-gray-600 mt-2"><InlineTranslator sourceLanguage={exam.language}>{examContent.audio_script}</InlineTranslator></p>
-                                </details>
-                            </div>
+                            </CardHeader>
+                            <CardContent className="p-4 md:p-6">
+                                <div className="p-3 md:p-4 bg-blue-50 rounded-lg mb-4 md:mb-6">
+                                    <h3 className="font-semibold mb-2 text-sm md:text-base">Listening Scenario:</h3>
+                                    <p className="text-xs md:text-sm text-gray-600 mb-3"><InlineTranslator sourceLanguage={exam.language}>{examContent.scenario_description}</InlineTranslator></p>
+                                    <ChaosControl />
+                                    <div className="flex flex-col gap-3">
+                                        <AudioPlayer
+                                            audioBase64={examContent.audio_base64}
+                                            dialogueSegments={examContent.dialogue_segments}
+                                            isDialogue={examContent.scenario_description?.toLowerCase().includes('dialogue')}
+                                            className="text-base md:text-lg w-full"
+                                        />
+                                        <span className="text-xs md:text-sm text-gray-500 text-center">
+                                            {examContent.scenario_description?.toLowerCase().includes('dialogue') ?
+                                                "Listen to the dialogue with different voices" :
+                                                "Listen to the audio"
+                                            }
+                                        </span>
+                                    </div>
+                                    <details className="mt-3 bg-white p-2 md:p-3 rounded border">
+                                        <summary className="text-xs md:text-sm text-gray-500 cursor-pointer hover:text-gray-700">
+                                            Show transcript (click to expand)
+                                        </summary>
+                                        <p className="font-mono text-xs md:text-sm italic text-gray-600 mt-2"><InlineTranslator sourceLanguage={exam.language}>{examContent.audio_script}</InlineTranslator></p>
+                                    </details>
+                                </div>
 
-                            <h3 className="text-base md:text-lg font-bold mb-3 md:mb-4">Questions</h3>
-                            <Progress value={progress} className="mb-4 md:mb-6 h-2" />
-                            <div className="space-y-0 bg-gray-50 p-2 md:p-3 rounded-lg max-h-[50vh] md:max-h-[60vh] overflow-y-auto">
-                                {examContent.questions.map((question, index) => renderQuestion(question, index))}
-                            </div>
-
-                            <div className="flex justify-stretch md:justify-end mt-4 md:mt-6">
-                                <Button
-                                    onClick={handleSubmit}
-                                    disabled={isSubmitting || answeredQuestionsCount < totalQuestions}
-                                    className="bg-green-600 hover:bg-green-700 w-full md:w-auto"
-                                    size="lg"
-                                >
-                                    <CheckCircle className="w-5 h-5 mr-2" />
-                                    {isSubmitting ? 'Submitting...' : 'Submit & View Results'}
-                                </Button>
-                            </div>
-                        </CardContent>
-                    </Card>
-                </div>
-            ) : section.id === 'speaking' ? ( // NEW BRANCH for speaking
-                <div className="space-y-6">
-                    <Card className="border-0 shadow-lg">
-                        <CardHeader>
-                            <div className="flex justify-between items-center">
-                                <div>
-                                    <Badge variant="secondary" className="mb-2 flex items-center gap-1">
-                                        <Sparkles className="w-3 h-3" />
-                                        Quick Practice
-                                    </Badge>
-                                    <CardTitle className="text-2xl font-bold">
-                                        Speaking Tasks
-                                    </CardTitle>
-                                    <Badge variant="secondary" className="mt-2">
-                                        {exam.language === 'finnish' ? 'Finnish' : 'Swedish'} - {exam.difficulty}
-                                    </Badge>
+                                <h3 className="text-base md:text-lg font-bold mb-3 md:mb-4">Questions</h3>
+                                <Progress value={progress} className="mb-4 md:mb-6 h-2" />
+                                <div className="space-y-0 bg-gray-50 p-2 md:p-3 rounded-lg max-h-[50vh] md:max-h-[60vh] overflow-y-auto">
+                                    {examContent.questions.map((question, index) => renderQuestion(question, index))}
                                 </div>
-                            </div>
-                            <Progress value={
-                                (Object.keys(answers).length / items.length) * 100
-                            } className="mt-4" />
-                        </CardHeader>
-                        <CardContent className="space-y-6">
-                            {items.map((task, index) => (
-                                <SpeakingTask
-                                    key={index}
-                                    task={task}
-                                    taskIndex={index}
-                                    onAnswerSubmit={handleSpeakingAnswer}
-                                    isSubmitting={isGrading} // Use parent's isGrading for overall submission control
-                                    language={exam.language}
-                                    difficulty={exam.difficulty}
-                                />
-                            ))}
-                            {isGrading && (
-                                <div className="p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200">
-                                    <div className="flex items-center gap-2 text-gray-700">
-                                        <Loader2 className="w-5 h-5 animate-spin text-blue-600" />
-                                        <span className="font-medium">Assessing your responses with AI...</span>
+
+                                <div className="flex justify-stretch md:justify-end mt-4 md:mt-6">
+                                    <Button
+                                        onClick={handleSubmit}
+                                        disabled={isSubmitting || answeredQuestionsCount < totalQuestions}
+                                        className="bg-green-600 hover:bg-green-700 w-full md:w-auto"
+                                        size="lg"
+                                    >
+                                        <CheckCircle className="w-5 h-5 mr-2" />
+                                        {isSubmitting ? 'Submitting...' : 'Submit & View Results'}
+                                    </Button>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </div>
+                ) : section.id === 'speaking' ? ( // NEW BRANCH for speaking
+                    <div className="space-y-6">
+                        <Card className="border-0 shadow-lg">
+                            <CardHeader>
+                                <div className="flex justify-between items-center">
+                                    <div>
+                                        <Badge variant="secondary" className="mb-2 flex items-center gap-1">
+                                            <Sparkles className="w-3 h-3" />
+                                            Quick Practice
+                                        </Badge>
+                                        <CardTitle className="text-2xl font-bold">
+                                            Speaking Tasks
+                                        </CardTitle>
+                                        <Badge variant="secondary" className="mt-2">
+                                            {exam.language === 'finnish' ? 'Finnish' : 'Swedish'} - {exam.difficulty}
+                                        </Badge>
                                     </div>
                                 </div>
-                            )}
-                            <div className="flex justify-end pt-6">
-                                <Button
-                                    onClick={handleSubmit}
-                                    disabled={isSubmitting || isGrading || Object.keys(answers).length !== items.length}
-                                    className="bg-green-600 hover:bg-green-700"
-                                    size="lg"
-                                >
-                                    <CheckCircle className="w-5 h-5 mr-2" />
-                                    {isSubmitting || isGrading ? 'Grading...' : 'Submit All & Get Feedback'}
-                                </Button>
-                            </div>
-                        </CardContent>
-                    </Card>
-                </div>
-            ) : (
-                <div className="space-y-6">
-                    {QuestionCardContent}
-                </div>
-            )}
+                                <Progress value={
+                                    (Object.keys(answers).length / items.length) * 100
+                                } className="mt-4" />
+                            </CardHeader>
+                            <CardContent className="space-y-6">
+                                <ChaosControl />
+                                {items.map((task, index) => (
+                                    <SpeakingTask
+                                        key={index}
+                                        task={task}
+                                        taskIndex={index}
+                                        onAnswerSubmit={handleSpeakingAnswer}
+                                        isSubmitting={isGrading} // Use parent's isGrading for overall submission control
+                                        language={exam.language}
+                                        difficulty={exam.difficulty}
+                                    />
+                                ))}
+                                {isGrading && (
+                                    <div className="p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200">
+                                        <div className="flex items-center gap-2 text-gray-700">
+                                            <Loader2 className="w-5 h-5 animate-spin text-blue-600" />
+                                            <span className="font-medium">Assessing your responses with AI...</span>
+                                        </div>
+                                    </div>
+                                )}
+                                <div className="flex justify-end pt-6">
+                                    <Button
+                                        onClick={handleSubmit}
+                                        disabled={isSubmitting || isGrading || Object.keys(answers).length !== items.length}
+                                        className="bg-green-600 hover:bg-green-700"
+                                        size="lg"
+                                    >
+                                        <CheckCircle className="w-5 h-5 mr-2" />
+                                        {isSubmitting || isGrading ? 'Grading...' : 'Submit All & Get Feedback'}
+                                    </Button>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </div>
+                ) : (
+                    <div className="space-y-6">
+                        {QuestionCardContent}
+                    </div>
+                )}
             </div>
         </>
     );
