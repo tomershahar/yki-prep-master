@@ -6,7 +6,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 
-const ChaosControl = ({ isActive, onToggle }) => {
+const ChaosControl = () => {
     const [volume, setVolume] = useState(0.4); // Default volume 40%
     const [enabled, setEnabled] = useState(false);
     const audioRef = useRef(null);
