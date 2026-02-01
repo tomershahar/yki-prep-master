@@ -13,7 +13,7 @@ const ChaosControl = ({ isActive, onToggle }) => {
 
     // Initialize Audio
     useEffect(() => {
-        audioRef.current = new Audio('/sounds/crowd.mp3');
+        audioRef.current = new Audio('/sounds/crowd.ogg');
         audioRef.current.loop = true;
 
         return () => {
