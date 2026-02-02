@@ -194,9 +194,9 @@ const SpeakingTask = ({ task, taskIndex, onAnswerSubmit, isSubmitting, language,
                             <span className="font-medium">Prompt:</span> <InlineTranslator sourceLanguage={language}>{task.prompt}</InlineTranslator>
                         </CardDescription>
                         {task.time_limit && (
-                            <p className="text-sm text-blue-600 mt-2">
+                            <div className="text-sm text-blue-600 mt-2">
                                 <strong>Time limit:</strong> <InlineTranslator sourceLanguage={language}>{task.time_limit}</InlineTranslator>
-                            </p>
+                            </div>
                         )}
                     </div>
                     {taskState === 'submitted' && <Badge className="bg-green-100 text-green-800"><CheckCircle className="w-4 h-4 mr-1" />Submitted</Badge>}
@@ -254,8 +254,8 @@ const SpeakingTask = ({ task, taskIndex, onAnswerSubmit, isSubmitting, language,
                 )}
                 {taskState === 'submitted' && (
                     <div className="p-4 bg-gray-50 border rounded-md">
-                        <p className="font-medium text-gray-800">Your confirmed response:</p>
-                        <p className="text-gray-600 mt-2 whitespace-pre-wrap"><InlineTranslator sourceLanguage={language}>{transcribedText}</InlineTranslator></p>
+                        <div className="font-medium text-gray-800">Your confirmed response:</div>
+                        <div className="text-gray-600 mt-2 whitespace-pre-wrap"><InlineTranslator sourceLanguage={language}>{transcribedText}</InlineTranslator></div>
                     </div>
                 )}
                 {error && (
@@ -966,15 +966,15 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
                 <div className="space-y-3 mb-4 md:mb-6 p-3 md:p-4 rounded-lg border bg-white">
                     <div className={`p-3 md:p-4 rounded-lg border-2 ${showResults ? (isCorrect ? 'border-green-500 bg-green-50' : isWrong ? 'border-red-500 bg-red-50' : 'border-gray-200') : 'border-gray-200'}`}>
                         <div className="flex items-start gap-2 md:gap-3">
-                            {showResults && (
-                                <div className="mt-1 flex-shrink-0">
-                                    {isCorrect ? <Check className="w-4 h-4 md:w-5 md:h-5 text-green-600" /> : isWrong ? <X className="w-4 h-4 md:w-5 md:h-5 text-red-600" /> : <div className="w-4 h-4 md:w-5 md:h-5 rounded-full bg-gray-300" />}
-                                </div>
-                            )}
-                            <div className="flex-1 min-w-0">
-                                <div className="flex items-center justify-between mb-2 md:mb-3">
-                                    <p className="font-semibold text-base md:text-lg break-words">{index + 1}. <InlineTranslator sourceLanguage={exam.language}>{question.question}</InlineTranslator></p>
-                                </div>
+                        {showResults && (
+                        <div className="mt-1 flex-shrink-0">
+                            {isCorrect ? <Check className="w-4 h-4 md:w-5 md:h-5 text-green-600" /> : isWrong ? <X className="w-4 h-4 md:w-5 md:h-5 text-red-600" /> : <div className="w-4 h-4 md:w-5 md:h-5 rounded-full bg-gray-300" />}
+                        </div>
+                        )}
+                        <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between mb-2 md:mb-3">
+                            <div className="font-semibold text-base md:text-lg break-words">{index + 1}. <InlineTranslator sourceLanguage={exam.language}>{question.question}</InlineTranslator></div>
+                        </div>
                                 {question.question_type === 'multiple_choice' ? (
                                     <RadioGroup value={answers[index] || ''} onValueChange={(value) => handleAnswerChange(index, value)} disabled={showResults}>
                                         {question.options?.map((option, optionIndex) => {
@@ -1019,17 +1019,17 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
                                     <div className="mt-4 space-y-3">
                                         {isWrong && (
                                             <div className="p-3 bg-red-50 border border-red-200 rounded">
-                                                <p className="text-red-800 font-medium">Correct answer: <InlineTranslator sourceLanguage={exam.language}>{question.correct_answer}</InlineTranslator></p>
+                                                <div className="text-red-800 font-medium">Correct answer: <InlineTranslator sourceLanguage={exam.language}>{question.correct_answer}</InlineTranslator></div>
                                             </div>
                                         )}
                                         <div className="p-3 bg-blue-50 border border-blue-200 rounded">
-                                            <p className="text-blue-800 font-medium">Explanation:</p>
-                                            <p className="text-blue-700 text-sm mt-1"><InlineTranslator sourceLanguage={exam.language}>{String(question.explanation || 'No explanation available')}</InlineTranslator></p>
+                                            <div className="text-blue-800 font-medium">Explanation:</div>
+                                            <div className="text-blue-700 text-sm mt-1"><InlineTranslator sourceLanguage={exam.language}>{String(question.explanation || 'No explanation available')}</InlineTranslator></div>
                                         </div>
                                         {question.text_reference && (
                                             <div className="p-3 bg-amber-50 border border-amber-200 rounded">
-                                                <p className="text-amber-800 font-medium">Text reference:</p>
-                                                <p className="text-amber-700 text-sm mt-1 italic">"<InlineTranslator sourceLanguage={exam.language}>{question.text_reference}</InlineTranslator>"</p>
+                                                <div className="text-amber-800 font-medium">Text reference:</div>
+                                                <div className="text-amber-700 text-sm mt-1 italic">"<InlineTranslator sourceLanguage={exam.language}>{question.text_reference}</InlineTranslator>"</div>
                                             </div>
                                         )}
                                     </div>
@@ -1049,43 +1049,45 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
                         <div className="flex items-center justify-between mb-2">
                             <Badge><InlineTranslator sourceLanguage={exam.language}>{task.task_type}</InlineTranslator></Badge>
                         </div>
-                        <p className="font-semibold text-lg"><InlineTranslator sourceLanguage={exam.language}>{task.prompt}</InlineTranslator></p>
+                        <div className="font-semibold text-lg"><InlineTranslator sourceLanguage={exam.language}>{task.prompt}</InlineTranslator></div>
                         {task.word_count && (
-                            <p className="text-sm text-blue-600 mt-2">
+                            <div className="text-sm text-blue-600 mt-2">
                                 <strong>Word count:</strong> {task.word_count}
-                            </p>
+                            </div>
                         )}
                         {task.time_limit && (
-                            <p className="text-sm text-blue-600 mt-1">
+                            <div className="text-sm text-blue-600 mt-1">
                                 <strong>Time limit:</strong> {task.time_limit}
-                            </p>
+                            </div>
                         )}
                     </div>
 
                     {task.sample_answer && (
                         <details className="bg-gray-50 p-4 rounded-lg">
-                            <summary className="cursor-pointer text-sm font-medium text-gray-700 hover:text-gray-900">
-                                Show example answer
-                            </summary>
-                            <div className="mt-3 text-gray-800 text-sm">
-                                <ReactMarkdown>{String(task.sample_answer || '')}</ReactMarkdown>
-                                {task.comments && (
-                                    <p className="text-xs text-gray-600 mt-2">
-                                        <strong>Assessment:</strong> <InlineTranslator sourceLanguage={exam.language}>{task.comments}</InlineTranslator>
-                                    </p>
-                                )}
+                        <summary className="cursor-pointer text-sm font-medium text-gray-700 hover:text-gray-900">
+                        Show example answer
+                        </summary>
+                        <div className="mt-3 text-gray-800 text-sm">
+                        <ReactMarkdown>{String(task.sample_answer || '')}</ReactMarkdown>
+                        {task.comments && (
+                            <div className="text-xs text-gray-600 mt-2">
+                                <strong>Assessment:</strong> <InlineTranslator sourceLanguage={exam.language}>{task.comments}</InlineTranslator>
                             </div>
+                        )}
+                        </div>
                         </details>
-                    )}
+                                )}
 
-                    <Textarea
-                        value={answers[index] || ''}
-                        onChange={(e) => handleAnswerChange(index, e.target.value)}
-                        placeholder={`Write your response here... (Target: ${task.word_count || 'check prompt guidelines'})`}
-                        className="min-h-32 text-base"
-                        rows={6}
-                        disabled={isGrading || showResults}
-                    />
+                                <div>
+                                <Textarea
+                                value={answers[index] || ''}
+                                onChange={(e) => handleAnswerChange(index, e.target.value)}
+                                placeholder={`Write your response here... (Target: ${task.word_count || 'check prompt guidelines'})`}
+                                className="min-h-32 text-base"
+                                rows={6}
+                                disabled={isGrading || showResults}
+                                />
+                                </div>
                     {section.id === 'writing' && (
                         <div className="text-sm text-gray-500">
                             Words: {(answers[index] || '').split(' ').filter(word => word.length > 0).length}
@@ -1114,19 +1116,19 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
                                     <CardContent>
                                         {feedbackResult.scores && (
                                             <div className="mb-4">
-                                                <p className="font-semibold text-sm mb-2">Detailed Scores (1-8 scale):</p>
-                                                <div className="grid grid-cols-2 gap-2 text-sm text-gray-700">
-                                                    <p>Task Fulfillment: <span className="font-medium">{feedbackResult.scores.communicative_ability}</span></p>
-                                                    <p>Coherence & Fluency: <span className="font-medium">{feedbackResult.scores.coherence}</span></p>
-                                                    <p>Vocabulary: <span className="font-medium">{feedbackResult.scores.vocabulary}</span></p>
-                                                    <p>Grammar: <span className="font-medium">{feedbackResult.scores.grammar}</span></p>
-                                                </div>
+                                               <div className="font-semibold text-sm mb-2">Detailed Scores (1-8 scale):</div>
+                                               <div className="grid grid-cols-2 gap-2 text-sm text-gray-700">
+                                                   <div>Task Fulfillment: <span className="font-medium">{feedbackResult.scores.communicative_ability}</span></div>
+                                                   <div>Coherence & Fluency: <span className="font-medium">{feedbackResult.scores.coherence}</span></div>
+                                                   <div>Vocabulary: <span className="font-medium">{feedbackResult.scores.vocabulary}</span></div>
+                                                   <div>Grammar: <span className="font-medium">{feedbackResult.scores.grammar}</span></div>
+                                               </div>
                                             </div>
-                                        )}
-                                        <div className="space-y-2 text-gray-800">
-                                            <p><span className="font-semibold">Strengths:</span> <InlineTranslator sourceLanguage={exam.language}>{feedbackResult.feedback.strengths}</InlineTranslator></p>
-                                            <p><span className="font-semibold">Weaknesses:</span> <InlineTranslator sourceLanguage={exam.language}>{feedbackResult.feedback.weaknesses}</InlineTranslator></p>
-                                        </div>
+                                            )}
+                                            <div className="space-y-2 text-gray-800">
+                                            <div><span className="font-semibold">Strengths:</span> <InlineTranslator sourceLanguage={exam.language}>{feedbackResult.feedback.strengths}</InlineTranslator></div>
+                                            <div><span className="font-semibold">Weaknesses:</span> <InlineTranslator sourceLanguage={exam.language}>{feedbackResult.feedback.weaknesses}</InlineTranslator></div>
+                                            </div>
                                     </CardContent>
                                 </Card>
                             ) : (
@@ -1317,7 +1319,7 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
                             <CardContent className="p-4 md:p-6">
                                 <div className="p-3 md:p-4 bg-blue-50 rounded-lg mb-4 md:mb-6">
                                     <h3 className="font-semibold mb-2 text-sm md:text-base">Listening Scenario:</h3>
-                                    <p className="text-xs md:text-sm text-gray-600 mb-3"><InlineTranslator sourceLanguage={exam.language}>{examContent.scenario_description}</InlineTranslator></p>
+                                    <div className="text-xs md:text-sm text-gray-600 mb-3"><InlineTranslator sourceLanguage={exam.language}>{examContent.scenario_description}</InlineTranslator></div>
                                     <ChaosControl />
                                     <div className="flex flex-col gap-3">
                                         <AudioPlayer
@@ -1337,7 +1339,7 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
                                         <summary className="text-xs md:text-sm text-gray-500 cursor-pointer hover:text-gray-700">
                                             Show transcript (click to expand)
                                         </summary>
-                                        <p className="font-mono text-xs md:text-sm italic text-gray-600 mt-2"><InlineTranslator sourceLanguage={exam.language}>{examContent.audio_script}</InlineTranslator></p>
+                                        <div className="font-mono text-xs md:text-sm italic text-gray-600 mt-2"><InlineTranslator sourceLanguage={exam.language}>{examContent.audio_script}</InlineTranslator></div>
                                     </details>
                                 </div>
 
