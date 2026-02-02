@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { User } from "@/entities/User";
 import { UploadFile } from "@/integrations/Core";
@@ -25,12 +24,17 @@ export default function Settings() {
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [formData, setFormData] = useState({
-    target_language: 'finnish',
+    target_country: 'FI',
+    target_test: 'YKI',
+    test_language: 'finnish',
+    interface_language: 'en',
+    target_level: 'A1',
     reading_level: 'A1',
     listening_level: 'A1',
     speaking_level: 'A1',
     writing_level: 'A1',
     daily_goal_minutes: 30,
+    test_date: '',
     profile_picture_url: '',
     show_grammar_tips: true,
     dark_mode: false
@@ -45,14 +49,19 @@ export default function Settings() {
       const currentUser = await User.me();
       setUser(currentUser);
       setFormData({
-        target_language: currentUser.target_language || 'finnish',
+        target_country: currentUser.target_country || 'FI',
+        target_test: currentUser.target_test || 'YKI',
+        test_language: currentUser.test_language || 'finnish',
+        interface_language: currentUser.interface_language || 'en',
+        target_level: currentUser.target_level || 'A1',
         reading_level: currentUser.reading_level || 'A1',
         listening_level: currentUser.listening_level || 'A1',
         speaking_level: currentUser.speaking_level || 'A1',
         writing_level: currentUser.writing_level || 'A1',
         daily_goal_minutes: currentUser.daily_goal_minutes || 30,
+        test_date: currentUser.test_date || '',
         profile_picture_url: currentUser.profile_picture_url || '',
-        show_grammar_tips: currentUser.show_grammar_tips !== false, // Default to true if not explicitly false
+        show_grammar_tips: currentUser.show_grammar_tips !== false,
         dark_mode: currentUser.dark_mode || false
       });
       
@@ -194,11 +203,50 @@ export default function Settings() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="language">Target Language</Label>
-                <Select value={formData.target_language} onValueChange={(value) => handleChange('target_language', value)}>
-                  <SelectTrigger><SelectValue placeholder="Select language" /></SelectTrigger>
-                  <SelectContent><SelectItem value="finnish">Finnish</SelectItem><SelectItem value="swedish">Swedish</SelectItem></SelectContent>
+                <Label htmlFor="target_test">Target Test</Label>
+                <Select value={formData.target_test} onValueChange={(value) => {
+                  handleChange('target_test', value);
+                  // Auto-update country and language based on test selection
+                  if (value === 'YKI') {
+                    handleChange('target_country', 'FI');
+                  } else if (value === 'Swedex' || value === 'TISUS' || value === 'SFI') {
+                    handleChange('target_country', 'SE');
+                    handleChange('test_language', 'swedish');
+                  } else if (value === 'PD3' || value === 'PD2') {
+                    handleChange('target_country', 'DK');
+                    handleChange('test_language', 'danish');
+                  }
+                }}>
+                  <SelectTrigger id="target_test"><SelectValue placeholder="Select test" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="YKI">🇫🇮 YKI (Finnish/Swedish)</SelectItem>
+                    <SelectItem value="Swedex">🇸🇪 Swedex (Coming Soon)</SelectItem>
+                    <SelectItem value="PD3">🇩🇰 Prøve i Dansk PD3 (Coming Soon)</SelectItem>
+                  </SelectContent>
                 </Select>
+              </div>
+
+              {formData.target_test === 'YKI' && (
+                <div className="space-y-2">
+                  <Label htmlFor="test_language">Test Language</Label>
+                  <Select value={formData.test_language} onValueChange={(value) => handleChange('test_language', value)}>
+                    <SelectTrigger id="test_language"><SelectValue placeholder="Select language" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="finnish">Finnish</SelectItem>
+                      <SelectItem value="swedish">Swedish</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+
+              <div className="space-y-2">
+                <Label htmlFor="test_date">Test Date (optional)</Label>
+                <Input
+                  id="test_date"
+                  type="date"
+                  value={formData.test_date}
+                  onChange={(e) => handleChange('test_date', e.target.value)}
+                />
               </div>
 
               <div>

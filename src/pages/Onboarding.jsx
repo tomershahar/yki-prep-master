@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -13,9 +12,9 @@ import { createPageUrl } from '@/utils';
 
 const steps = [
   { id: 1, title: 'Welcome' },
-  { id: 2, title: 'Language' },
+  { id: 2, title: 'Test Selection' },
   { id: 3, title: 'Skill Levels' },
-  { id: 4, title: 'Experience' },
+  { id: 4, title: 'Goals' },
   { id: 5, title: 'Complete' },
 ];
 
@@ -30,12 +29,17 @@ export default function Onboarding() {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
-    target_language: 'finnish',
+    target_country: 'FI',
+    target_test: 'YKI',
+    test_language: 'finnish',
+    target_level: 'A1',
     reading_level: 'A1',
     listening_level: 'A1',
     speaking_level: 'A1',
     writing_level: 'A1',
-    has_taken_exam_before: false
+    test_date: '',
+    daily_practice_goal: 15,
+    interface_language: 'en'
   });
   const [isSaving, setIsSaving] = useState(false);
 
@@ -68,7 +72,7 @@ export default function Onboarding() {
     try {
       await User.updateMyUserData({
         ...formData,
-        has_completed_onboarding: true,
+        onboarding_completed: true,
       });
       navigate(createPageUrl('Dashboard'));
     } catch (error) {
@@ -85,7 +89,7 @@ export default function Onboarding() {
         return (
           <div className="text-center">
             <Languages className="w-16 h-16 mx-auto text-amber-500 mb-6" />
-            <h1 className="text-3xl font-bold mb-2">Welcome to YKI Prep Master!</h1>
+            <h1 className="text-3xl font-bold mb-2">Welcome to Nordic Test Prep!</h1>
             <p className="text-gray-600 mb-8">Let's quickly personalize your learning journey.</p>
             <Button onClick={handleNext} size="lg" className="w-full">Get Started <ArrowRight className="ml-2 w-5 h-5" /></Button>
           </div>
@@ -93,15 +97,92 @@ export default function Onboarding() {
       case 2:
         return (
           <div>
-            <h2 className="text-2xl font-bold text-center mb-6">Which language are you preparing for?</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Card className={`p-6 cursor-pointer border-2 transition-all ${formData.target_language === 'finnish' ? 'border-amber-500 shadow-lg' : 'hover:border-gray-300'}`} onClick={() => handleUpdate('target_language', 'finnish')}>
-                <Flag className="w-8 h-8 text-blue-600 mb-2" />
-                <h3 className="font-bold">Finnish</h3><p className="text-sm text-gray-500">Suomen kieli</p>
+            <h2 className="text-2xl font-bold text-center mb-2">Which test are you preparing for?</h2>
+            <p className="text-center text-gray-600 mb-6">Select your target language proficiency test</p>
+            <div className="grid grid-cols-1 gap-4">
+              <Card 
+                className={`p-6 cursor-pointer border-2 transition-all ${formData.target_country === 'FI' ? 'border-amber-500 bg-amber-50 shadow-lg' : 'hover:border-gray-300'}`} 
+                onClick={() => {
+                  handleUpdate('target_country', 'FI');
+                  handleUpdate('target_test', 'YKI');
+                  handleUpdate('test_language', formData.test_language === 'danish' ? 'finnish' : formData.test_language);
+                }}
+              >
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-2xl">🇫🇮</span>
+                      <h3 className="font-bold text-lg">YKI - Finnish Citizenship Test</h3>
+                    </div>
+                    <p className="text-sm text-gray-600 mb-3">Finnish or Swedish language proficiency for residence/citizenship</p>
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        variant={formData.target_country === 'FI' && formData.test_language === 'finnish' ? 'default' : 'outline'}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleUpdate('target_country', 'FI');
+                          handleUpdate('target_test', 'YKI');
+                          handleUpdate('test_language', 'finnish');
+                        }}
+                      >
+                        Finnish
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant={formData.target_country === 'FI' && formData.test_language === 'swedish' ? 'default' : 'outline'}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleUpdate('target_country', 'FI');
+                          handleUpdate('target_test', 'YKI');
+                          handleUpdate('test_language', 'swedish');
+                        }}
+                      >
+                        Swedish
+                      </Button>
+                    </div>
+                  </div>
+                </div>
               </Card>
-              <Card className={`p-6 cursor-pointer border-2 transition-all ${formData.target_language === 'swedish' ? 'border-amber-500 shadow-lg' : 'hover:border-gray-300'}`} onClick={() => handleUpdate('target_language', 'swedish')}>
-                <Flag className="w-8 h-8 text-yellow-500 mb-2" />
-                <h3 className="font-bold">Swedish</h3><p className="text-sm text-gray-500">Svenska språket</p>
+
+              <Card 
+                className={`p-6 cursor-pointer border-2 transition-all ${formData.target_country === 'SE' ? 'border-blue-500 bg-blue-50 shadow-lg' : 'hover:border-gray-300 opacity-60'}`}
+                onClick={() => {
+                  handleUpdate('target_country', 'SE');
+                  handleUpdate('target_test', 'Swedex');
+                  handleUpdate('test_language', 'swedish');
+                }}
+              >
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-2xl">🇸🇪</span>
+                      <h3 className="font-bold text-lg">Swedex / SFI - Swedish Test</h3>
+                      <Badge variant="secondary" className="ml-2">Coming Soon</Badge>
+                    </div>
+                    <p className="text-sm text-gray-600">Swedish language proficiency for residence/citizenship</p>
+                  </div>
+                </div>
+              </Card>
+
+              <Card 
+                className={`p-6 cursor-pointer border-2 transition-all ${formData.target_country === 'DK' ? 'border-red-500 bg-red-50 shadow-lg' : 'hover:border-gray-300 opacity-60'}`}
+                onClick={() => {
+                  handleUpdate('target_country', 'DK');
+                  handleUpdate('target_test', 'PD3');
+                  handleUpdate('test_language', 'danish');
+                }}
+              >
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-2xl">🇩🇰</span>
+                      <h3 className="font-bold text-lg">Prøve i Dansk (PD3) - Danish Test</h3>
+                      <Badge variant="secondary" className="ml-2">Coming Soon</Badge>
+                    </div>
+                    <p className="text-sm text-gray-600">Danish language proficiency for residence/citizenship</p>
+                  </div>
+                </div>
               </Card>
             </div>
           </div>
@@ -137,10 +218,33 @@ export default function Onboarding() {
       case 4:
          return (
           <div>
-            <h2 className="text-2xl font-bold text-center mb-6">Have you taken the YKI exam before?</h2>
-            <div className="flex justify-center gap-4 mb-6">
-                <Button variant={formData.has_taken_exam_before ? 'default' : 'outline'} onClick={() => handleUpdate('has_taken_exam_before', true)}>Yes, I have</Button>
-                <Button variant={!formData.has_taken_exam_before ? 'default' : 'outline'} onClick={() => handleUpdate('has_taken_exam_before', false)}>No, this is my first time</Button>
+            <h2 className="text-2xl font-bold text-center mb-6">Set Your Learning Goals</h2>
+            <div className="space-y-6">
+              <div>
+                <Label htmlFor="test_date">When is your test? (optional)</Label>
+                <Input
+                  id="test_date"
+                  type="date"
+                  value={formData.test_date}
+                  onChange={(e) => handleUpdate('test_date', e.target.value)}
+                  className="mt-2"
+                />
+              </div>
+              <div>
+                <Label htmlFor="daily_goal">Daily practice goal (minutes)</Label>
+                <Select value={formData.daily_practice_goal.toString()} onValueChange={(value) => handleUpdate('daily_practice_goal', parseInt(value))}>
+                  <SelectTrigger id="daily_goal" className="mt-2">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="10">10 minutes</SelectItem>
+                    <SelectItem value="15">15 minutes</SelectItem>
+                    <SelectItem value="30">30 minutes</SelectItem>
+                    <SelectItem value="45">45 minutes</SelectItem>
+                    <SelectItem value="60">1 hour</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </div>
         );
