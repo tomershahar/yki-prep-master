@@ -208,7 +208,16 @@ export const staticContent = {
           ]
         }
       ],
-      B1: [],
+      B1: [
+        {
+          text: "Midsommar är en av de viktigaste högtiderna i Sverige. Den firas alltid på en fredag mellan den 19 och 25 juni. Många svenskar lämnar städerna och åker ut till landet för att fira med familj och vänner. En viktig tradition är att resa en midsommarstång, som man klär med löv och blommor. Man dansar runt stången och sjunger gamla sånger, som 'Små grodorna'. Maten är också viktig. På midsommarbordet finns ofta sill, färskpotatis med dill, gräddfil och gräslök. Till efterrätt äter man jordgubbar, ofta med grädde eller glass. Midsommar är en fest för att fira att sommaren och ljuset har kommit tillbaka efter den långa vintern.",
+          questions: [
+            { type: "multiple_choice", question: "När firas midsommar?", options: ["Alltid den 21 juni", "På en fredag mellan 19-25 juni", "Första helgen i juli"], correct_answer: "På en fredag mellan 19-25 juni", explanation: "Texten säger att det firas på en fredag mellan den 19 och 25 juni." },
+            { type: "multiple_choice", question: "Vad gör många svenskar på midsommar?", options: ["Stannar i staden", "Åker utomlands", "Åker till landet"], correct_answer: "Åker till landet", explanation: "Många svenskar lämnar städerna och åker ut till landet." },
+            { type: "multiple_choice", question: "Vilken mat är typisk för midsommar?", options: ["Köttbullar och mos", "Sill och färskpotatis", "Ärtsoppa och pannkakor"], correct_answer: "Sill och färskpotatis", explanation: "På midsommarbordet finns ofta sill, färskpotatis med dill." }
+          ]
+        }
+      ],
       B2: []
     }
   },
@@ -240,7 +249,16 @@ export const staticContent = {
         }
       ],
       A2: [],
-      B1: [],
+      B1: [
+        {
+          audio_script: "Intervju med en student: 'Hej! Jag heter Alex och jag studerar ekonomi vid Stockholms universitet. Det är ganska tufft men intressant. Jag har föreläsningar tre dagar i veckan, och resten av tiden pluggar jag själv eller gör grupparbeten. Det bästa med universitetet är studentlivet. Det finns många föreningar och klubbar man kan gå med i. Jag är med i en sportklubb där vi spelar innebandy varje torsdag. Det är ett bra sätt att träffa nya människor och koppla av från studierna. I framtiden hoppas jag kunna jobba som ekonomikonsult på ett stort företag.'",
+          scenario_description: "Du hör en intervju med en universitetsstudent.",
+          questions: [
+            { type: "multiple_choice", question: "Vad studerar Alex?", options: ["Juridik", "Teknik", "Ekonomi"], correct_answer: "Ekonomi", explanation: "Alex säger 'jag studerar ekonomi vid Stockholms universitet'." },
+            { type: "multiple_choice", question: "Vad gör Alex på torsdagar?", options: ["Har föreläsningar", "Spelar innebandy", "Jobbar extra"], correct_answer: "Spelar innebandy", explanation: "Alex är med i en sportklubb där de spelar innebandy varje torsdag." }
+          ]
+        }
+      ],
       B2: []
     }
   },
@@ -278,7 +296,14 @@ export const staticContent = {
           ]
         }
       ],
-      B1: [],
+      B1: [
+        {
+          tasks: [
+            { type: "formal", prompt: "Du köpte en dator från en webbutik, men den fungerar inte som den ska. Skriv ett reklamationsmail till kundtjänst. Beskriv problemet och kräv en lösning (ny dator eller pengarna tillbaka).", word_count: "60-80 ord", sample_answer: "Hej Kundtjänst,\n\nJag köpte en bärbar dator (Ordernr: 12345) från er webbutik förra veckan. Tyvärr har jag upptäckt ett problem med produkten. Skärmen blinkar och stängs av slumpmässigt. Jag har försökt starta om den, men problemet kvarstår.\n\nJag är mycket besviken eftersom jag behöver datorn för mitt arbete. Jag vill reklamera varan och önskar antingen få en ny, fungerande dator eller pengarna tillbaka så snart som möjligt.\n\nMed vänliga hälsningar,\n[Ditt Namn]", comments: "Formell ton, tydlig beskrivning av problemet och krav på åtgärd." },
+            { type: "informal", prompt: "Du har flyttat till en ny lägenhet. Skriv ett brev till din vän och berätta om flytten, den nya lägenheten och grannskapet.", word_count: "60-80 ord", sample_answer: "Hej Anna!\n\nHoppas allt är bra med dig! Jag har äntligen flyttat till min nya lägenhet i Göteborg. Flytten var jobbig men det gick bra tack vare att mina föräldrar hjälpte till.\n\nLägenheten är jättefin, den är ljus och har en stor balkong. Området verkar lugnt och det finns en fin park precis bredvid. Jag trivs redan bra här. Du måste komma och hälsa på snart! När har du tid?\n\nKram,\n[Ditt Namn]", comments: "Personlig ton, beskrivande språk." }
+          ]
+        }
+      ],
       B2: []
     }
   },
@@ -304,7 +329,13 @@ export const staticContent = {
         }
       ],
       A2: [],
-      B1: [],
+      B1: [
+        {
+          tasks: [
+            { type: "description", prompt: "Berätta om en resa som du aldrig glömmer. Vart åkte du? Vem reste du med? Vad hände?", assessment: "Använd imperfekt (dåtid) för att berätta om det förflutna. Beskriv känslor och upplevelser.", sample_answer: "Förra sommaren reste jag till Lofoten i Norge med min familj. Vi hyrde en bil och körde hela vägen. Naturen var fantastisk med höga berg och blått hav. Det var ljust dygnet runt eftersom det var midnattssol. En dag vandrade vi uppför ett berg och utsikten var otrolig. Det var den vackraste plats jag någonsin sett. Jag kommer aldrig att glömma den resan." }
+          ]
+        }
+      ],
       B2: []
     }
   }
