@@ -30,11 +30,11 @@ export default function Settings() {
     target_test: 'YKI',
     test_language: 'finnish',
     interface_language: 'en',
-    target_level: '3',
-    reading_level: '3',
-    listening_level: '3',
-    speaking_level: '3',
-    writing_level: '3',
+    target_level: 'A1',
+    reading_level: 'A1',
+    listening_level: 'A1',
+    speaking_level: 'A1',
+    writing_level: 'A1',
     daily_goal_minutes: 30,
     test_date: '',
     profile_picture_url: '',
@@ -298,8 +298,8 @@ export default function Settings() {
                 <Label>Skill Levels</Label>
                 {testConfig && (
                   <p className="text-xs text-gray-500 mt-1">
-                    {testConfig.scoring_rules?.scale_type === 'numeric_1_6' && 'Scale: 1 (Basic) to 6 (Advanced)'}
-                    {testConfig.scoring_rules?.scale_type === 'cefr' && 'Scale: CEFR (A2 to C1)'}
+                    {testConfig.scoring_rules?.scale_type === 'cefr' && testConfig.test_name === 'YKI' && 'Scale: CEFR (A1 to B2)'}
+                    {testConfig.scoring_rules?.scale_type === 'cefr' && testConfig.test_name === 'Swedex' && 'Scale: CEFR (A2 to C1)'}
                     {testConfig.scoring_rules?.scale_type === 'danish_7_point' && 'Scale: Danish 7-point (B2 Level)'}
                   </p>
                 )}
