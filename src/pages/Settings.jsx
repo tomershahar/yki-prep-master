@@ -265,8 +265,8 @@ export default function Settings() {
                   <SelectTrigger id="target_test"><SelectValue placeholder="Select test" /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="YKI">🇫🇮 YKI (Finnish/Swedish)</SelectItem>
-                    <SelectItem value="Swedex">🇸🇪 Swedex (Coming Soon)</SelectItem>
-                    <SelectItem value="PD3">🇩🇰 Prøve i Dansk PD3 (Coming Soon)</SelectItem>
+                    <SelectItem value="Swedex">🇸🇪 Swedex</SelectItem>
+                    <SelectItem value="PD3">🇩🇰 Prøve i Dansk PD3</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
