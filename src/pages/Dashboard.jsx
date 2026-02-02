@@ -16,15 +16,24 @@ import { useUserJourney } from "../components/dashboard/UserJourneyHook";
 import KpiCard from "../components/dashboard/KpiCard";
 import ErrorBoundary from "../components/dashboard/ErrorBoundary";
 import { SafeRender, safeText, safeNumber } from "../components/dashboard/SafeRender";
-import { UserVisit } from "@/entities/UserVisit"; // Import UserVisit entity
+import { UserVisit } from "@/entities/UserVisit";
+import TestTypeSwitcher from "../components/dashboard/TestTypeSwitcher";
+import { TestConfiguration } from "@/entities/TestConfiguration";
 
 
 const difficultyLevels = ["A1", "A2", "B1", "B2"];
 
 // Helper component for the Hero Section
-const HeroBanner = ({ user }) => {
+const HeroBanner = ({ user, testConfig }) => {
   const userName = safeText(user.full_name, 'User').split(' ')[0];
-  const targetLanguage = user.target_language === 'finnish' ? 'Finnish' : 'Swedish';
+  const testName = testConfig?.display_name || 'YKI Test';
+  const languageMap = {
+    'finnish': 'Finnish',
+    'swedish': 'Swedish',
+    'danish': 'Danish'
+  };
+  const targetLanguage = languageMap[user.test_language] || 'Finnish';
+  
   return (
     <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-3xl p-8 text-white">
       <div className="max-w-4xl">
@@ -32,7 +41,7 @@ const HeroBanner = ({ user }) => {
           Welcome back, {userName}! 👋
         </h1>
         <p className="text-xl text-blue-100">
-          Continue your {targetLanguage} YKI exam preparation journey
+          Continue your {targetLanguage} {testName} preparation journey
         </p>
       </div>
     </div>
@@ -67,6 +76,7 @@ export default function Dashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showWelcomeBanner, setShowWelcomeBanner] = useState(false);
+  const [testConfig, setTestConfig] = useState(null);
   const navigate = useNavigate();
 
   // Check if welcome banner should be shown
@@ -252,6 +262,16 @@ export default function Dashboard() {
 
       setUser(currentUser);
       
+      // Load test configuration
+      const configs = await TestConfiguration.filter({
+        country_code: currentUser.target_country || 'FI',
+        test_name: currentUser.target_test || 'YKI',
+        is_active: true
+      });
+      if (configs && configs.length > 0) {
+        setTestConfig(configs[0]);
+      }
+      
       const sessions = await PracticeSession.filter(
         { created_by: currentUser.email },
         '-created_date',
@@ -333,10 +353,11 @@ export default function Dashboard() {
 
   const getMotivationalMessage = () => {
     const { isFirstTimeUser, hasSession, totalSessions, preferredSection } = journeyData;
+    const testName = testConfig?.test_name || 'YKI';
     
     if (isFirstTimeUser) {
       return {
-        title: "Welcome to your YKI journey! 🎯",
+        title: `Welcome to your ${testName} journey! 🎯`,
         message: "Start with a quick practice session to get familiar with the exam format.",
         action: "Start Your First Practice",
         actionUrl: createPageUrl("Practice")
@@ -355,7 +376,7 @@ export default function Dashboard() {
     if (totalSessions >= 10) {
       return {
         title: "You're making great progress! 📚",
-        message: `You've completed ${totalSessions} practice sessions. Ready for a full exam simulation?`,
+        message: `You've completed ${totalSessions} practice sessions. Ready for a full ${testName} exam simulation?`,
         action: "Try Full Exam",
         actionUrl: createPageUrl("FullExam")
       };
@@ -377,7 +398,7 @@ export default function Dashboard() {
     
     return {
       title: "Ready to practice today? 💪",
-      message: "Consistent practice is the key to YKI success. Let's continue learning!",
+      message: `Consistent practice is the key to ${testName} success. Let's continue learning!`,
       action: "Continue Practice",
       actionUrl: createPageUrl("Practice")
     };
@@ -552,7 +573,10 @@ export default function Dashboard() {
             )}
 
             {/* Hero Section */}
-            <HeroBanner user={user} />
+            <HeroBanner user={user} testConfig={testConfig} />
+            
+            {/* Test Type Switcher */}
+            <TestTypeSwitcher currentUser={user} onTestChange={(config) => setTestConfig(config)} />
             
             {/* Quick Actions Section */}
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
