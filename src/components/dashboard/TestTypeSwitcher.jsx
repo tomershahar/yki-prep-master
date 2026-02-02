@@ -76,8 +76,9 @@ export default function TestTypeSwitcher({ currentUser, onTestChange }) {
         {currentConfig && (
           <div className="flex gap-2 flex-wrap">
             <Badge variant="secondary">{currentConfig.country_code}</Badge>
-            <Badge variant="secondary">{currentConfig.language_code.toUpperCase()}</Badge>
-            <Badge variant="outline">{currentConfig.levels.join(', ')}</Badge>
+            <Badge variant="secondary">
+              {currentUser.test_language === 'finnish' ? 'Finnish' : currentUser.test_language === 'swedish' ? 'Swedish' : 'Danish'}
+            </Badge>
           </div>
         )}
       </CardContent>
