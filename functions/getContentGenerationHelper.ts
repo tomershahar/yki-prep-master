@@ -64,7 +64,17 @@ Deno.serve(async (req) => {
       taskType
     });
 
-    return Response.json(result, { headers: corsHeaders });
+    // Extract data from the function invocation result
+    if (result.error) {
+      return Response.json({ 
+        error: result.error 
+      }, { 
+        status: 500,
+        headers: corsHeaders 
+      });
+    }
+
+    return Response.json(result.data, { headers: corsHeaders });
 
   } catch (error) {
     console.error('Error in content generation helper:', error);
