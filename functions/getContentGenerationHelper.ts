@@ -22,37 +22,43 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Unauthorized' }, { status: 401, headers: corsHeaders });
     }
 
-    const { testType, section, level, topic, wordCount, taskType } = await req.json();
+    const { testType, section, level, language, topic, wordCount, taskType } = await req.json();
 
-    // Route to appropriate generation function based on test type
+    // Route to appropriate generation function based on test type AND language
     let generationFunction;
-    switch (testType) {
-      case 'YKI':
-        // Use existing YKI generation logic (Finnish/Swedish)
-        generationFunction = 'generateYKIContent'; // This would be your existing function
-        break;
-      case 'Swedex':
-      case 'TISUS':
-      case 'SFI':
+    
+    if (testType === 'YKI') {
+      // YKI can be Finnish or Swedish - route based on language
+      if (language === 'swedish') {
         generationFunction = 'generateSwedishContent';
-        break;
-      case 'PD3':
-      case 'PD2':
-        generationFunction = 'generateDanishContent';
-        break;
-      default:
+      } else {
+        // For Finnish, we need to use the inline generation (no separate function exists)
+        // Fall back to returning an error for now
         return Response.json({ 
-          error: `Unknown test type: ${testType}` 
+          error: 'YKI Finnish content generation not yet implemented as a separate function' 
         }, { 
-          status: 400, 
+          status: 501, 
           headers: corsHeaders 
         });
+      }
+    } else if (testType === 'Swedex' || testType === 'TISUS' || testType === 'SFI') {
+      generationFunction = 'generateSwedishContent';
+    } else if (testType === 'PD3' || testType === 'PD2') {
+      generationFunction = 'generateDanishContent';
+    } else {
+      return Response.json({ 
+        error: `Unknown test type: ${testType}` 
+      }, { 
+        status: 400, 
+        headers: corsHeaders 
+      });
     }
 
     // Call the appropriate generation function
     const result = await base44.functions.invoke(generationFunction, {
       section,
       level,
+      language,
       topic,
       wordCount,
       taskType
