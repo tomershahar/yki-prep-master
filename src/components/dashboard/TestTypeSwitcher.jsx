@@ -68,25 +68,9 @@ export default function TestTypeSwitcher({ currentUser, onTestChange }) {
   return (
     <Card className="bg-gradient-to-br from-blue-50 to-purple-50 border-blue-200">
       <CardContent className="p-4">
-        <div className="flex items-center justify-between mb-3">
-          <div>
-            <p className="text-sm text-gray-600">Preparing for:</p>
-            <p className="font-bold text-lg">{currentConfig?.display_name || 'YKI Test'}</p>
-          </div>
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => {
-              const otherConfigs = testConfigs.filter(c => c.id !== currentConfig?.id);
-              if (otherConfigs.length > 0) {
-                handleTestSwitch(otherConfigs[0]);
-              }
-            }}
-            disabled={isSwitching || testConfigs.length <= 1}
-          >
-            <RefreshCw className={`w-4 h-4 mr-2 ${isSwitching ? 'animate-spin' : ''}`} />
-            Switch Test
-          </Button>
+        <div className="mb-3">
+          <p className="text-sm text-gray-600">Preparing for:</p>
+          <p className="font-bold text-lg">{currentConfig?.display_name || 'YKI Test'}</p>
         </div>
         
         {currentConfig && (
