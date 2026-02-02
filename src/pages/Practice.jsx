@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { User } from "@/entities/User";
 import { PracticeSession } from "@/entities/PracticeSession";
+import { TestConfiguration } from "@/entities/TestConfiguration";
 import { InvokeLLM } from "@/integrations/Core";
 import { generateSpeech } from '@/functions/generateSpeech';
-// Still imported, but no longer used for listening practice generation
 import { KnowledgeBaseContent } from "@/entities/KnowledgeBaseContent";
 import { Achievement } from "@/entities/Achievement";
+import { getContentGenerationHelper } from '@/functions/getContentGenerationHelper';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -20,13 +21,14 @@ const difficultyLevels = ["A1", "A2", "B1", "B2"];
 
 export default function Practice() {
   const [user, setUser] = useState(null);
+  const [testConfig, setTestConfig] = useState(null);
   const [activeExam, setActiveExam] = useState(null);
   const [activeSection, setActiveSection] = useState(false);
   const [isLoadingExam, setIsLoadingExam] = useState(false);
-  const [practiceReady, setPracticeReady] = useState(false); // New state for two-stage loading
-  const [isCompleting, setIsCompleting] = useState(false); // Safeguard state
-  const [showGrammarTips, setShowGrammarTips] = useState(true); // New state for showing/hiding grammar tips
-  const [completionDialog, setCompletionDialog] = useState(null); // For completion message dialog
+  const [practiceReady, setPracticeReady] = useState(false);
+  const [isCompleting, setIsCompleting] = useState(false);
+  const [showGrammarTips, setShowGrammarTips] = useState(true);
+  const [completionDialog, setCompletionDialog] = useState(null);
 
   useEffect(() => {
     loadUserData();
@@ -47,7 +49,17 @@ export default function Practice() {
     try {
       const currentUser = await User.me();
       setUser(currentUser);
-      // Initialize showGrammarTips based on user preferences, default to true
+      
+      // Load test configuration
+      const configs = await TestConfiguration.filter({
+        country_code: currentUser.target_country || 'FI',
+        test_name: currentUser.target_test || 'YKI',
+        is_active: true
+      });
+      if (configs && configs.length > 0) {
+        setTestConfig(configs[0]);
+      }
+      
       setShowGrammarTips(currentUser.show_grammar_tips !== false);
       const lastRefresh = localStorage.getItem('dashboard_refresh_needed');
       if (lastRefresh) {
@@ -273,118 +285,25 @@ INSTRUCTIONS:
 
   const generateQuickPractice = async (section, language, difficulty) => {
     try {
-      const knowledgeFiles = await KnowledgeBaseContent.list();
-      const fileUrls = knowledgeFiles.map((file) => file.file_url);
-
-      // Fetch writing weak spots if this is a writing practice
-      let weakSpotsData = null;
-      if (section.id === 'writing') {
-        try {
-          const { data } = await getWritingWeakSpots();
-          if (data && data.weakSpots) {
-            weakSpotsData = data;
-          }
-        } catch (error) {
-          console.log('Could not fetch weak spots, continuing without:', error);
-        }
-      }
-
-      // OPTIMIZED PROMPT - shorter and more focused
-      const prompt = getAIPrompt(section, language, difficulty, weakSpotsData);
-
-      let responseSchema;
-      if (section.id === 'reading') {
-        responseSchema = {
-          type: "object",
-          properties: {
-            text: { type: "string" },
-            questions: {
-              type: "array",
-              items: {
-                type: "object",
-                properties: {
-                  question_type: { type: "string" },
-                  question: { type: "string" },
-                  options: { type: "array", items: { type: "string" } },
-                  correct_answer: { type: "string" },
-                  explanation: { type: "string" }
-                },
-                required: ["question_type", "question", "correct_answer"]
-              }
-            }
-          },
-          required: ["text", "questions"]
-        };
-      } else if (section.id === 'listening') {
-        responseSchema = {
-          type: "object",
-          properties: {
-            audio_script: { type: "string" },
-            scenario_description: { type: "string" },
-            questions: {
-              type: "array",
-              items: {
-                type: "object",
-                properties: {
-                  question_type: { type: "string" },
-                  question: { type: "string" },
-                  options: { type: "array", items: { type: "string" } },
-                  correct_answer: { type: "string" },
-                  explanation: { type: "string" }
-                },
-                required: ["question_type", "question", "correct_answer"]
-              }
-            }
-          },
-          required: ["audio_script", "scenario_description", "questions"]
-        };
-      } else {// writing or speaking
-        responseSchema = {
-          type: "object",
-          properties: {
-            tasks: {
-              type: "array",
-              items: {
-                type: "object",
-                properties: {
-                  task_type: { type: "string" },
-                  prompt: { type: "string" },
-                  word_count: { type: "string" },
-                  sample_answer: { type: "string" },
-                  comments: { type: "string" },
-                  assessment: { type: "string" },
-                  time_limit: { type: "string" },
-                  assessment_criteria: {
-                    type: "object",
-                    properties: {
-                      task_fulfillment: { type: "string" },
-                      language_sophistication: { type: "string" },
-                      grammatical_accuracy: { type: "string" }
-                    }
-                  }
-                },
-                required: ["task_type", "prompt", "sample_answer"]
-              }
-            }
-          },
-          required: ["tasks"]
-        };
-      }
-
-      // Increased timeout for GPT-4o processing
-      const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error('Generation timeout')), 100000); // 100 second timeout for GPT-4o
+      // Use the helper function to route to the correct generator
+      const testType = testConfig?.test_name || 'YKI';
+      
+      const { data, error } = await getContentGenerationHelper({
+        testType,
+        section: section.id,
+        level: difficulty,
+        language
       });
+      
+      if (error || !data) {
+        throw new Error(error?.message || 'Content generation failed');
+      }
+      
+      return data;
 
-      const generationPromise = InvokeLLM({
-        prompt: prompt,
-        response_json_schema: responseSchema,
-        file_urls: fileUrls,
-        model: "gpt-4o" // UPGRADED: Use GPT-4o instead of mini
-      });
 
-      const response = await Promise.race([generationPromise, timeoutPromise]);
-      return response;
+
+
     } catch (error) {
       console.error("Error generating quick practice:", error);
       throw error;
@@ -968,8 +887,10 @@ Would you like to advance to level ${newLevel}?`)) {
         <div className="text-center space-y-4">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Quick Practice</h1>
           <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">Build your skills with focused, untimed practice sessions. Each practice has 4-6 questions tailored to your level.</p>
-          <div className="flex items-center justify-center gap-4">
-            <Badge variant="secondary" className="text-sm">Language: {String(user?.target_language === 'finnish' ? 'Finnish' : 'Swedish')}</Badge>
+          <div className="flex items-center justify-center gap-4 flex-wrap">
+            <Badge variant="secondary" className="text-sm">
+              {testConfig?.display_name || 'Language Test'}
+            </Badge>
             <div className="flex items-center gap-1">
               <Clock className="w-3 h-3 text-gray-500" />
               <Badge variant="outline" className="text-sm">Untimed Practice</Badge>
