@@ -1,10 +1,11 @@
-
 import React, { useState, useEffect } from "react";
 import { User } from "@/entities/User";
 import { PracticeSession } from "@/entities/PracticeSession";
 import { GeneratedExam } from "@/entities/GeneratedExam";
+import { TestConfiguration } from "@/entities/TestConfiguration";
 import { InvokeLLM } from "@/integrations/Core";
 import { KnowledgeBaseContent } from "@/entities/KnowledgeBaseContent";
+import { getContentGenerationHelper } from '@/functions/getContentGenerationHelper';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -72,6 +73,7 @@ const validateExamContent = (contentString, sectionId) => {
 
 export default function FullExam() {
   const [user, setUser] = useState(null);
+  const [testConfig, setTestConfig] = useState(null);
   const [activeExam, setActiveExam] = useState(null);
   const [activeSection, setActiveSection] = useState(null);
   const [isLoadingExam, setIsLoadingExam] = useState(false);
@@ -87,6 +89,16 @@ export default function FullExam() {
     try {
       const currentUser = await User.me();
       setUser(currentUser);
+      
+      // Load test configuration
+      const configs = await TestConfiguration.filter({
+        country_code: currentUser.target_country || 'FI',
+        test_name: currentUser.target_test || 'YKI',
+        is_active: true
+      });
+      if (configs && configs.length > 0) {
+        setTestConfig(configs[0]);
+      }
     } catch (error) {
       console.error("Error loading user data:", error);
     }
@@ -232,17 +244,21 @@ INSTRUCTIONS:
 
   const generateFullExam = async (section, language, difficulty) => {
     try {
-      // TRY to get knowledge base files, but don't fail if network is down
-      let fileUrls = [];
-      try {
-        const knowledgeFiles = await KnowledgeBaseContent.list();
-        fileUrls = knowledgeFiles.map((file) => file.file_url);
-      } catch (knowledgeError) {
-        console.warn("Could not load knowledge base files, proceeding without them:", knowledgeError);
-        // Continue without knowledge base files - AI can still generate quality content
+      // Use the helper function to route to the correct generator
+      const testType = testConfig?.test_name || 'YKI';
+      
+      const { data, error } = await getContentGenerationHelper({
+        testType,
+        section: section.id,
+        level: difficulty,
+        language
+      });
+      
+      if (error || !data) {
+        throw new Error(error?.message || 'Content generation failed');
       }
-
-      const prompt = getAIPrompt(section, language, difficulty);
+      
+      return data;
 
       let responseSchema;
       if (section.id === 'reading') {
@@ -533,17 +549,17 @@ INSTRUCTIONS:
         // No pre-generated exam available or the found one was invalid, so generate one on the fly
         setLoadingMessage("Generating personalized exam content...");
 
-        const generatedContent = await generateFullExam(section, currentUser.target_language, userLevel);
+        const generatedContent = await generateFullExam(section, currentUser.test_language, userLevel);
 
         // Generate audio for listening exams before saving
         // The structure of generatedContent.clips is now generatedContent.sections for listening
         if (section.id === 'listening' && generatedContent.sections) {
           setLoadingMessage("Generating audio for listening tasks...");
-          for (const clip of generatedContent.sections) { // Changed from generatedContent.clips to generatedContent.sections
+          for (const clip of generatedContent.sections) {
             try {
               const { data: audioData } = await generateSpeech({
                 text_to_speak: clip.audio_script,
-                language: currentUser.target_language
+                language: currentUser.test_language
               });
               if (audioData.status === 'success') {
                 clip.audio_base64 = audioData.audio_base64;
@@ -568,7 +584,7 @@ INSTRUCTIONS:
         try {
           newExam = await GeneratedExam.create({
             section: section.id,
-            language: currentUser.target_language,
+            language: currentUser.test_language,
             difficulty: userLevel,
             content: JSON.stringify(generatedContent),
             is_taken: true,
@@ -579,7 +595,7 @@ INSTRUCTIONS:
           newExam = {
             id: 'temp_' + Date.now(),
             section: section.id,
-            language: currentUser.target_language,
+            language: currentUser.test_language,
             difficulty: userLevel,
             content: JSON.stringify(generatedContent),
             is_taken: true,
@@ -776,11 +792,11 @@ INSTRUCTIONS:
             <div className="mb-4">
               <Sparkles className="w-8 h-8 text-amber-500 mx-auto mb-2" />
               <h2 className="text-2xl font-bold text-gray-800 mb-2">
-                Crafting Your YKI Exam Simulation
+                Crafting Your {testConfig?.test_name || 'Language'} Exam Simulation
               </h2>
             </div>
             <p className="text-gray-600 mb-6">
-              We're using advanced AI to generate a unique, full-length YKI exam tailored to your chosen section and level. This ensures an authentic practice experience.
+              We're using advanced AI to generate a unique, full-length {testConfig?.test_name || 'exam'} tailored to your chosen section and level. This ensures an authentic practice experience.
             </p>
           </div>
           
@@ -816,10 +832,14 @@ INSTRUCTIONS:
   return (
     <div className="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen p-4 md:p-8 max-w-7xl mx-auto space-y-8">
       <div className="text-center space-y-4">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Full YKI Exam Simulation</h1>
-        <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">Take a complete YKI exam simulation with official timing and full question count. This is as close as you can get to the real exam experience.</p>
-        <div className="flex items-center justify-center gap-4">
-          <Badge variant="secondary" className="text-sm">Language: {user?.target_language === 'finnish' ? 'Finnish' : 'Swedish'}</Badge>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Full Exam Simulation</h1>
+        <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+          Take a complete {testConfig?.display_name || 'exam'} simulation with official timing and full question count. This is as close as you can get to the real exam experience.
+        </p>
+        <div className="flex items-center justify-center gap-4 flex-wrap">
+          <Badge variant="secondary" className="text-sm">
+            {testConfig?.display_name || 'Language Test'}
+          </Badge>
           <Badge variant="outline" className="text-sm flex items-center gap-1">
             <Timer className="w-3 h-3" />
             Timed Exam
@@ -878,7 +898,7 @@ INSTRUCTIONS:
       <div className="text-center pt-8">
         <div className="p-6 bg-gradient-to-r from-green-50 to-blue-50 dark:from-gray-800 dark:to-gray-700 rounded-xl border border-green-100 dark:border-gray-600">
           <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Want to practice specific skills first?</h3>
-          <p className="text-gray-600 dark:text-gray-300 mb-4">Try our quick, untimed practice sessions to build your confidence before taking the full exam.</p>
+          <p className="text-gray-600 dark:text-gray-300 mb-4">Try our quick, untimed practice sessions to build your confidence before taking the full {testConfig?.test_name || 'exam'}.</p>
           <Button variant="outline" className="border-green-500 text-green-600 hover:bg-green-50 dark:text-green-400 dark:border-green-600 dark:hover:bg-gray-600">
             ← Go to Quick Practice
           </Button>

@@ -395,9 +395,9 @@ INSTRUCTIONS:
 
     try {
       let currentUser = await User.me();
-      const language = currentUser.target_language;
+      const language = currentUser.test_language;
       const difficulty = currentUser[`${section.id}_level`] || 'A1';
-      let weakSpotsData = null; // Define here for all sections
+      let weakSpotsData = null;
 
       // Add loading timeout alert for speaking
       let timeoutAlert = null;
@@ -429,7 +429,7 @@ INSTRUCTIONS:
           try {
             const { data: audioData } = await generateSpeech({
               text_to_speak: generatedContent.audio_script,
-              language: language
+              language
             });
             if (audioData.status === 'success') {
               generatedContent.audio_base64 = audioData.audio_base64;
@@ -484,7 +484,7 @@ INSTRUCTIONS:
             try {
               const { data: audioData } = await generateSpeech({
                 text_to_speak: staticContent.audio_script,
-                language: language
+                language
               });
               if (audioData.status === 'success') {
                 staticContent.audio_base64 = audioData.audio_base64;

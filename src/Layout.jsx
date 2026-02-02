@@ -59,29 +59,32 @@ export default function Layout({ children, currentPageName }) {
   };
 
   const updateSEOTags = (pageName) => {
+    const testName = user?.target_test || 'Language Test';
+    const appName = 'Nordic Test Prep';
+    
     const pageTitles = {
-      Dashboard: "Dashboard - YKI Prep Master",
-      Practice: "Quick Practice - YKI Exam Preparation",
-      FullExam: "Full Exam Simulation - YKI Prep Master",
-      History: "Practice History - YKI Prep Master",
-      Achievements: "Achievements - YKI Prep Master",
-      WordBank: "Word Bank - YKI Prep Master",
-      Settings: "Settings - YKI Prep Master",
-      Landing: "YKI Prep Master - Finnish & Swedish Exam Preparation"
+      Dashboard: `Dashboard - ${appName}`,
+      Practice: `Quick Practice - ${testName} Preparation`,
+      FullExam: `Full Exam Simulation - ${appName}`,
+      History: `Practice History - ${appName}`,
+      Achievements: `Achievements - ${appName}`,
+      WordBank: `Word Bank - ${appName}`,
+      Settings: `Settings - ${appName}`,
+      Landing: `${appName} - Finnish, Swedish & Danish Language Test Preparation`
     };
 
     const pageDescriptions = {
-      Dashboard: "Track your YKI exam preparation progress with personalized insights and recommendations.",
-      Practice: "Practice YKI exam questions for reading, listening, speaking, and writing with AI feedback.",
-      FullExam: "Take a complete YKI practice exam under realistic conditions.",
-      History: "Review your past YKI practice sessions and track improvement over time.",
-      Achievements: "See your earned achievements and milestones in YKI exam preparation.",
-      WordBank: "Build your Finnish/Swedish vocabulary with personalized word lists.",
-      Settings: "Customize your YKI exam preparation settings and preferences.",
-      Landing: "Ace your YKI Finnish or Swedish exam with AI-powered practice and instant feedback."
+      Dashboard: `Track your ${testName} exam preparation progress with personalized insights and recommendations.`,
+      Practice: `Practice ${testName} exam questions for reading, listening, speaking, and writing with AI feedback.`,
+      FullExam: `Take a complete ${testName} practice exam under realistic conditions.`,
+      History: `Review your past ${testName} practice sessions and track improvement over time.`,
+      Achievements: `See your earned achievements and milestones in ${testName} exam preparation.`,
+      WordBank: "Build your Finnish/Swedish/Danish vocabulary with personalized word lists.",
+      Settings: `Customize your ${testName} exam preparation settings and preferences.`,
+      Landing: "Ace your Nordic language proficiency test with AI-powered practice and instant feedback."
     };
 
-    document.title = pageTitles[pageName] || "YKI Master - Pass the Finnish YKI Test";
+    document.title = pageTitles[pageName] || `${appName} - Pass Your Language Test`;
 
     let metaDescription = document.querySelector('meta[name="description"]');
     if (!metaDescription) {
@@ -89,7 +92,7 @@ export default function Layout({ children, currentPageName }) {
       metaDescription.name = 'description';
       document.head.appendChild(metaDescription);
     }
-    metaDescription.content = pageDescriptions[pageName] || "Ace your Finnish or Swedish YKI language proficiency test with AI-powered practice courses. Get instant feedback on reading, writing, listening, and speaking skills with personalized study plans tailored to your level.";
+    metaDescription.content = pageDescriptions[pageName] || "Ace your Finnish, Swedish, or Danish language proficiency test with AI-powered practice. Get instant feedback on reading, writing, listening, and speaking skills with personalized study plans.";
   };
 
   const navigationItems = [
@@ -235,8 +238,10 @@ export default function Layout({ children, currentPageName }) {
                 <Languages className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h2 className="font-bold text-white text-lg">YKI Prep Master</h2>
-                <p className="text-xs text-green-100">Finnish & Swedish Exam Prep</p>
+                <h2 className="font-bold text-white text-lg">Nordic Test Prep</h2>
+                <p className="text-xs text-green-100">
+                  {user?.target_test || 'Language'} Exam Preparation
+                </p>
               </div>
             </div>
           </SidebarHeader>
@@ -293,7 +298,7 @@ export default function Layout({ children, currentPageName }) {
           <header className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border-b border-gray-100 dark:border-gray-700 px-6 py-4 md:hidden">
             <div className="flex items-center gap-4">
               <SidebarTrigger className="hover:bg-gray-100 dark:hover:bg-gray-800 p-2 rounded-lg transition-colors duration-200" aria-label="Toggle sidebar" />
-              <h1 className="text-xl font-bold text-gray-900 dark:text-white">YKI Prep Master</h1>
+              <h1 className="text-xl font-bold text-gray-900 dark:text-white">Nordic Test Prep</h1>
             </div>
           </header>
 
