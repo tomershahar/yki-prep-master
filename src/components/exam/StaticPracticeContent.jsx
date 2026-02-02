@@ -218,7 +218,15 @@ export const staticContent = {
           ]
         }
       ],
-      B2: []
+      B2: [
+        {
+          text: "Digitaliseringen av det svenska samhället har gått snabbt, men det finns oro för att vissa grupper hamnar utanför. Äldre och nyanlända kan ha svårt att använda digitala tjänster som BankID och Swish, vilket är nödvändigt för många vardagliga ärenden. Myndigheter och banker arbetar för att öka den digitala delaktigheten, men kritiker menar att det behövs mer resurser och utbildning. Samtidigt debatteras riskerna med ett kontantlöst samhälle, särskilt i kristider. Det är en balansgång mellan effektivitet och tillgänglighet som kräver noggrann planering för framtiden.",
+          questions: [
+            { type: "multiple_choice", question: "Vilket problem lyfts fram i texten?", options: ["Att internet är för långsamt", "Att vissa grupper hamnar utanför digitaliseringen", "Att teknik är för dyrt"], correct_answer: "Att vissa grupper hamnar utanför digitaliseringen", explanation: "Texten nämner oro för att vissa grupper hamnar utanför." },
+            { type: "multiple_choice", question: "Vilka tjänster nämns som nödvändiga?", options: ["Facebook och Instagram", "BankID och Swish", "Netflix och Spotify"], correct_answer: "BankID och Swish", explanation: "Texten nämner BankID och Swish som nödvändiga." }
+          ]
+        }
+      ]
     }
   },
   listening: {
@@ -249,6 +257,16 @@ export const staticContent = {
         }
       ],
       A2: [],
+      A2: [
+        {
+          audio_script: "Meddelande på telefonsvarare: 'Hej, det är Lisa. Jag ringer för att fråga om vi kan byta tid för vår middag på lördag? Jag måste jobba över och hinner inte till klockan 18. Kan vi ses klockan 19:30 istället? Ring mig när du hör det här. Hej då!'",
+          scenario_description: "Du lyssnar på ett meddelande på din telefonsvarare.",
+          questions: [
+            { type: "multiple_choice", question: "Varför ringer Lisa?", options: ["För att avboka middagen", "För att byta tid", "För att fråga om vägen"], correct_answer: "För att byta tid", explanation: "Lisa frågar 'kan vi byta tid för vår middag'." },
+            { type: "multiple_choice", question: "Vilken ny tid föreslår hon?", options: ["18:00", "19:00", "19:30"], correct_answer: "19:30", explanation: "Hon frågar 'Kan vi ses klockan 19:30 istället?'." }
+          ]
+        }
+      ],
       B1: [
         {
           audio_script: "Intervju med en student: 'Hej! Jag heter Alex och jag studerar ekonomi vid Stockholms universitet. Det är ganska tufft men intressant. Jag har föreläsningar tre dagar i veckan, och resten av tiden pluggar jag själv eller gör grupparbeten. Det bästa med universitetet är studentlivet. Det finns många föreningar och klubbar man kan gå med i. Jag är med i en sportklubb där vi spelar innebandy varje torsdag. Det är ett bra sätt att träffa nya människor och koppla av från studierna. I framtiden hoppas jag kunna jobba som ekonomikonsult på ett stort företag.'",
@@ -259,7 +277,16 @@ export const staticContent = {
           ]
         }
       ],
-      B2: []
+      B2: [
+        {
+          audio_script: "Nyhetsinslag: 'Regeringen har presenterat ett nytt förslag för att minska plastavfallet i haven. Förslaget innebär hårdare regler för engångsartiklar av plast och ökade krav på återvinning. Miljöminister Per Andersson säger att detta är ett nödvändigt steg för att skydda vår miljö för kommande generationer. Kritiker anser dock att åtgärderna inte går tillräckligt långt och efterlyser ett totalförbud mot vissa plastprodukter. Debatten väntas fortsätta i riksdagen under hösten.'",
+          scenario_description: "Du lyssnar på ett nyhetsinslag om miljön.",
+          questions: [
+            { type: "multiple_choice", question: "Vad handlar förslaget om?", options: ["Att sänka skatten på plast", "Att minska plastavfallet i haven", "Att bygga fler återvinningscentraler"], correct_answer: "Att minska plastavfallet i haven", explanation: "Förslaget är för att 'minska plastavfallet i haven'." },
+            { type: "multiple_choice", question: "Vad tycker kritikerna?", options: ["Att förslaget är för dyrt", "Att förslaget är bra", "Att åtgärderna inte räcker till"], correct_answer: "Att åtgärderna inte räcker till", explanation: "Kritiker anser att 'åtgärderna inte går tillräckligt långt'." }
+          ]
+        }
+      ]
     }
   },
   writing: {
@@ -304,7 +331,13 @@ export const staticContent = {
           ]
         }
       ],
-      B2: []
+      B2: [
+        {
+          tasks: [
+            { type: "formal", prompt: "Skriv en insändare till en lokaltidning där du argumenterar för (eller emot) bilfria zoner i stadens centrum.", word_count: "100-150 ord", sample_answer: "Rubrik: Bilfria zoner gör staden levande\n\nJag anser att vi bör införa fler bilfria zoner i centrum. För det första skulle det minska buller och luftföroreningar, vilket är bra för både hälsan och miljön. För det andra skulle det skapa mer plats för uteserveringar, marknader och fotgängare, vilket gör staden trevligare att vistas i.\n\nSjälvklart måste vi se till att varutransporter och färdtjänst fortfarande fungerar, men privatbilismen bör begränsas. Låt oss göra vår stad till en plats för människor, inte bilar!\n\n/Miljövännen", comments: "Argumenterande text, tydlig åsikt, struktur med inledning/argument/avslutning." }
+          ]
+        }
+      ]
     }
   },
   speaking: {
@@ -329,6 +362,13 @@ export const staticContent = {
         }
       ],
       A2: [],
+      A2: [
+        {
+          tasks: [
+            { type: "description", prompt: "Beskriv din familj. Hur många är ni? Vad heter de? Vad gör de?", assessment: "Berätta kort om familjemedlemmar. Använd presens.", sample_answer: "Min familj är ganska liten. Jag har en mamma, en pappa och en syster. Min mamma heter Eva och hon arbetar som lärare. Min pappa heter Lars och han är ingenjör. Min syster heter Anna och hon går i skolan. Vi bor i ett hus nära staden." }
+          ]
+        }
+      ],
       B1: [
         {
           tasks: [
@@ -336,7 +376,13 @@ export const staticContent = {
           ]
         }
       ],
-      B2: []
+      B2: [
+        {
+          tasks: [
+            { type: "opinion", prompt: "Vad tycker du är viktigast för att trivas på en arbetsplats? Lön, kollegor eller arbetsuppgifter? Motivera ditt svar.", assessment: "Uttryck åsikter och ge argument. Jämför olika alternativ.", sample_answer: "Enligt mig är kollegorna det viktigaste. Självklart är lönen viktig, men om man inte trivs med personerna man träffar varje dag blir arbetet tungt. Bra kollegor kan göra även tråkiga arbetsuppgifter roliga. En god stämning på jobbet minskar stress och gör att man presterar bättre. Därför väljer jag social trivsel framför hög lön." }
+          ]
+        }
+      ]
     }
   }
 };
