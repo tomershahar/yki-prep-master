@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { User } from "@/entities/User";
+import { TestConfiguration } from "@/entities/TestConfiguration";
 import { UploadFile } from "@/integrations/Core";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -20,6 +21,7 @@ const sectionOptions = [
 
 export default function Settings() {
   const [user, setUser] = useState(null);
+  const [testConfig, setTestConfig] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -28,11 +30,11 @@ export default function Settings() {
     target_test: 'YKI',
     test_language: 'finnish',
     interface_language: 'en',
-    target_level: 'A1',
-    reading_level: 'A1',
-    listening_level: 'A1',
-    speaking_level: 'A1',
-    writing_level: 'A1',
+    target_level: '3',
+    reading_level: '3',
+    listening_level: '3',
+    speaking_level: '3',
+    writing_level: '3',
     daily_goal_minutes: 30,
     test_date: '',
     profile_picture_url: '',
@@ -48,16 +50,30 @@ export default function Settings() {
     try {
       const currentUser = await User.me();
       setUser(currentUser);
+      
+      // Load test configuration
+      const configs = await TestConfiguration.filter({
+        country_code: currentUser.target_country || 'FI',
+        test_name: currentUser.target_test || 'YKI',
+        is_active: true
+      });
+      
+      const config = configs && configs.length > 0 ? configs[0] : null;
+      setTestConfig(config);
+      
+      // Get default level from config
+      const defaultLevel = config?.levels?.[0] || '3';
+      
       setFormData({
         target_country: currentUser.target_country || 'FI',
         target_test: currentUser.target_test || 'YKI',
         test_language: currentUser.test_language || 'finnish',
         interface_language: currentUser.interface_language || 'en',
-        target_level: currentUser.target_level || 'A1',
-        reading_level: currentUser.reading_level || 'A1',
-        listening_level: currentUser.listening_level || 'A1',
-        speaking_level: currentUser.speaking_level || 'A1',
-        writing_level: currentUser.writing_level || 'A1',
+        target_level: currentUser.target_level || defaultLevel,
+        reading_level: currentUser.reading_level || defaultLevel,
+        listening_level: currentUser.listening_level || defaultLevel,
+        speaking_level: currentUser.speaking_level || defaultLevel,
+        writing_level: currentUser.writing_level || defaultLevel,
         daily_goal_minutes: currentUser.daily_goal_minutes || 30,
         test_date: currentUser.test_date || '',
         profile_picture_url: currentUser.profile_picture_url || '',
@@ -204,17 +220,46 @@ export default function Settings() {
 
               <div className="space-y-2">
                 <Label htmlFor="target_test">Target Test</Label>
-                <Select value={formData.target_test} onValueChange={(value) => {
+                <Select value={formData.target_test} onValueChange={async (value) => {
                   handleChange('target_test', value);
+                  
                   // Auto-update country and language based on test selection
+                  let country = 'FI';
+                  let language = 'finnish';
+                  
                   if (value === 'YKI') {
-                    handleChange('target_country', 'FI');
+                    country = 'FI';
                   } else if (value === 'Swedex' || value === 'TISUS' || value === 'SFI') {
-                    handleChange('target_country', 'SE');
-                    handleChange('test_language', 'swedish');
+                    country = 'SE';
+                    language = 'swedish';
                   } else if (value === 'PD3' || value === 'PD2') {
-                    handleChange('target_country', 'DK');
-                    handleChange('test_language', 'danish');
+                    country = 'DK';
+                    language = 'danish';
+                  }
+                  
+                  handleChange('target_country', country);
+                  handleChange('test_language', language);
+                  
+                  // Load new test config and reset levels
+                  try {
+                    const configs = await TestConfiguration.filter({
+                      country_code: country,
+                      test_name: value,
+                      is_active: true
+                    });
+                    
+                    const newConfig = configs && configs.length > 0 ? configs[0] : null;
+                    setTestConfig(newConfig);
+                    
+                    // Reset all levels to the first available level in the new config
+                    const defaultLevel = newConfig?.levels?.[0] || '3';
+                    handleChange('target_level', defaultLevel);
+                    handleChange('reading_level', defaultLevel);
+                    handleChange('listening_level', defaultLevel);
+                    handleChange('speaking_level', defaultLevel);
+                    handleChange('writing_level', defaultLevel);
+                  } catch (error) {
+                    console.error('Error loading test config:', error);
                   }
                 }}>
                   <SelectTrigger id="target_test"><SelectValue placeholder="Select test" /></SelectTrigger>
@@ -251,13 +296,24 @@ export default function Settings() {
 
               <div>
                 <Label>Skill Levels</Label>
+                {testConfig && (
+                  <p className="text-xs text-gray-500 mt-1">
+                    {testConfig.scoring_rules?.scale_type === 'numeric_1_6' && 'Scale: 1 (Basic) to 6 (Advanced)'}
+                    {testConfig.scoring_rules?.scale_type === 'cefr' && 'Scale: CEFR (A2 to C1)'}
+                    {testConfig.scoring_rules?.scale_type === 'danish_7_point' && 'Scale: Danish 7-point (B2 Level)'}
+                  </p>
+                )}
                 <div className="grid md:grid-cols-2 gap-4 mt-2">
                   {sectionOptions.map(section => (
                     <div key={section.id} className="space-y-1">
                       <Label htmlFor={`${section.id}_level`} className="flex items-center gap-1.5 text-sm font-medium"><section.icon className="w-4 h-4" />{section.label}</Label>
                       <Select value={formData[`${section.id}_level`]} onValueChange={(value) => handleChange(`${section.id}_level`, value)}>
                         <SelectTrigger id={`${section.id}_level`}><SelectValue placeholder="Select level" /></SelectTrigger>
-                        <SelectContent><SelectItem value="A1">A1</SelectItem><SelectItem value="A2">A2</SelectItem><SelectItem value="B1">B1</SelectItem><SelectItem value="B2">B2</SelectItem></SelectContent>
+                        <SelectContent>
+                          {testConfig?.levels?.map(level => (
+                            <SelectItem key={level} value={level}>{level}</SelectItem>
+                          ))}
+                        </SelectContent>
                       </Select>
                     </div>
                   ))}
