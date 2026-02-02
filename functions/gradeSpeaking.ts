@@ -20,8 +20,8 @@ const callOpenAI = async (prompt, responseSchema, timeout = 45000) => {
                 model: "gpt-4o", // Using gpt-4o for detailed feedback
                 messages: [
                     {
-                        role: "system",
-                        content: "You are an expert YKI speaking evaluator providing detailed, actionable feedback. Respond with valid JSON only."
+                       role: "system",
+                       content: "You are an expert language proficiency speaking evaluator (YKI/Swedex/PD3) providing detailed, actionable feedback. Respond with valid JSON only."
                     },
                     {
                         role: "user",
@@ -75,7 +75,7 @@ Deno.serve(async (req) => {
             });
         }
 
-        const { task, userTranscription, difficulty, language } = await req.json();
+        const { task, userTranscription, difficulty, language, testType } = await req.json();
         
         if (!task || !userTranscription || !difficulty || !language) {
             return new Response(JSON.stringify({ 
@@ -86,9 +86,15 @@ Deno.serve(async (req) => {
             });
         }
 
-        const languageName = language === 'finnish' ? 'Finnish' : 'Swedish';
+        const languageMap = {
+            'finnish': 'Finnish',
+            'swedish': 'Swedish',
+            'danish': 'Danish'
+        };
+        const languageName = languageMap[language] || 'Finnish';
+        const testName = testType || 'YKI';
         
-        const prompt = `Evaluate this YKI ${languageName} speaking response at level ${difficulty}.
+        const prompt = `Evaluate this ${testName} ${languageName} speaking response at level ${difficulty}.
 
 Task: "${task.prompt}"
 Student response (transcribed): "${userTranscription}"

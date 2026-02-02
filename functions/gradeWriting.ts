@@ -20,8 +20,8 @@ const callOpenAI = async (prompt, timeout = 60000) => {
                 model: "gpt-4o",
                 messages: [
                     {
-                        role: "system",
-                        content: "You are an expert YKI writing evaluator providing detailed, actionable feedback. Respond with valid JSON only."
+                       role: "system",
+                       content: "You are an expert language proficiency writing evaluator (YKI/Swedex/PD3) providing detailed, actionable feedback. Respond with valid JSON only."
                     },
                     {
                         role: "user",
@@ -75,7 +75,7 @@ Deno.serve(async (req) => {
             });
         }
 
-        const { task, userResponse, difficulty, language, weakSpots } = await req.json();
+        const { task, userResponse, difficulty, language, weakSpots, testType } = await req.json();
         
         if (!task || !userResponse || !difficulty || !language) {
             return new Response(JSON.stringify({ 
@@ -91,7 +91,13 @@ Deno.serve(async (req) => {
             .replace(/[\u0000-\u001F\u007F-\u009F]/g, '')
             .substring(0, 5000);
 
-        const languageName = language === 'finnish' ? 'Finnish' : 'Swedish';
+        const languageMap = {
+            'finnish': 'Finnish',
+            'swedish': 'Swedish',
+            'danish': 'Danish'
+        };
+        const languageName = languageMap[language] || 'Finnish';
+        const testName = testType || 'YKI';
         
         let weakSpotsContext = '';
         if (validatedWeakSpots.length > 0) {
@@ -101,7 +107,7 @@ ${validatedWeakSpots.map(ws => `- ${ws.description || 'Unknown issue'} (occurred
 Pay special attention to these areas when evaluating.`;
         }
         
-        const prompt = `You are an expert YKI ${languageName} writing evaluator at the ${difficulty} CEFR level.
+        const prompt = `You are an expert ${testName} ${languageName} writing evaluator at the ${difficulty} level.
 
 Task: "${task.prompt}"
 Student's response: "${sanitizedResponse}"${weakSpotsContext}

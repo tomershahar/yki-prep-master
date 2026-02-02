@@ -368,7 +368,8 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
                 userResponse: userAnswer,
                 difficulty,
                 language: exam.language,
-                weakSpots: validatedWeakSpots
+                weakSpots: validatedWeakSpots,
+                testType: exam.testType || 'YKI'
             });
 
             console.log('Raw backend response:', response);
@@ -426,7 +427,8 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
                 task,
                 userTranscription,
                 difficulty,
-                language: exam.language
+                language: exam.language,
+                testType: exam.testType || 'YKI'
             });
 
             console.log('Raw backend response:', response);

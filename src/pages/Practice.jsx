@@ -454,7 +454,8 @@ INSTRUCTIONS:
             is_practice: true,
             source: 'ai',
             practiceId: null,
-            weak_spots: weakSpotsData || null
+            weak_spots: weakSpotsData || null,
+            testType: testConfig?.test_name || 'YKI'
           });
           setPracticeReady(true);
         } else {
