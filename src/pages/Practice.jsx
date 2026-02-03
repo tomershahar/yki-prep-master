@@ -80,7 +80,7 @@ export default function Practice() {
 
 
   const getAIPrompt = (section, language, difficulty, weakSpotsData = null) => {
-    const languageName = language === 'finnish' ? 'Finnish' : 'Swedish';
+    const languageName = language === 'finnish' ? 'Finnish' : language === 'swedish' ? 'Swedish' : 'Danish';
 
     // Build weak spots context for writing
     let weakSpotsContext = '';
