@@ -205,8 +205,15 @@ Deno.serve(async (req) => {
 
     const content = await callOpenAI(prompt);
 
+    // Ensure writing and speaking content is wrapped in a tasks array
+    let responseContent = { ...content };
+    if ((section === 'writing' || section === 'speaking') && !responseContent.tasks) {
+      // If it's a single task object, wrap it in tasks array
+      responseContent = { tasks: [responseContent] };
+    }
+
     return Response.json({
-      ...content,
+      ...responseContent,
       language: 'danish',
       difficulty: level,
       topic: selectedTopic
