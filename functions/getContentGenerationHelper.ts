@@ -65,16 +65,18 @@ Deno.serve(async (req) => {
     });
 
     // Extract data from the function invocation result
+    // The result from base44.functions.invoke is wrapped in { data, error }
     if (result.error) {
       return Response.json({ 
-        error: result.error 
+        error: result.error.message || result.error
       }, { 
         status: 500,
         headers: corsHeaders 
       });
     }
 
-    return Response.json(result.data, { headers: corsHeaders });
+    // Return the data directly - it's already in the correct format
+    return Response.json(result.data || result, { headers: corsHeaders });
 
   } catch (error) {
     console.error('Error in content generation helper:', error);
