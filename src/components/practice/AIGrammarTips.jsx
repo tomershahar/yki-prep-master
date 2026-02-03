@@ -17,7 +17,7 @@ const AIGrammarTips = ({ language, level, section }) => {
     setIsLoading(true);
     setError(null);
 
-    const languageName = language === 'finnish' ? 'Finnish' : language === 'swedish' ? 'Swedish' : 'Danish';
+    const languageName = language === 'finnish' ? 'Finnish' : language === 'swedish' ? 'Swedish' : language === 'danish' ? 'Danish' : 'Danish';
 
     // Add randomization and section-specific context
     const sectionContext = {
@@ -33,7 +33,7 @@ const AIGrammarTips = ({ language, level, section }) => {
     const prompt = `
       You are an expert ${languageName} language teacher preparing personalized grammar tips for a student about to start ${section} practice at the ${level} CEFR level.
 
-      CONTEXT: The student is preparing for the YKI (Finnish) or TISUS (Swedish) exam, ${sectionContext[section] || ''}.
+      CONTEXT: The student is preparing for the ${language === 'finnish' ? 'YKI (Finnish)' : language === 'swedish' ? 'TISUS/Swedex (Swedish)' : 'Prøve i Dansk 3 / PD3 (Danish)'} exam, ${sectionContext[section] || ''}.
 
       RANDOMIZATION SEED: ${randomSeed}
       GENERATION TIME: ${currentTime}
