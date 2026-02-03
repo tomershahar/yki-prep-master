@@ -1019,7 +1019,11 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
                                     <div className="mt-4 space-y-3">
                                         {isWrong && (
                                             <div className="p-3 bg-red-50 border border-red-200 rounded">
-                                                <div className="text-red-800 font-medium">Correct answer: <InlineTranslator sourceLanguage={exam.language}>{question.correct_answer}</InlineTranslator></div>
+                                                <div className="text-red-800 font-medium">Correct answer: <InlineTranslator sourceLanguage={exam.language}>
+                                                    {question.question_type === 'multiple_choice' && question.correct_answer && question.correct_answer.length === 1 && question.correct_answer.toUpperCase() >= 'A' && question.correct_answer.toUpperCase() <= 'Z'
+                                                        ? (question.options && question.options[question.correct_answer.toUpperCase().charCodeAt(0) - 65]) || question.correct_answer
+                                                        : question.correct_answer}
+                                                </InlineTranslator></div>
                                             </div>
                                         )}
                                         <div className="p-3 bg-blue-50 border border-blue-200 rounded">
