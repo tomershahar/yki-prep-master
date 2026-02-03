@@ -31,6 +31,8 @@ Deno.serve(async (req) => {
       // YKI can be Finnish or Swedish - route based on language
       if (language === 'swedish') {
         generationFunction = 'generateSwedishContent';
+      } else if (language === 'danish') {
+        generationFunction = 'generateDanishContent';
       } else {
         // For Finnish, we need to use the inline generation (no separate function exists)
         // Fall back to returning an error for now
