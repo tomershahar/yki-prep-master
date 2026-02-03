@@ -243,6 +243,12 @@ Deno.serve(async (req) => {
       if (!content.questions || !Array.isArray(content.questions) || content.questions.length === 0) {
         throw new Error(`Invalid ${section} content: missing questions array`);
       }
+      
+      // CRITICAL FIX: Ensure all questions have question_type set to multiple_choice
+      content.questions = content.questions.map(q => ({
+        ...q,
+        question_type: 'multiple_choice' // Force this field for all Danish questions
+      }));
     } else if (section === 'writing' || section === 'speaking') {
       if (!content.tasks || !Array.isArray(content.tasks) || content.tasks.length === 0) {
         throw new Error(`Invalid ${section} content: missing tasks array`);
