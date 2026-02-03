@@ -208,10 +208,14 @@ Deno.serve(async (req) => {
     // Ensure writing and speaking content is wrapped in a tasks array
     let responseContent = { ...content };
     if ((section === 'writing' || section === 'speaking') && !responseContent.tasks) {
-      // If it's a single task object, wrap it in tasks array
-      responseContent = { tasks: [responseContent] };
+      // Check if content has the task fields but not wrapped in tasks array
+      if (responseContent.task_type || responseContent.prompt) {
+        // It's a single task object, wrap it in tasks array
+        responseContent = { tasks: [{ ...responseContent }] };
+      }
     }
 
+    // Return with additional metadata
     return Response.json({
       ...responseContent,
       language: 'danish',
