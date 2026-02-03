@@ -37,50 +37,75 @@ Return ONLY valid JSON in this exact format:
   "text": "The Danish reading text...",
   "questions": [
     {
+      "question_type": "multiple_choice",
       "question": "Question text?",
-      "options": ["A) Option 1", "B) Option 2", "C) Option 3", "D) Option 4"],
-      "correct_answer": "A",
+      "options": ["Option 1", "Option 2", "Option 3", "Option 4"],
+      "correct_answer": "Option 1",
       "explanation": "Why this is correct"
     }
   ]
 }`,
 
-  writing: (level, taskType) => `Generate a Danish writing task for CEFR level ${level} (PD3 exam).
+  writing: (level, taskType) => `Generate TWO Danish writing tasks for CEFR level ${level} (PD3 exam).
 
 Task type: ${taskType}
 Cultural context: Danish society
 
-Create a writing prompt that:
-- Is appropriate for PD3 (B2 level)
-- Reflects Danish cultural contexts (work, education, daily life)
-- Includes clear instructions in Danish
-- Specifies word count requirements
-- Provides realistic scenario
+Create two writing prompts that:
+- Are appropriate for PD3 (B2 level)
+- Reflect Danish cultural contexts (work, education, daily life)
+- Include clear instructions in Danish
+- Specify word count requirements
+- Provide realistic scenarios
 
 Return ONLY valid JSON in this exact format:
 {
-  "task_type": "${taskType}",
-  "prompt": "The task instructions in Danish...",
-  "word_count": "200-250 words",
-  "time_limit": "75 minutes",
-  "sample_answer": "Example response...",
-  "comments": "Assessment notes..."
+  "tasks": [
+    {
+      "task_type": "Informal Message",
+      "prompt": "The task instructions in Danish...",
+      "word_count": "150-200 words",
+      "time_limit": "30 minutes",
+      "sample_answer": "Example response...",
+      "comments": "Assessment notes..."
+    },
+    {
+      "task_type": "Formal Message",
+      "prompt": "The task instructions in Danish...",
+      "word_count": "200-250 words",
+      "time_limit": "45 minutes",
+      "sample_answer": "Example response...",
+      "comments": "Assessment notes..."
+    }
+  ]
 }`,
 
-  speaking: (level) => `Generate a Danish speaking task for CEFR level ${level} (PD3 exam).
+  speaking: (level) => `Generate TWO Danish speaking tasks for CEFR level ${level} (PD3 exam).
 
-Create a speaking prompt that:
-- Is appropriate for PD3 (B2 level)
-- Includes a realistic Danish scenario
-- Has clear instructions in Danish
-- Provides context for 2-minute presentation plus conversation
+Create speaking prompts that:
+- Are appropriate for PD3 (B2 level)
+- Include realistic Danish scenarios
+- Have clear instructions in Danish
+- Provide varied task types
 
 Return ONLY valid JSON in this exact format:
 {
-  "task_type": "presentation",
-  "prompt": "Speaking task description in Danish...",
-  "time_limit": "2 minutes presentation + conversation",
-  "follow_up_questions": ["Question 1?", "Question 2?", "Question 3?"]
+  "tasks": [
+    {
+      "task_type": "Situational Response",
+      "prompt": "Speaking task description in Danish...",
+      "time_limit": "30 seconds",
+      "sample_answer": "Example response in Danish...",
+      "assessment": "Assessment criteria..."
+    },
+    {
+      "task_type": "Monologue",
+      "prompt": "Speaking task description in Danish...",
+      "time_limit": "90 seconds",
+      "sample_answer": "Example response in Danish...",
+      "assessment": "Assessment criteria..."
+    }
+  ]
 }`,
 
   listening: (level, wordCount) => `Generate a Danish listening comprehension scenario for CEFR level ${level} (PD3 exam).
@@ -97,9 +122,10 @@ Return ONLY valid JSON in this exact format:
   "audio_script": "The Danish dialogue/monologue text...",
   "questions": [
     {
+      "question_type": "multiple_choice",
       "question": "Question text?",
-      "options": ["A) Option 1", "B) Option 2", "C) Option 3", "D) Option 4"],
-      "correct_answer": "A",
+      "options": ["Option 1", "Option 2", "Option 3", "Option 4"],
+      "correct_answer": "Option 1",
       "explanation": "Why this is correct"
     }
   ]
@@ -204,20 +230,28 @@ Deno.serve(async (req) => {
     }
 
     const content = await callOpenAI(prompt);
+    
+    console.log('Danish content generated:', JSON.stringify(content).substring(0, 200));
 
-    // Ensure writing and speaking content is wrapped in a tasks array
-    let responseContent = { ...content };
-    if ((section === 'writing' || section === 'speaking') && !responseContent.tasks) {
-      // Check if content has the task fields but not wrapped in tasks array
-      if (responseContent.task_type || responseContent.prompt) {
-        // It's a single task object, wrap it in tasks array
-        responseContent = { tasks: [{ ...responseContent }] };
+    // Validate the content structure
+    if (!content) {
+      throw new Error('No content generated from OpenAI');
+    }
+
+    // Ensure the content has the required fields
+    if (section === 'reading' || section === 'listening') {
+      if (!content.questions || !Array.isArray(content.questions) || content.questions.length === 0) {
+        throw new Error(`Invalid ${section} content: missing questions array`);
+      }
+    } else if (section === 'writing' || section === 'speaking') {
+      if (!content.tasks || !Array.isArray(content.tasks) || content.tasks.length === 0) {
+        throw new Error(`Invalid ${section} content: missing tasks array`);
       }
     }
 
     // Return with additional metadata
     return Response.json({
-      ...responseContent,
+      ...content,
       language: 'danish',
       difficulty: level,
       topic: selectedTopic
