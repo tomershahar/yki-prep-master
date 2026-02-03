@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { InvokeLLM } from "@/integrations/Core";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,7 +17,7 @@ const AIGrammarTips = ({ language, level, section }) => {
     setIsLoading(true);
     setError(null);
 
-    const languageName = language === 'finnish' ? 'Finnish' : 'Swedish';
+    const languageName = language === 'finnish' ? 'Finnish' : language === 'swedish' ? 'Swedish' : 'Danish';
 
     // Add randomization and section-specific context
     const sectionContext = {
