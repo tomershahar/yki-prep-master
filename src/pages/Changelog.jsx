@@ -27,6 +27,13 @@ export default function ChangelogPage() {
     // Recent improvements from the last 2 weeks
     const recentImprovements = [
         {
+            date: 'February 3, 2026',
+            type: 'feature',
+            title: 'Expanded Nordic Language Support',
+            description: 'Nordic Test Prep now supports all major Nordic language proficiency exams! In addition to Finnish (YKI), we now support Swedish (Swedex, TISUS, SFI) and Danish (Prøve i Dansk 3/PD3, PD2). Practice reading, writing, listening, and speaking with AI-generated content tailored to each exam format.',
+            icon: Sparkles
+        },
+        {
             date: 'January 4, 2026',
             type: 'improvement',
             title: 'Upgraded Writing AI Agent',
