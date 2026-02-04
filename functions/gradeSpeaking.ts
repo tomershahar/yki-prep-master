@@ -75,6 +75,23 @@ Deno.serve(async (req) => {
             });
         }
 
+        // Check rate limit
+        const rateLimitCheck = await base44.functions.invoke('checkAIRateLimit', { 
+            functionName: 'gradeSpeaking' 
+        });
+        
+        if (!rateLimitCheck.allowed) {
+            return new Response(JSON.stringify({ 
+                error: 'Rate limit exceeded',
+                message: rateLimitCheck.message,
+                resetTime: rateLimitCheck.resetTime,
+                minutesUntilReset: rateLimitCheck.minutesUntilReset
+            }), { 
+                status: 429, 
+                headers: { "Content-Type": "application/json", ...corsHeaders }
+            });
+        }
+
         const { task, userTranscription, difficulty, language, testType } = await req.json();
         
         if (!task || !userTranscription || !difficulty || !language) {
