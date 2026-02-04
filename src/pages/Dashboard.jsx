@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { User } from "@/entities/User";
 import { PracticeSession } from "@/entities/PracticeSession";
 import { Achievement } from "@/entities/Achievement";
@@ -94,13 +94,13 @@ export default function Dashboard() {
 
   const journeyData = useUserJourney(user);
 
-  const kpis = {
+  const kpis = useMemo(() => ({
     totalHours: Object.values(sectionProgress).reduce((sum, section) => sum + (section.totalHours || 0), 0),
     streak: currentStreak || 0,
     currentGoal: (user?.daily_goal_minutes) || 30,
     minutesToday: minutesToday || 0,
     totalAchievements: (user?.achievements?.length) || 0
-  };
+  }), [sectionProgress, currentStreak, user?.daily_goal_minutes, minutesToday, user?.achievements?.length]);
 
   const calculateSectionProgress = useCallback((sessions, currentUser) => {
     const sections = ['reading', 'listening', 'speaking', 'writing'];
@@ -443,17 +443,22 @@ export default function Dashboard() {
     );
   }
 
-  // Get recent achievements (only earned ones)
-  const userAchievements = user.achievements || [];
-  const recentEarnedAchievements = achievements
-    .filter(ach => userAchievements.includes(ach.id))
-    .slice(0, 2); // Show only 2 most recent
+  // Get recent achievements (only earned ones) - Memoized
+  const recentEarnedAchievements = useMemo(() => {
+    const userAchievements = user?.achievements || [];
+    return achievements
+      .filter(ach => userAchievements.includes(ach.id))
+      .slice(0, 2);
+  }, [achievements, user?.achievements]);
 
-  // Get next milestone achievements (not yet earned)
-  const nextMilestones = achievements
-    .filter(ach => !userAchievements.includes(ach.id))
-    .sort((a, b) => a.requirement - b.requirement) // Assuming 'requirement' is a numerical field indicating progress to unlock
-    .slice(0, 1); // Show only the next one
+  // Get next milestone achievements (not yet earned) - Memoized
+  const nextMilestones = useMemo(() => {
+    const userAchievements = user?.achievements || [];
+    return achievements
+      .filter(ach => !userAchievements.includes(ach.id))
+      .sort((a, b) => a.requirement - b.requirement)
+      .slice(0, 1);
+  }, [achievements, user?.achievements]);
 
   // Get practice sections with enhanced info
   const practiceSections = [
@@ -495,8 +500,8 @@ export default function Dashboard() {
     }
   ];
 
-  // Calculate daily progress for last 7 days - FIXED FOR MONDAY START
-  const getLast7DaysData = () => {
+  // Calculate daily progress for last 7 days - FIXED FOR MONDAY START - Memoized
+  const weeklyData = useMemo(() => {
     const days = [];
     const today = new Date();
     
@@ -524,13 +529,17 @@ export default function Dashboard() {
     }
     
     return days;
-  };
+  }, [recentSessions]);
 
-  const weeklyData = getLast7DaysData();
   // Set a minimum max of 60 minutes for a better visual scale, otherwise use the max from the data
-  const maxMinutes = Math.max(...weeklyData.map(d => d.minutes), 60);
+  const maxMinutes = useMemo(() => Math.max(...weeklyData.map(d => d.minutes), 60), [weeklyData]);
 
-  const motivationalContent = getMotivationalMessage();
+  const motivationalContent = useMemo(() => getMotivationalMessage(), [
+    journeyData, 
+    currentStreak, 
+    testConfig?.test_name, 
+    testConfig?.display_name
+  ]);
 
   return (
     <ErrorBoundary>
