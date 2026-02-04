@@ -297,14 +297,6 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
     const [gradingErrorDialog, setGradingErrorDialog] = useState(null); // For grading error modal
     const [rateLimitError, setRateLimitError] = useState(null); // Track rate limit errors
 
-    // Keyboard shortcuts for navigation
-    useKeyboardShortcuts({
-        onNext: handleNext,
-        onPrevious: handlePrevious,
-        onSubmit: handleSubmit,
-        enabled: !showSummary && !isSubmitting && !isGrading,
-    });
-
     // Effect for initial exam content loading
     useEffect(() => {
         if (exam && exam.content) {
