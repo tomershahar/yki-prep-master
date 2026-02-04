@@ -179,7 +179,15 @@ export default function Layout({ children, currentPageName }) {
   }
 
   return (
-    <SidebarProvider>
+    <>
+      {/* Skip to main content link for keyboard users */}
+      <a 
+        href="#main-content" 
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:bg-blue-600 focus:text-white focus:px-4 focus:py-2 focus:rounded-lg"
+      >
+        Skip to main content
+      </a>
+      <SidebarProvider>
       <style>
         {`
           :root {
@@ -303,11 +311,14 @@ export default function Layout({ children, currentPageName }) {
           </header>
 
           <div className="flex-1 overflow-auto">
-            {children}
+            <main id="main-content" role="main">
+              {children}
+            </main>
           </div>
           <FeedbackButton />
         </main>
       </div>
     </SidebarProvider>
+    </>
   );
 }

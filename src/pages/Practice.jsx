@@ -17,6 +17,7 @@ import AIGrammarTips from "../components/practice/AIGrammarTips";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { getWritingWeakSpots } from '@/functions/getWritingWeakSpots';
 import { checkAndAwardAchievements } from '../components/shared/achievementUtils';
+import { useKeyboardShortcuts } from '../components/shared/KeyboardShortcuts';
 
 const difficultyLevels = ["A1", "A2", "B1", "B2"];
 
@@ -30,6 +31,12 @@ export default function Practice() {
   const [isCompleting, setIsCompleting] = useState(false);
   const [showGrammarTips, setShowGrammarTips] = useState(true);
   const [completionDialog, setCompletionDialog] = useState(null);
+
+  // Keyboard shortcuts (only enable when practice is ready)
+  useKeyboardShortcuts({
+    onNext: () => practiceReady && !isLoadingExam && setIsLoadingExam(false),
+    enabled: practiceReady && isLoadingExam,
+  });
 
   useEffect(() => {
     loadUserData();
@@ -842,7 +849,8 @@ Would you like to advance to level ${newLevel}?`)) {
                   <Button
                     onClick={() => startPractice(section)}
                     className={`w-full bg-gradient-to-r ${section.color} hover:opacity-90 text-white shadow-lg group-hover:scale-105 transition-transform`}
-                    disabled={isLoadingExam}>
+                    disabled={isLoadingExam}
+                    aria-label={`Start ${section.title} practice at level ${userLevel}`}>
                     <Play className="w-4 h-4 mr-2" />
                     Start Practice
                   </Button>
