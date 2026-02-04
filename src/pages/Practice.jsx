@@ -18,6 +18,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { getWritingWeakSpots } from '@/functions/getWritingWeakSpots';
 import { checkAndAwardAchievements } from '../components/shared/achievementUtils';
 import { useKeyboardShortcuts } from '../components/shared/KeyboardShortcuts';
+import ErrorBoundary from '../components/shared/ErrorBoundary';
 
 const difficultyLevels = ["A1", "A2", "B1", "B2"];
 
@@ -796,15 +797,20 @@ Would you like to advance to level ${newLevel}?`)) {
 
   if (activeExam && activeSection) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white py-8">
-        <QuickPracticeSession
-          section={activeSection}
-          exam={activeExam}
-          onComplete={(sessionData, markAsCompleted) => handlePracticeComplete(sessionData, activeExam.practiceId, markAsCompleted)}
-          onCancel={handlePracticeCancel} />
-
-      </div>);
-
+      <ErrorBoundary
+        title="Practice Session Error"
+        description="There was a problem loading your practice session. Please try again."
+        onReset={handlePracticeCancel}
+      >
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white py-8">
+          <QuickPracticeSession
+            section={activeSection}
+            exam={activeExam}
+            onComplete={(sessionData, markAsCompleted) => handlePracticeComplete(sessionData, activeExam.practiceId, markAsCompleted)}
+            onCancel={handlePracticeCancel} />
+        </div>
+      </ErrorBoundary>
+    );
   }
 
   return (
