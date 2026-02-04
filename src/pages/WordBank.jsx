@@ -22,7 +22,7 @@ const WordCard = ({ entry, onDelete, onPlayAudio }) => {
                         <CardTitle className="text-2xl font-bold capitalize">{sanitizedWord}</CardTitle>
                         <CardDescription className="text-lg text-blue-600">{sanitizedTranslation}</CardDescription>
                     </div>
-                    <Button variant="ghost" size="icon" onClick={() => onPlayAudio(sanitizedWord)}>
+                    <Button variant="ghost" size="icon" onClick={() => onPlayAudio(sanitizedWord)} aria-label={`Play pronunciation of ${sanitizedWord}`}>
                         <Volume2 className="w-5 h-5" />
                     </Button>
                 </div>
@@ -31,14 +31,14 @@ const WordCard = ({ entry, onDelete, onPlayAudio }) => {
                 <div className="border-t pt-4 mt-2">
                     <p className="text-sm text-gray-500 mb-2">Example Sentence:</p>
                     <div className="flex items-center gap-2">
-                        <Button variant="ghost" size="icon" onClick={() => onPlayAudio(sanitizedExample)}>
+                        <Button variant="ghost" size="icon" onClick={() => onPlayAudio(sanitizedExample)} aria-label="Play example sentence">
                             <Volume2 className="w-4 h-4" />
                         </Button>
                         <p className="text-gray-700 italic">"{sanitizedExample}"</p>
                     </div>
                 </div>
                 <div className="flex justify-end mt-4">
-                    <Button variant="destructive" size="sm" onClick={() => onDelete(entry.id)}>
+                    <Button variant="destructive" size="sm" onClick={() => onDelete(entry.id)} aria-label={`Delete word ${sanitizedWord}`}>
                         <Trash2 className="w-4 h-4 mr-2" />
                         Delete
                     </Button>

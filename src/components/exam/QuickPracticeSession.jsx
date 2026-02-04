@@ -21,6 +21,7 @@ import { gradeSpeaking } from "@/functions/gradeSpeaking";
 import { gradeWriting } from "@/functions/gradeWriting";
 import ChaosControl from '../practice/ChaosControl';
 import AIRateLimitBanner from '../shared/AIRateLimitBanner';
+import { useKeyboardShortcuts } from '../shared/KeyboardShortcuts';
 
 // Speaking Task Component
 const SpeakingTask = ({ task, taskIndex, onAnswerSubmit, isSubmitting, language, difficulty }) => {
@@ -205,13 +206,13 @@ const SpeakingTask = ({ task, taskIndex, onAnswerSubmit, isSubmitting, language,
             </CardHeader>
             <CardContent>
                 {taskState === 'idle' && (
-                    <Button onClick={handleStartRecording} disabled={isSubmitting}>
+                    <Button onClick={handleStartRecording} disabled={isSubmitting} aria-label="Start recording your response">
                         <Mic className="w-4 h-4 mr-2" /> Start Recording
                     </Button>
                 )}
                 {taskState === 'recording' && (
                     <div className="flex items-center gap-4">
-                        <Button onClick={handleStopRecording} variant="destructive">
+                        <Button onClick={handleStopRecording} variant="destructive" aria-label="Stop recording">
                             <Square className="w-4 h-4 mr-2" /> Stop Recording
                         </Button>
                         <div className="flex items-center gap-2 text-red-600 font-mono text-lg">
@@ -244,10 +245,10 @@ const SpeakingTask = ({ task, taskIndex, onAnswerSubmit, isSubmitting, language,
                             />
                         </div>
                         <div className="flex flex-wrap gap-2">
-                            <Button onClick={handleSubmit} disabled={isSubmitting}>
+                            <Button onClick={handleSubmit} disabled={isSubmitting} aria-label="Confirm and submit transcription">
                                 <Send className="w-4 h-4 mr-2" /> Confirm Transcription
                             </Button>
-                            <Button onClick={handleRerecord} variant="outline" disabled={isSubmitting}>
+                            <Button onClick={handleRerecord} variant="outline" disabled={isSubmitting} aria-label="Record again">
                                 <RefreshCw className="w-4 h-4 mr-2" /> Re-record
                             </Button>
                         </div>
@@ -295,6 +296,14 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
     const submissionInProgress = useRef(false); // FIXED: Prevent duplicate submissions
     const [gradingErrorDialog, setGradingErrorDialog] = useState(null); // For grading error modal
     const [rateLimitError, setRateLimitError] = useState(null); // Track rate limit errors
+
+    // Keyboard shortcuts for navigation
+    useKeyboardShortcuts({
+        onNext: handleNext,
+        onPrevious: handlePrevious,
+        onSubmit: handleSubmit,
+        enabled: !showSummary && !isSubmitting && !isGrading,
+    });
 
     // Effect for initial exam content loading
     useEffect(() => {
@@ -1206,12 +1215,13 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
                         variant="outline"
                         onClick={handlePrevious}
                         disabled={currentQuestion === 0 || isGrading || isSubmitting}
+                        aria-label="Go to previous question"
                     >
                         <ArrowLeft className="w-4 h-4 mr-2" />
                         Previous
                     </Button>
                     <div className="flex gap-3">
-                        <Button variant="outline" onClick={onCancel} disabled={isGrading || isSubmitting}>
+                        <Button variant="outline" onClick={onCancel} disabled={isGrading || isSubmitting} aria-label="Exit practice session">
                             Exit Practice
                         </Button>
                         {showResults ? (
