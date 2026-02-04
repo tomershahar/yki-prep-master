@@ -21,7 +21,6 @@ import { gradeSpeaking } from "@/functions/gradeSpeaking";
 import { gradeWriting } from "@/functions/gradeWriting";
 import ChaosControl from '../practice/ChaosControl';
 import AIRateLimitBanner from '../shared/AIRateLimitBanner';
-import { useKeyboardShortcuts } from '../shared/KeyboardShortcuts';
 
 // Speaking Task Component
 const SpeakingTask = ({ task, taskIndex, onAnswerSubmit, isSubmitting, language, difficulty }) => {
@@ -356,14 +355,6 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
             setShowResults(false);
         }
     };
-
-    // Keyboard shortcuts for navigation - must be after handlers are defined
-    useKeyboardShortcuts({
-        onNext: handleNext,
-        onPrevious: handlePrevious,
-        onSubmit: handleSubmit,
-        enabled: !showSummary && !isSubmitting && !isGrading,
-    });
 
     const gradeWritingWithAI = async (task, userAnswer, difficulty, chosenPrompt) => {
         try {
