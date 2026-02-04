@@ -339,6 +339,73 @@ export default function Dashboard() {
     return () => window.removeEventListener('storage', handleStorageChange);
   }, [refreshDashboard]); // refreshDashboard is now stable due to useCallback
 
+  // ALL USEMEMO HOOKS MUST BE BEFORE EARLY RETURNS
+  // Get recent achievements (only earned ones) - Memoized
+  const recentEarnedAchievements = useMemo(() => {
+    const userAchievements = user?.achievements || [];
+    return achievements
+      .filter(ach => userAchievements.includes(ach.id))
+      .slice(0, 2);
+  }, [achievements, user?.achievements]);
+
+  // Get next milestone achievements (not yet earned) - Memoized
+  const nextMilestones = useMemo(() => {
+    const userAchievements = user?.achievements || [];
+    return achievements
+      .filter(ach => !userAchievements.includes(ach.id))
+      .sort((a, b) => a.requirement - b.requirement)
+      .slice(0, 1);
+  }, [achievements, user?.achievements]);
+
+  // Calculate daily progress for last 7 days - FIXED FOR MONDAY START - Memoized
+  const weeklyData = useMemo(() => {
+    const days = [];
+    const today = new Date();
+    
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date(today);
+      date.setDate(date.getDate() - i);
+      
+      // Use local timezone consistently
+      const dayStart = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0, 0);
+      const dayEnd = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 59, 59, 999);
+
+      const dayMinutes = recentSessions
+        .filter(s => {
+          if (!s.created_date) return false;
+          const sessionDate = new Date(s.created_date);
+          return sessionDate >= dayStart && sessionDate <= dayEnd;
+        })
+        .reduce((sum, s) => sum + safeNumber(s.duration_minutes, 0), 0);
+      
+      days.push({
+        // FIXED: Use Finnish locale with Monday as first day of week
+        date: date.toLocaleDateString('fi-FI', { weekday: 'short' }),
+        minutes: dayMinutes,
+      });
+    }
+    
+    return days;
+  }, [recentSessions]);
+
+  // Set a minimum max of 60 minutes for a better visual scale, otherwise use the max from the data
+  const maxMinutes = useMemo(() => Math.max(...weeklyData.map(d => d.minutes), 60), [weeklyData]);
+
+  const motivationalContent = useMemo(() => {
+    if (!journeyData || journeyData.isLoading) {
+      return null;
+    }
+    return getMotivationalMessage();
+  }, [
+    journeyData?.isFirstTimeUser, 
+    journeyData?.hasSession,
+    journeyData?.totalSessions,
+    journeyData?.preferredSection,
+    journeyData?.isLoading,
+    currentStreak, 
+    testConfig?.test_name
+  ]);
+
   const formatTime = (hours) => {
     if (!hours || isNaN(hours)) return "0m";
     const numericHours = parseFloat(hours);
