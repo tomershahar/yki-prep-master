@@ -1,5 +1,5 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
+import DOMPurify from 'isomorphic-dompurify';
 import { WordBankEntry } from '@/entities/WordBankEntry';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
@@ -9,15 +9,20 @@ import { Loader2, Trash2, Library, Volume2, PlayCircle, BookOpen } from 'lucide-
 import { generateSpeech } from '@/functions/generateSpeech';
 
 const WordCard = ({ entry, onDelete, onPlayAudio }) => {
+    // Sanitize all user/AI-generated content
+    const sanitizedWord = DOMPurify.sanitize(entry.word || '', { ALLOWED_TAGS: [] });
+    const sanitizedTranslation = DOMPurify.sanitize(entry.translation || '', { ALLOWED_TAGS: [] });
+    const sanitizedExample = DOMPurify.sanitize(entry.example_sentence || '', { ALLOWED_TAGS: [] });
+
     return (
         <Card className="hover:shadow-lg transition-shadow">
             <CardHeader className="pb-2">
                 <div className="flex justify-between items-start">
                     <div>
-                        <CardTitle className="text-2xl font-bold capitalize">{entry.word}</CardTitle>
-                        <CardDescription className="text-lg text-blue-600">{entry.translation}</CardDescription>
+                        <CardTitle className="text-2xl font-bold capitalize">{sanitizedWord}</CardTitle>
+                        <CardDescription className="text-lg text-blue-600">{sanitizedTranslation}</CardDescription>
                     </div>
-                    <Button variant="ghost" size="icon" onClick={() => onPlayAudio(entry.word)}>
+                    <Button variant="ghost" size="icon" onClick={() => onPlayAudio(sanitizedWord)}>
                         <Volume2 className="w-5 h-5" />
                     </Button>
                 </div>
@@ -26,10 +31,10 @@ const WordCard = ({ entry, onDelete, onPlayAudio }) => {
                 <div className="border-t pt-4 mt-2">
                     <p className="text-sm text-gray-500 mb-2">Example Sentence:</p>
                     <div className="flex items-center gap-2">
-                        <Button variant="ghost" size="icon" onClick={() => onPlayAudio(entry.example_sentence)}>
+                        <Button variant="ghost" size="icon" onClick={() => onPlayAudio(sanitizedExample)}>
                             <Volume2 className="w-4 h-4" />
                         </Button>
-                        <p className="text-gray-700 italic">"{entry.example_sentence}"</p>
+                        <p className="text-gray-700 italic">"{sanitizedExample}"</p>
                     </div>
                 </div>
                 <div className="flex justify-end mt-4">
