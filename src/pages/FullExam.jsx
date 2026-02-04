@@ -15,6 +15,7 @@ import { BookOpen, Headphones, Mic, PenTool, Clock, Play, Target, Timer, Loader2
 import PreGeneratedExamSession from "../components/exam/PreGeneratedExamSession";
 import { Achievement } from "@/entities/Achievement";
 import { generateSpeech } from '@/functions/generateSpeech';
+import { checkAndAwardAchievements } from '../components/shared/achievementUtils';
 
 const difficultyLevels = ["A1", "A2", "B1", "B2"];
 const difficultyMap = { A1: 1, A2: 2, B1: 3, B2: 4 };
@@ -632,90 +633,7 @@ INSTRUCTIONS:
     }
   };
 
-  const checkAndAwardAchievements = async (currentUser) => {
-    // 1. Get all data
-    const [allSessions, allAchievements] = await Promise.all([
-      PracticeSession.filter({ created_by: currentUser.email }),
-      Achievement.list()
-    ]);
 
-    const userAchievements = new Set(currentUser.achievements || []);
-    const achievementsToAward = [];
-
-    // 2. Separate session types
-    const practiceSessions = allSessions.filter((s) => s.session_type === 'practice');
-    const examSessions = allSessions.filter((s) => s.session_type === 'full_exam');
-    const passingPracticeSessions = practiceSessions.filter((s) => s.score >= 75);
-    const passingExamSessions = examSessions.filter((s) => s.score >= 75);
-
-    // 3. Loop through achievements that the user has NOT yet earned
-    for (const ach of allAchievements) {
-      if (userAchievements.has(ach.id)) continue; // Skip already earned achievements
-
-      let unlocked = false;
-
-      // 4. Check conditions for each category
-      switch (ach.category) {
-        case 'completion':
-          if (ach.title.toLowerCase().includes('practice') && practiceSessions.length >= ach.requirement) {
-            unlocked = true;
-          } else if (ach.title.toLowerCase().includes('exam') && examSessions.length >= ach.requirement) {
-            unlocked = true;
-          }
-          break;
-
-        case 'milestone':
-          if (ach.title.toLowerCase().includes('first pass')) {
-            if (passingPracticeSessions.length >= 1 || passingExamSessions.length >= 1) {
-              unlocked = true;
-            }
-          } else if (ach.title.toLowerCase().includes('perfect')) {
-            const perfectSessions = allSessions.filter((s) => s.score >= 100);
-            if (perfectSessions.length >= ach.requirement) unlocked = true;
-          } else if (ach.title.toLowerCase().includes('excellence')) {
-            const excellentSessions = allSessions.filter((s) => s.score >= 90);
-            if (excellentSessions.length >= ach.requirement) unlocked = true;
-          }
-          break;
-
-        case 'streak':
-          // Streak logic is handled elsewhere
-          break;
-
-        case 'hours':
-          const totalHours = currentUser.total_hours_trained || 0;
-          if (totalHours >= ach.requirement) unlocked = true;
-          break;
-
-        case 'reading':
-        case 'listening':
-        case 'speaking':
-        case 'writing':
-          const passedMasterySessions = allSessions.filter((s) => s.exam_section === ach.category && s.score >= 75);
-          if (passedMasterySessions.length >= ach.requirement) {
-            unlocked = true;
-          }
-          break;
-      }
-
-      // 5. Award achievement
-      if (unlocked) {
-        achievementsToAward.push(ach);
-        userAchievements.add(ach.id);
-      }
-    }
-
-    // 6. Update user if new achievements were found
-    if (achievementsToAward.length > 0) {
-      await User.updateMyUserData({ achievements: Array.from(userAchievements) });
-      achievementsToAward.forEach((ach, index) => {
-        setTimeout(() => {
-          alert(`🎉 Achievement Unlocked: ${ach.title}!\n${ach.description}`);
-        }, index * 500);
-      }
-      );
-    }
-  };
 
   const handleExamComplete = async (sessionData) => {
     try {
