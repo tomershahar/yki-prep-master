@@ -391,20 +391,7 @@ export default function Dashboard() {
   // Set a minimum max of 60 minutes for a better visual scale, otherwise use the max from the data
   const maxMinutes = useMemo(() => Math.max(...weeklyData.map(d => d.minutes), 60), [weeklyData]);
 
-  const motivationalContent = useMemo(() => {
-    if (!journeyData || journeyData.isLoading) {
-      return null;
-    }
-    return getMotivationalMessage();
-  }, [
-    journeyData?.isFirstTimeUser, 
-    journeyData?.hasSession,
-    journeyData?.totalSessions,
-    journeyData?.preferredSection,
-    journeyData?.isLoading,
-    currentStreak, 
-    testConfig?.test_name
-  ]);
+
 
   const formatTime = (hours) => {
     if (!hours || isNaN(hours)) return "0m";
