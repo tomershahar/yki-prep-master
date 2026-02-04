@@ -510,23 +510,6 @@ export default function Dashboard() {
     );
   }
 
-  // Get recent achievements (only earned ones) - Memoized
-  const recentEarnedAchievements = useMemo(() => {
-    const userAchievements = user?.achievements || [];
-    return achievements
-      .filter(ach => userAchievements.includes(ach.id))
-      .slice(0, 2);
-  }, [achievements, user?.achievements]);
-
-  // Get next milestone achievements (not yet earned) - Memoized
-  const nextMilestones = useMemo(() => {
-    const userAchievements = user?.achievements || [];
-    return achievements
-      .filter(ach => !userAchievements.includes(ach.id))
-      .sort((a, b) => a.requirement - b.requirement)
-      .slice(0, 1);
-  }, [achievements, user?.achievements]);
-
   // Get practice sections with enhanced info
   const practiceSections = [
     { 
