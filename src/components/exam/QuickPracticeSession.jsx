@@ -379,6 +379,12 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
             // Handle different response formats
             let result;
             if (response.error) {
+                // Check for rate limit error (429)
+                if (response.error === 'Rate limit exceeded') {
+                    const rateLimitErr = new Error('Rate limit exceeded');
+                    rateLimitErr.rateLimitData = response;
+                    throw rateLimitErr;
+                }
                 throw new Error(response.error.message || response.error || 'Backend grading failed');
             }
 
@@ -442,6 +448,12 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
             // Handle different response formats
             let result;
             if (response.error) {
+                // Check for rate limit error (429)
+                if (response.error === 'Rate limit exceeded') {
+                    const rateLimitErr = new Error('Rate limit exceeded');
+                    rateLimitErr.rateLimitData = response;
+                    throw rateLimitErr;
+                }
                 throw new Error(response.error.message || response.error || 'Backend grading failed');
             }
 
