@@ -1,5 +1,5 @@
-
 import React, { useState, useRef, useCallback, useEffect } from 'react';
+import DOMPurify from 'isomorphic-dompurify';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
 import { Loader2, Languages, Bookmark, CheckCircle } from 'lucide-react';
@@ -44,7 +44,7 @@ Word: "${text}"`;
         prompt,
         model: "gpt-4o"
       });
-      setTranslation(result);
+      setTranslation(DOMPurify.sanitize(result, { ALLOWED_TAGS: [] }));
     } catch (err) {
       console.error("Translation error:", err);
       setError('Translation failed.');
@@ -55,7 +55,7 @@ Word: "${text}"`;
 
   const handleMouseUp = useCallback(() => {
     const selection = window.getSelection();
-    const text = selection.toString().trim().toLowerCase();
+    const text = DOMPurify.sanitize(selection.toString().trim().toLowerCase(), { ALLOWED_TAGS: [] });
 
     if (text.length > 0 && text.length < 50 && !/\s/.test(text)) { // Only trigger for single words
       const range = selection.getRangeAt(0);
@@ -99,15 +99,16 @@ Word: "${text}"`;
         prompt: sentencePrompt,
         model: "gpt-4o"
       });
+      const sanitizedSentence = DOMPurify.sanitize(exampleSentence, { ALLOWED_TAGS: [] });
       
-      console.log('Example sentence generated:', exampleSentence);
+      console.log('Example sentence generated:', sanitizedSentence);
 
       // Then save the word
       const wordData = {
-        word: selectedText,
+        word: DOMPurify.sanitize(selectedText, { ALLOWED_TAGS: [] }),
         language: sourceLanguage,
-        translation: translation,
-        example_sentence: exampleSentence,
+        translation: DOMPurify.sanitize(translation, { ALLOWED_TAGS: [] }),
+        example_sentence: sanitizedSentence,
       };
       
       console.log('Creating WordBankEntry with data:', wordData);
