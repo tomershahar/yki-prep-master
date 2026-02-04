@@ -357,6 +357,14 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
         }
     };
 
+    // Keyboard shortcuts for navigation - must be after handlers are defined
+    useKeyboardShortcuts({
+        onNext: handleNext,
+        onPrevious: handlePrevious,
+        onSubmit: handleSubmit,
+        enabled: !showSummary && !isSubmitting && !isGrading,
+    });
+
     const gradeWritingWithAI = async (task, userAnswer, difficulty, chosenPrompt) => {
         try {
             console.log('Calling backend writing grading function...');
