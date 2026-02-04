@@ -418,7 +418,8 @@ export default function Dashboard() {
     return `${wholeHours}h ${minutes}m`;
   };
 
-  const getMotivationalMessage = () => {
+  const getMotivationalMessage = useCallback(() => {
+    if (!journeyData) return null;
     const { isFirstTimeUser, hasSession, totalSessions, preferredSection } = journeyData;
     const testName = testConfig?.test_name || 'YKI';
     
@@ -452,8 +453,6 @@ export default function Dashboard() {
     // Smart recommendation based on weakest section
     if (preferredSection) {
       const otherSections = ['reading', 'listening', 'speaking', 'writing'].filter(s => s !== preferredSection);
-      // For simplicity, let's pick the first 'other' section or a default if none.
-      // A more sophisticated approach might find the section with lowest totalHours or lowest completion.
       const weakestSection = otherSections.length > 0 ? otherSections[0] : 'reading'; 
       return {
         title: `Continue building your skills! 💪`,
@@ -469,7 +468,7 @@ export default function Dashboard() {
       action: "Continue Practice",
       actionUrl: createPageUrl("Practice")
     };
-  };
+  }, [journeyData, testConfig?.test_name, currentStreak]);
 
   // Loading state
   if (isLoading) {
