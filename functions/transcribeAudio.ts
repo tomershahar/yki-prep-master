@@ -3,7 +3,7 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.5.0';
 Deno.serve(async (req) => {
     // CORS headers
     const corsHeaders = {
-        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Origin": Deno.env.get("APP_URL") || "*",
         "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
         "Access-Control-Allow-Methods": "POST, OPTIONS"
     };

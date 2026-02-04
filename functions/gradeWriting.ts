@@ -55,7 +55,7 @@ const callOpenAI = async (prompt, timeout = 60000) => {
 
 Deno.serve(async (req) => {
     const corsHeaders = {
-        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Origin': Deno.env.get("APP_URL") || '*',
         'Access-Control-Allow-Methods': 'POST, OPTIONS',
         'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     };
