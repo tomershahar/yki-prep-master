@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Loader2, Trash2, Library, Volume2, PlayCircle, BookOpen } from 'lucide-react';
 import { generateSpeech } from '@/functions/generateSpeech';
+import ErrorBoundary from '../components/shared/ErrorBoundary';
 
 const WordCard = ({ entry, onDelete, onPlayAudio }) => {
     // Sanitize all user/AI-generated content
@@ -114,8 +115,12 @@ export default function WordBank() {
     }
 
     return (
-        <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-8">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <ErrorBoundary
+            title="Word Bank Error"
+            description="There was a problem loading your word bank. Please try refreshing the page."
+        >
+            <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-8">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div className="flex items-center gap-4">
                     <div className="p-3 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-xl">
                         <Library className="w-6 h-6 text-white" />

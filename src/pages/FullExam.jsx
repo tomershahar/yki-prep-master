@@ -735,15 +735,21 @@ INSTRUCTIONS:
 
   if (activeExam && activeSection) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white py-8">
-        <PreGeneratedExamSession
-          section={activeSection}
-          exam={activeExam}
-          useTimer={useTimer}
-          onComplete={handleExamComplete}
-          onCancel={handleExamCancel}
-        />
-      </div>
+      <ErrorBoundary
+        title="Full Exam Error"
+        description="There was a problem with your exam session. Your progress has been saved."
+        onReset={handleExamCancel}
+      >
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white py-8">
+          <PreGeneratedExamSession
+            section={activeSection}
+            exam={activeExam}
+            useTimer={useTimer}
+            onComplete={handleExamComplete}
+            onCancel={handleExamCancel}
+          />
+        </div>
+      </ErrorBoundary>
     );
   }
 
