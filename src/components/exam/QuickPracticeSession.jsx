@@ -20,6 +20,7 @@ import InlineTranslator from '../shared/InlineTranslator';
 import { gradeSpeaking } from "@/functions/gradeSpeaking";
 import { gradeWriting } from "@/functions/gradeWriting";
 import ChaosControl from '../practice/ChaosControl';
+import AIRateLimitBanner from '../shared/AIRateLimitBanner';
 
 // Speaking Task Component
 const SpeakingTask = ({ task, taskIndex, onAnswerSubmit, isSubmitting, language, difficulty }) => {
@@ -293,6 +294,7 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
     const [writingWeakSpots, setWritingWeakSpots] = useState(null);
     const submissionInProgress = useRef(false); // FIXED: Prevent duplicate submissions
     const [gradingErrorDialog, setGradingErrorDialog] = useState(null); // For grading error modal
+    const [rateLimitError, setRateLimitError] = useState(null); // Track rate limit errors
 
     // Effect for initial exam content loading
     useEffect(() => {
@@ -415,6 +417,10 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
             return result;
         } catch (error) {
             console.error("Writing grading error:", error);
+            // Check if it's a rate limit error
+            if (error.rateLimitData) {
+                setRateLimitError(error.rateLimitData);
+            }
             // FIXED: Preserve user input on error by keeping it in state
             throw error;
         }
@@ -474,6 +480,10 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
             return result;
         } catch (error) {
             console.error("Speaking grading error:", error);
+            // Check if it's a rate limit error
+            if (error.rateLimitData) {
+                setRateLimitError(error.rateLimitData);
+            }
             throw error;
         }
     };
@@ -1177,6 +1187,7 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
                 <Progress value={progress} className="mt-4" />
             </CardHeader>
             <CardContent className="space-y-6">
+                <AIRateLimitBanner error={rateLimitError} />
                 {renderQuestion(items[currentQuestion], currentQuestion)}
                 <div className="flex justify-between items-center pt-6">
                     <Button
@@ -1390,6 +1401,7 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
                                 } className="mt-4" />
                             </CardHeader>
                             <CardContent className="space-y-6">
+                                <AIRateLimitBanner error={rateLimitError} />
                                 <ChaosControl />
                                 {items.map((task, index) => (
                                     <SpeakingTask
