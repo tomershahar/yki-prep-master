@@ -1,6 +1,7 @@
 import { PracticeSession } from "@/entities/PracticeSession";
 import { Achievement } from "@/entities/Achievement";
 import { User } from "@/entities/User";
+import { toast } from "@/components/ui/use-toast";
 
 /**
  * Checks and awards achievements to a user based on their practice sessions
@@ -86,8 +87,12 @@ export async function checkAndAwardAchievements(currentUser) {
     await User.updateMyUserData({ achievements: Array.from(userAchievements) });
     achievementsToAward.forEach((ach, index) => {
       setTimeout(() => {
-        alert(`🎉 Achievement Unlocked: ${ach.title}!\n${ach.description}`);
-      }, index * 500); // Stagger alerts to prevent them from overlapping
+        toast({
+          title: "🎉 Achievement Unlocked!",
+          description: `${ach.title} - ${ach.description}`,
+          duration: 5000,
+        });
+      }, index * 1000); // Stagger toasts to prevent them from overlapping
     });
   }
 

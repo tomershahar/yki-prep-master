@@ -13,6 +13,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Database, Upload, FileText, Trash2, AlertCircle, Check, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
+import { toast } from "@/components/ui/use-toast";
 
 export default function KnowledgeBase() {
   const navigate = useNavigate();
@@ -34,9 +35,14 @@ export default function KnowledgeBase() {
     try {
       const currentUser = await User.me();
       setUser(currentUser);
-      
+
       if (currentUser.role !== 'admin') {
-        alert("Access denied. This page is only available to administrators.");
+        toast({
+          title: "Access Denied",
+          description: "This page is only available to administrators.",
+          variant: "destructive",
+          duration: 5000,
+        });
         navigate(createPageUrl("Dashboard"));
         return;
       }
@@ -74,7 +80,12 @@ export default function KnowledgeBase() {
 
   const handleUpload = async () => {
     if (!uploadForm.file || !uploadForm.fileName) {
-      alert("Please select a file and provide a name.");
+      toast({
+        title: "Missing Information",
+        description: "Please select a file and provide a name.",
+        variant: "destructive",
+        duration: 5000,
+      });
       return;
     }
 
@@ -103,11 +114,20 @@ export default function KnowledgeBase() {
 
       // Reload files
       await loadKnowledgeFiles();
-      
-      alert("File uploaded successfully!");
+
+      toast({
+        title: "Upload Successful",
+        description: "File uploaded successfully!",
+        duration: 3000,
+      });
     } catch (error) {
       console.error("Error uploading file:", error);
-      alert("Error uploading file. Please try again.");
+      toast({
+        title: "Upload Failed",
+        description: "Error uploading file. Please try again.",
+        variant: "destructive",
+        duration: 5000,
+      });
     } finally {
       setIsUploading(false);
     }
@@ -118,10 +138,19 @@ export default function KnowledgeBase() {
       try {
         await KnowledgeBaseContent.delete(fileId);
         await loadKnowledgeFiles();
-        alert("File deleted successfully!");
+        toast({
+          title: "Delete Successful",
+          description: "File deleted successfully!",
+          duration: 3000,
+        });
       } catch (error) {
         console.error("Error deleting file:", error);
-        alert("Error deleting file. Please try again.");
+        toast({
+          title: "Delete Failed",
+          description: "Error deleting file. Please try again.",
+          variant: "destructive",
+          duration: 5000,
+        });
       }
     }
   };

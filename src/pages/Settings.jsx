@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Settings as SettingsIcon, Save, User as UserIcon, BookOpen, Headphones, Mic, PenTool, LogOut, Loader2, Moon, Eye } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
+import { toast } from "@/components/ui/use-toast";
 
 const sectionOptions = [
     { id: 'reading', label: 'Reading', icon: BookOpen },
@@ -99,10 +100,19 @@ export default function Settings() {
     try {
       const dataToSave = { ...formData };
       await User.updateMyUserData(dataToSave);
-      alert('Settings saved successfully!');
+      toast({
+        title: "Settings Saved",
+        description: "Settings saved successfully!",
+        duration: 3000,
+      });
     } catch (error) {
       console.error("Error saving settings:", error);
-      alert('Error saving settings. Please try again.');
+      toast({
+        title: "Save Error",
+        description: "Error saving settings. Please try again.",
+        variant: "destructive",
+        duration: 5000,
+      });
     } finally {
       setIsSaving(false);
     }
@@ -124,7 +134,12 @@ export default function Settings() {
       await User.updateMyUserData({ profile_picture_url: file_url });
     } catch (error) {
       console.error("Error uploading profile picture:", error);
-      alert("Failed to upload profile picture. Please try again.");
+      toast({
+        title: "Upload Failed",
+        description: "Failed to upload profile picture. Please try again.",
+        variant: "destructive",
+        duration: 5000,
+      });
     } finally {
       setIsUploading(false);
     }
@@ -154,7 +169,12 @@ export default function Settings() {
         document.documentElement.classList.add('dark');
       }
       setFormData(prev => ({ ...prev, dark_mode: !checked })); // Revert state
-      alert('Error saving dark mode preference. Please try again.');
+      toast({
+        title: "Dark Mode Error",
+        description: "Error saving dark mode preference. Please try again.",
+        variant: "destructive",
+        duration: 5000,
+      });
     }
   };
 
@@ -165,7 +185,12 @@ export default function Settings() {
         window.location.reload();
       } catch (error) {
         console.error("Logout failed:", error);
-        alert("Logout failed. Please try again.");
+        toast({
+          title: "Logout Failed",
+          description: "Logout failed. Please try again.",
+          variant: "destructive",
+          duration: 5000,
+        });
       }
     }
   };

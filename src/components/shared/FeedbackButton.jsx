@@ -8,6 +8,7 @@ import { Feedback } from '@/entities/Feedback';
 import { UploadFile } from '@/integrations/Core';
 import { User } from '@/entities/User';
 import { Achievement } from '@/entities/Achievement';
+import { toast } from "@/components/ui/use-toast";
 
 export default function FeedbackButton() {
     const [isOpen, setIsOpen] = useState(false);
@@ -59,7 +60,11 @@ export default function FeedbackButton() {
                 userAchievements.add(feedbackAchId);
                 await User.updateMyUserData({ achievements: Array.from(userAchievements) });
                 setTimeout(() => {
-                    alert("🎉 Achievement Unlocked: Feedback Contributor!\nThank you for helping us improve the app.");
+                    toast({
+                        title: "🎉 Achievement Unlocked!",
+                        description: "Feedback Contributor - Thank you for helping us improve the app.",
+                        duration: 5000,
+                    });
                 }, 500);
             }
         } catch (error) {
@@ -69,7 +74,12 @@ export default function FeedbackButton() {
 
     const handleSubmit = async () => {
         if (!feedbackText.trim()) {
-            alert("Please enter your feedback before submitting.");
+            toast({
+                title: "Feedback Required",
+                description: "Please enter your feedback before submitting.",
+                variant: "destructive",
+                duration: 5000,
+            });
             return;
         }
 
@@ -97,12 +107,21 @@ export default function FeedbackButton() {
             setIsSuccess(true);
             setTimeout(() => {
                 setIsOpen(false);
-                alert(`✅ Feedback saved! ID: ${newFeedback.id}\n\nYou can view it on the Feedback page.`);
+                toast({
+                    title: "✅ Feedback Saved!",
+                    description: `ID: ${newFeedback.id}\n\nYou can view it on the Feedback page.`,
+                    duration: 5000,
+                });
             }, 1500);
 
         } catch (error) {
             console.error("Error submitting feedback:", error);
-            alert("Failed to submit feedback. Please try again.");
+            toast({
+                title: "Submission Failed",
+                description: "Failed to submit feedback. Please try again.",
+                variant: "destructive",
+                duration: 5000,
+            });
         } finally {
             setIsSubmitting(false);
         }

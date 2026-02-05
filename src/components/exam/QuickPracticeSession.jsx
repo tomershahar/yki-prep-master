@@ -21,6 +21,7 @@ import { gradeSpeaking } from "@/functions/gradeSpeaking";
 import { gradeWriting } from "@/functions/gradeWriting";
 import ChaosControl from '../practice/ChaosControl';
 import AIRateLimitBanner from '../shared/AIRateLimitBanner';
+import { toast } from "@/components/ui/use-toast";
 
 // Speaking Task Component
 const SpeakingTask = ({ task, taskIndex, onAnswerSubmit, isSubmitting, language, difficulty }) => {
@@ -320,7 +321,12 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
             const userAgent = navigator.userAgent;
             const isIOSChrome = /CriOS/.test(userAgent) && /iPhone|iPad/.test(userAgent);
             if (isIOSChrome) {
-                alert("⚠️ Recording doesn't work properly in Chrome on iPhone/iPad.\n\nFor the best speaking practice experience, please:\n1. Open this page in Safari instead\n2. Or switch to Safari for speaking practice\n\nYou can continue, but recording may not work correctly.");
+                toast({
+                    title: "⚠️ Microphone Issue Detected",
+                    description: "Recording doesn't work properly in Chrome on iPhone/iPad.\n\nFor the best speaking practice experience, please:\n1. Open this page in Safari instead\n2. Or switch to Safari for speaking practice\n\nYou can continue, but recording may not work correctly.",
+                    variant: "destructive",
+                    duration: 8000,
+                });
             }
         }
     }, [section.id]);
@@ -808,7 +814,12 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
             }
         } catch (error) {
             console.error("Critical error in handleSubmit:", error);
-            alert(`An unexpected error occurred: ${error.message}. Please try again.`);
+            toast({
+                title: "Submission Error",
+                description: `An unexpected error occurred: ${error.message}. Please try again.`,
+                variant: "destructive",
+                duration: 5000,
+            });
         } finally {
             setIsSubmitting(false);
             setIsGrading(false);
@@ -819,7 +830,12 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
     const handleFinalizePractice = (markAsCompleted) => {
         if (!scoreData) {
             console.error("Score data not available when finalizing practice.");
-            alert("Error: Practice results are not available. Please try the practice again.");
+            toast({
+                title: "Results Unavailable",
+                description: "Error: Practice results are not available. Please try the practice again.",
+                variant: "destructive",
+                duration: 5000,
+            });
             return;
         }
 
@@ -870,7 +886,12 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
             onComplete(sessionData, exam.practiceId, markAsCompleted);
         } catch (error) {
             console.error('Error completing practice:', error);
-            alert(`Error completing practice: ${error.message}. Please try again.`);
+            toast({
+                title: "Completion Error",
+                description: `Error completing practice: ${error.message}. Please try again.`,
+                variant: "destructive",
+                duration: 5000,
+            });
         }
     };
 

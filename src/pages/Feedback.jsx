@@ -8,6 +8,7 @@ import { Loader2, MessageSquare, Image as ImageIcon } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
+import { toast } from "@/components/ui/use-toast";
 
 // Status mapping for colors and user-friendly names
 const statusConfig = {
@@ -57,7 +58,12 @@ export default function FeedbackPage() {
             loadPageData();
         } catch (error) {
             console.error("Error updating feedback status:", error);
-            alert("Failed to update status. Please try again.");
+            toast({
+                title: "Update Failed",
+                description: "Failed to update status. Please try again.",
+                variant: "destructive",
+                duration: 5000,
+            });
         }
     };
 

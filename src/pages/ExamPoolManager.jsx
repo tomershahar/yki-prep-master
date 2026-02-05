@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { AlertCircle, Construction, Zap } from "lucide-react"; // Added Zap
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
+import { toast } from "@/components/ui/use-toast";
 
 export default function ExamPoolManager() {
   const navigate = useNavigate();
@@ -23,7 +24,12 @@ export default function ExamPoolManager() {
       setUser(currentUser);
       
       if (currentUser.role !== 'admin') {
-        alert("Access denied. This page is only available to administrators.");
+        toast({
+          title: "Access Denied",
+          description: "This page is only available to administrators.",
+          variant: "destructive",
+          duration: 5000,
+        });
         navigate(createPageUrl("Dashboard"));
         return;
       }

@@ -5,7 +5,7 @@ const RATE_LIMIT_WINDOW = 60 * 60 * 1000; // 1 hour in milliseconds
 
 Deno.serve(async (req) => {
     const corsHeaders = {
-        'Access-Control-Allow-Origin': Deno.env.get("APP_URL") || '*',
+        'Access-Control-Allow-Origin': Deno.env.get("APP_URL") || 'https://app.ykiprep.com',
         'Access-Control-Allow-Methods': 'POST, OPTIONS',
         'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     };

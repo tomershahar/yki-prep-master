@@ -16,6 +16,7 @@ import ExamSummary from './ExamSummary';
 import AudioPlayer from './AudioPlayer';
 import { transcribeAudio } from '@/functions/transcribeAudio';
 import InlineTranslator from '../shared/InlineTranslator';
+import { toast } from "@/components/ui/use-toast";
 
 const gradeSpeakingWithAI = async (task, transcribedResponse, difficulty) => {
     const knowledgeFiles = await KnowledgeBaseContent.list();
@@ -129,7 +130,12 @@ export default function PreGeneratedExamSession({ section, exam, useTimer, onCom
     if (section.id === 'speaking') {
       const isIOSChrome = /CriOS/.test(navigator.userAgent) && /iPhone|iPad/.test(navigator.userAgent);
       if (isIOSChrome) {
-        alert("⚠️ Recording doesn't work properly in Chrome on iPhone/iPad.\n\nFor the best speaking practice experience, please:\n1. Open this page in Safari instead\n2. Or switch to Safari for speaking practice\n\nYou can continue, but recording may not work correctly.");
+        toast({
+          title: "⚠️ Microphone Issue Detected",
+          description: "Recording doesn't work properly in Chrome on iPhone/iPad.\n\nFor the best speaking practice experience, please:\n1. Open this page in Safari instead\n2. Or switch to Safari for speaking practice\n\nYou can continue, but recording may not work correctly.",
+          variant: "destructive",
+          duration: 8000,
+        });
       }
     }
   }, [section.id]); // Dependency on section.id to trigger check when section changes.
@@ -287,7 +293,12 @@ export default function PreGeneratedExamSession({ section, exam, useTimer, onCom
 
           } catch (err) {
               console.error("Error accessing microphone:", err);
-              alert("Could not access microphone. Please check your browser permissions.");
+              toast({
+                  title: "Microphone Access Denied",
+                  description: "Could not access microphone. Please check your browser permissions.",
+                  variant: "destructive",
+                  duration: 5000,
+              });
               setIsRecording(prev => ({...prev, [taskIndex]: false}));
               setTranscriptionError(prev => ({...prev, [taskIndex]: "Microphone access denied or error."}));
           }

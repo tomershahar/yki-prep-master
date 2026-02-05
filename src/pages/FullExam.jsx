@@ -16,6 +16,7 @@ import PreGeneratedExamSession from "../components/exam/PreGeneratedExamSession"
 import { Achievement } from "@/entities/Achievement";
 import { generateSpeech } from '@/functions/generateSpeech';
 import { checkAndAwardAchievements } from '../components/shared/achievementUtils';
+import { toast } from "@/components/ui/use-toast";
 
 const difficultyLevels = ["A1", "A2", "B1", "B2"];
 const difficultyMap = { A1: 1, A2: 2, B1: 3, B2: 4 };
@@ -569,7 +570,12 @@ INSTRUCTIONS:
               }
             } catch (audioError) {
               console.error("Audio generation failed for a clip:", audioError);
-              alert(`There was an issue generating audio for this exam: ${audioError.message}. Please try again.`);
+              toast({
+                title: "Audio Generation Failed",
+                description: `There was an issue generating audio for this exam: ${audioError.message}. Please try again.`,
+                variant: "destructive",
+                duration: 5000,
+              });
               setIsLoadingExam(false);
               setActiveSection(null);
               clearInterval(progressInterval); // Clear interval on error
@@ -623,8 +629,13 @@ INSTRUCTIONS:
       } else if (error.message.includes('timeout')) {
         userMessage = "The exam generation is taking longer than expected. Please try again.";
       }
-      
-      alert(userMessage);
+
+      toast({
+        title: "Exam Preparation Error",
+        description: userMessage,
+        variant: "destructive",
+        duration: 5000,
+      });
       setActiveSection(null);
       setSimulatedProgress(0);
     } finally {
@@ -668,15 +679,31 @@ INSTRUCTIONS:
             await User.updateMyUserData({
               [`${sessionData.section}_level`]: newLevel
             });
-            alert(`Great! You have been promoted to level ${newLevel} for ${sessionData.section}!`);
+            toast({
+              title: "Level Advanced!",
+              description: `Great! You have been promoted to level ${newLevel} for ${sessionData.section}!`,
+              duration: 5000,
+            });
           } else {
-            alert(`Exam passed! You've chosen to stay at level ${currentLevel}.`);
+            toast({
+              title: "Exam Passed!",
+              description: `You've chosen to stay at level ${currentLevel}.`,
+              duration: 5000,
+            });
           }
         } else {
-          alert(`Amazing! You passed with ${sessionData.score}%! You are at the highest level (${currentLevel}) for this section!`);
+          toast({
+            title: "Highest Level Achieved!",
+            description: `Amazing! You passed with ${sessionData.score}%! You are at the highest level (${currentLevel}) for this section!`,
+            duration: 5000,
+          });
         }
       } else {
-        alert(`Exam completed! Your score is ${sessionData.score}%. Keep practicing to improve!`);
+        toast({
+          title: "Exam Completed",
+          description: `Your score is ${sessionData.score}%. Keep practicing to improve!`,
+          duration: 5000,
+        });
       }
 
       const freshUser = await User.me(); // Get freshest user data after potential level updates
@@ -690,7 +717,12 @@ INSTRUCTIONS:
       localStorage.setItem('dashboard_refresh', Date.now().toString());
     } catch (error) {
       console.error("Error saving exam session:", error);
-      alert("Error saving your results. Please try again.");
+      toast({
+        title: "Save Error",
+        description: "Error saving your results. Please try again.",
+        variant: "destructive",
+        duration: 5000,
+      });
     }
   };
 

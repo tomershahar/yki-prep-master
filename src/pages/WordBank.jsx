@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Loader2, Trash2, Library, Volume2, PlayCircle, BookOpen } from 'lucide-react';
 import { generateSpeech } from '@/functions/generateSpeech';
 import ErrorBoundary from '../components/shared/ErrorBoundary';
+import { toast } from "@/components/ui/use-toast";
 
 const WordCard = ({ entry, onDelete, onPlayAudio }) => {
     // Sanitize all user/AI-generated content
@@ -78,7 +79,12 @@ export default function WordBank() {
                 setWords(words.filter(w => w.id !== id));
             } catch (error) {
                 console.error("Failed to delete word:", error);
-                alert('Could not delete word. Please try again.');
+                toast({
+                    title: "Delete Failed",
+                    description: "Could not delete word. Please try again.",
+                    variant: "destructive",
+                    duration: 5000,
+                });
             }
         }
     };
@@ -100,7 +106,12 @@ export default function WordBank() {
             }
         } catch (error) {
             console.error("Failed to play audio:", error);
-            alert('Could not play audio.');
+            toast({
+                title: "Audio Playback Failed",
+                description: "Could not play audio.",
+                variant: "destructive",
+                duration: 5000,
+            });
         } finally {
             setIsAudioLoading(false);
         }

@@ -7,6 +7,7 @@ import { Brain, Sparkles, Loader2, X } from 'lucide-react';
 import { getAdaptiveLearningRecommendations } from '@/functions/getAdaptiveLearningRecommendations';
 import { proactiveCoachCheck } from '@/functions/proactiveCoachCheck';
 import { AgentRecommendation } from '@/entities/AgentRecommendation';
+import { toast } from "@/components/ui/use-toast";
 
 export default function AgentRecommendations() {
     const [recommendations, setRecommendations] = useState([]);
@@ -51,7 +52,12 @@ export default function AgentRecommendations() {
             await loadRecommendations();
         } catch (error) {
             console.error('Failed to generate recommendations:', error);
-            alert('Failed to generate recommendations: ' + error.message);
+            toast({
+                title: "Recommendation Error",
+                description: "Failed to generate recommendations: " + error.message,
+                variant: "destructive",
+                duration: 5000,
+            });
         } finally {
             setIsGenerating(false);
         }

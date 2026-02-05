@@ -16,6 +16,7 @@ import { AlertCircle, Loader2, Wand2, BookOpen, FileText } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import ReactMarkdown from 'react-markdown';
+import { toast } from "@/components/ui/use-toast";
 
 const ScoreCard = ({ title, score, children }) => (
     <Card>
@@ -93,7 +94,12 @@ export default function ModelEvaluation() {
             loadPastReports(); // Refresh the list of past reports
         } catch (error) {
             console.error("Evaluation failed:", error);
-            alert(`Evaluation failed: ${error.message}`);
+            toast({
+                title: "Evaluation Failed",
+                description: `Evaluation failed: ${error.message}`,
+                variant: "destructive",
+                duration: 5000,
+            });
         } finally {
             setIsEvaluating(false);
         }

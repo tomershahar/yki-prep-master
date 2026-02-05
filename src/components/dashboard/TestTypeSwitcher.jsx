@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { RefreshCw } from 'lucide-react';
+import { toast } from "@/components/ui/use-toast";
 
 export default function TestTypeSwitcher({ currentUser, onTestChange }) {
   const [testConfigs, setTestConfigs] = useState([]);
@@ -45,8 +46,13 @@ export default function TestTypeSwitcher({ currentUser, onTestChange }) {
       window.location.reload();
     } catch (error) {
       console.error('Error switching test:', error);
-      alert('Failed to switch test. Please try again.');
-    } finally {
+      toast({
+        title: "Switch Failed",
+        description: "Failed to switch test. Please try again.",
+        variant: "destructive",
+        duration: 5000,
+      });
+    } finally{
       setIsSwitching(false);
     }
   };

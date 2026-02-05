@@ -55,7 +55,7 @@ const callOpenAI = async (prompt, responseSchema, timeout = 45000) => {
 
 Deno.serve(async (req) => {
     const corsHeaders = {
-        'Access-Control-Allow-Origin': Deno.env.get("APP_URL") || '*',
+        'Access-Control-Allow-Origin': Deno.env.get("APP_URL") || 'https://app.ykiprep.com',
         'Access-Control-Allow-Methods': 'POST, OPTIONS',
         'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     };

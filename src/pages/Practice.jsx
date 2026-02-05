@@ -20,6 +20,7 @@ import { checkAndAwardAchievements } from '../components/shared/achievementUtils
 import { useKeyboardShortcuts } from '../components/shared/KeyboardShortcuts';
 import ErrorBoundary from '../components/shared/ErrorBoundary';
 import { calculateReadinessScore } from '@/functions/calculateReadinessScore';
+import { toast } from "@/components/ui/use-toast";
 
 const difficultyLevels = ["A1", "A2", "B1", "B2"];
 
@@ -448,7 +449,12 @@ INSTRUCTIONS:
             }
           } catch (audioError) {
             console.error("Failed to pre-generate audio:", audioError);
-            alert(`There was an issue generating the audio for this practice: ${audioError.message}. Please try again.`);
+            toast({
+              title: "Audio Generation Failed",
+              description: `There was an issue generating the audio: ${audioError.message}. Please try again.`,
+              variant: "destructive",
+              duration: 5000,
+            });
             setActiveSection(null);
             setIsLoadingExam(false);
             return;
@@ -475,7 +481,11 @@ INSTRUCTIONS:
         if (timeoutAlert) clearTimeout(timeoutAlert);
         console.error("AI practice generation failed, falling back to static content. Error:", generationError);
 
-        alert("We couldn't generate a unique AI practice for you at this moment. Don't worry, here is a pre-made practice session instead!");
+        toast({
+          title: "Using Pre-made Practice",
+          description: "We couldn't generate a unique AI practice at this moment. Here's a pre-made practice session instead!",
+          duration: 5000,
+        });
 
         let staticPractice = getStaticPractice(section, language, difficulty, currentUser.passed_practices || []);
 
@@ -504,7 +514,12 @@ INSTRUCTIONS:
               }
             } catch (audioError) {
               console.error("Failed to generate audio for fallback practice:", audioError);
-              alert(`We couldn't prepare the audio for the backup practice. Please try again.`);
+              toast({
+                title: "Audio Preparation Failed",
+                description: "We couldn't prepare the audio for the backup practice. Please try again.",
+                variant: "destructive",
+                duration: 5000,
+              });
               setActiveSection(null);
               setIsLoadingExam(false);
               return;
@@ -515,15 +530,25 @@ INSTRUCTIONS:
           setPracticeReady(true);
         } else {
           console.error("Fallback to static practice also failed (no content available).");
-          const errorDetails = `\n\nDetails:\n- Section: ${section.id}\n- Language: ${language}\n- Level: ${difficulty}\n\nPlease try:\n1. Refreshing the page\n2. Trying a different practice section\n3. Checking your internet connection\n4. Contacting support if this persists`;
-          alert(`Sorry, we couldn't prepare a practice session for you.${errorDetails}`);
+          const errorDetails = `Details:\n- Section: ${section.id}\n- Language: ${language}\n- Level: ${difficulty}\n\nPlease try:\n1. Refreshing the page\n2. Trying a different practice section\n3. Checking your internet connection\n4. Contacting support if this persists`;
+          toast({
+            title: "Practice Session Unavailable",
+            description: `Sorry, we couldn't prepare a practice session for you.\n\n${errorDetails}`,
+            variant: "destructive",
+            duration: 8000,
+          });
           setActiveSection(null);
           setIsLoadingExam(false);
         }
       }
     } catch (error) {
       console.error("Error starting practice:", error);
-      alert("An error occurred while preparing your practice session. Please try again.");
+      toast({
+        title: "Practice Preparation Error",
+        description: "An error occurred while preparing your practice session. Please try again.",
+        variant: "destructive",
+        duration: 5000,
+      });
       setActiveSection(null);
       setIsLoadingExam(false);
     }
@@ -627,10 +652,18 @@ INSTRUCTIONS:
             if (confirm(`You've completed ${newCount} practices for ${sectionId} at level ${userCurrentLevel}!
 Would you like to advance to level ${newLevel}?`)) {
               await User.updateMyUserData({ [`${sectionId}_level`]: newLevel });
-              alert(`You've been advanced to level ${newLevel} for ${sectionId}!`);
+              toast({
+                title: "Level Advanced!",
+                description: `You've been advanced to level ${newLevel} for ${sectionId}!`,
+                duration: 5000,
+              });
               currentUser = await User.me(); // Refresh user again
             } else {
-              alert("No problem, you can keep practicing at your current level.");
+              toast({
+                title: "Staying at Current Level",
+                description: "No problem, you can keep practicing at your current level.",
+                duration: 5000,
+              });
             }
           }
         }
@@ -649,7 +682,12 @@ Would you like to advance to level ${newLevel}?`)) {
       } catch (userUpdateError) {
         console.error('Error updating user data:', userUpdateError);
         // Don't throw here - the main session was saved successfully
-        alert('Practice completed but there was an issue updating your progress. Your session was still saved.');
+        toast({
+          title: "Progress Update Issue",
+          description: "Practice completed but there was an issue updating your progress. Your session was still saved.",
+          variant: "destructive",
+          duration: 5000,
+        });
       }
 
       // FIXED: Add try-catch around achievements check
@@ -715,7 +753,12 @@ Would you like to advance to level ${newLevel}?`)) {
       } else {
         errorMessage += "Please try again or contact support if the problem persists.";
       }
-      alert(errorMessage);
+      toast({
+        title: "Save Error",
+        description: errorMessage,
+        variant: "destructive",
+        duration: 5000,
+      });
     } finally {
       setIsCompleting(false); // Reset the safeguard
     }

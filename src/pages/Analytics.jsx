@@ -4,6 +4,7 @@ import { getAnalytics } from "@/functions/getAnalytics";
 import { Card, CardContent } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle, Loader2, BarChart3, Users, Clock, Target } from "lucide-react";
+import { toast } from "@/components/ui/use-toast";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import KpiCard from "../components/dashboard/KpiCard";
@@ -24,7 +25,12 @@ export default function AnalyticsPage() {
         setUser(currentUser);
 
         if (currentUser.role !== 'admin') {
-          alert("Access denied. This page is for administrators only.");
+          toast({
+            title: "Access Denied",
+            description: "This page is for administrators only.",
+            variant: "destructive",
+            duration: 5000,
+          });
           navigate(createPageUrl("Dashboard"));
           return;
         }
