@@ -797,40 +797,11 @@ Would you like to advance to level ${newLevel}?`)) {
             </p>
           </div>
 
-          {user && activeSection && showGrammarTips &&
-            <div className="mb-6 relative">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="absolute top-2 right-2 z-10"
-                onClick={() => setShowGrammarTips(false)}
-                aria-label="Hide grammar tips">
-
-                <X className="w-4 h-4" />
-              </Button>
-              <AIGrammarTips
-                language={user.target_language}
-                level={user[`${activeSection.id}_level`] || 'A1'}
-                section={activeSection.id} />
-
-            </div>
-          }
-
           {practiceReady &&
-            <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
-              {!showGrammarTips && user?.show_grammar_tips !== false &&
-                <Button
-                  variant="outline"
-                  onClick={() => setShowGrammarTips(true)}
-                  aria-label="Show grammar tips">
-
-                  <Lightbulb className="w-4 h-4 mr-2" />
-                  Show Tips
-                </Button>
-              }
+            <div className="mt-8 flex justify-center">
               <Button size="lg" onClick={() => setIsLoadingExam(false)} className="bg-green-600 hover:bg-green-700">
                 <Play className="w-5 h-5 mr-2" />
-                Continue to Practice
+                Start Practice
               </Button>
             </div>
           }
