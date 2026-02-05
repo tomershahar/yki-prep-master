@@ -430,10 +430,48 @@ INSTRUCTIONS:
         }
       }
 
-      try {
-        const generatedContent = await generateQuickPractice(section, language, difficulty);
+      // Retry logic for AI generation (up to 3 attempts)
+      let generatedContent = null;
+      let lastError = null;
+      const maxRetries = 3;
+      
+      for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        try {
+          console.log(`AI generation attempt ${attempt}/${maxRetries}...`);
+          generatedContent = await generateQuickPractice(section, language, difficulty);
 
-        if (timeoutAlert) clearTimeout(timeoutAlert);
+          if (generatedContent && (generatedContent.questions || generatedContent.tasks)) {
+            console.log('AI generation successful!');
+            break; // Success - exit retry loop
+          } else {
+            throw new Error("Generated content is invalid or missing required fields");
+          }
+        } catch (error) {
+          lastError = error;
+          console.error(`AI generation attempt ${attempt} failed:`, error);
+          
+          if (attempt < maxRetries) {
+            console.log(`Retrying in ${attempt} second(s)...`);
+            await new Promise(resolve => setTimeout(resolve, attempt * 1000));
+          }
+        }
+      }
+
+      if (timeoutAlert) clearTimeout(timeoutAlert);
+
+      if (!generatedContent) {
+        // All retries failed
+        console.error("All AI generation attempts failed:", lastError);
+        toast({
+          title: "Practice Generation Failed",
+          description: "We couldn't generate your personalized practice. Please try again or choose a different section.",
+          variant: "destructive",
+          duration: 5000,
+        });
+        setActiveSection(null);
+        setIsLoadingExam(false);
+        return;
+      }
 
         // For speaking, we don't need audio generation like listening
         if (section.id === 'listening' && generatedContent?.audio_script) {
@@ -461,86 +499,19 @@ INSTRUCTIONS:
           }
         }
 
-        if (generatedContent && (generatedContent.questions || generatedContent.tasks)) {
-          setActiveExam({
-            section: section.id,
-            language: language,
-            difficulty: difficulty,
-            content: JSON.stringify(generatedContent),
-            is_practice: true,
-            source: 'ai',
-            practiceId: null,
-            weak_spots: weakSpotsData || null,
-            testType: testConfig?.test_name || 'YKI'
-          });
-          setPracticeReady(true);
-        } else {
-          throw new Error("Generated content is invalid or missing required fields");
-        }
-      } catch (generationError) {
-        if (timeoutAlert) clearTimeout(timeoutAlert);
-        console.error("AI practice generation failed, falling back to static content. Error:", generationError);
-
-        toast({
-          title: "Using Pre-made Practice",
-          description: "We couldn't generate a unique AI practice at this moment. Here's a pre-made practice session instead!",
-          duration: 5000,
-        });
-
-        let staticPractice = getStaticPractice(section, language, difficulty, currentUser.passed_practices || []);
-
-        // If no static practice available (all completed), try without filtering by passed practices
-        if (!staticPractice) {
-          console.log("No unpassed static practices found, trying to reuse completed ones...");
-          staticPractice = getStaticPractice(section, language, difficulty, []);
-        }
-
-        if (staticPractice) {
-          console.log("Successfully fell back to static practice:", staticPractice.practiceId);
-          let staticContent = JSON.parse(staticPractice.content);
-
-          // For listening, the static content needs its audio generated on-the-fly.
-          if (section.id === 'listening' && staticContent?.audio_script) {
-            try {
-              const { data: audioData } = await generateSpeech({
-                text_to_speak: staticContent.audio_script,
-                language
-              });
-              if (audioData.status === 'success') {
-                staticContent.audio_base64 = audioData.audio_base64;
-                staticPractice.content = JSON.stringify(staticContent); // Update content with audio
-              } else {
-                throw new Error(audioData.message || 'Failed to generate speech for static content.');
-              }
-            } catch (audioError) {
-              console.error("Failed to generate audio for fallback practice:", audioError);
-              toast({
-                title: "Audio Preparation Failed",
-                description: "We couldn't prepare the audio for the backup practice. Please try again.",
-                variant: "destructive",
-                duration: 5000,
-              });
-              setActiveSection(null);
-              setIsLoadingExam(false);
-              return;
-            }
-          }
-
-          setActiveExam(staticPractice);
-          setPracticeReady(true);
-        } else {
-          console.error("Fallback to static practice also failed (no content available).");
-          const errorDetails = `Details:\n- Section: ${section.id}\n- Language: ${language}\n- Level: ${difficulty}\n\nPlease try:\n1. Refreshing the page\n2. Trying a different practice section\n3. Checking your internet connection\n4. Contacting support if this persists`;
-          toast({
-            title: "Practice Session Unavailable",
-            description: `Sorry, we couldn't prepare a practice session for you.\n\n${errorDetails}`,
-            variant: "destructive",
-            duration: 8000,
-          });
-          setActiveSection(null);
-          setIsLoadingExam(false);
-        }
-      }
+      // Set the practice session with AI-generated content
+      setActiveExam({
+        section: section.id,
+        language: language,
+        difficulty: difficulty,
+        content: JSON.stringify(generatedContent),
+        is_practice: true,
+        source: 'ai',
+        practiceId: null,
+        weak_spots: weakSpotsData || null,
+        testType: testConfig?.test_name || 'YKI'
+      });
+      setPracticeReady(true);
     } catch (error) {
       console.error("Error starting practice:", error);
       toast({
