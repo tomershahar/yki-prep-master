@@ -15,7 +15,8 @@ import {
   MessageSquare, // Added Feedback icon
   Wand2, // Added Model Evaluation icon
   ClipboardList, // Added Changelog icon
-  Library // Added Word Bank icon
+  Library, // Added Word Bank icon
+  Target // Added Exam Readiness icon
 } from "lucide-react";
 import {
   Sidebar,
