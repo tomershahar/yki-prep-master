@@ -45,42 +45,72 @@ Return ONLY valid JSON in this exact format:
   ]
 }`,
 
-  writing: (level, taskType) => `Generate a Swedish writing task for CEFR level ${level}.
+  writing: (level, taskType) => `Generate TWO Swedish writing tasks for CEFR level ${level}.
 
 Task type: ${taskType}
 Cultural context: Swedish society
 
-Create a writing prompt that:
-- Is appropriate for ${level} level
-- Reflects Swedish cultural contexts (work, education, daily life)
-- Includes clear instructions in Swedish
-- Specifies word count requirements
-- Provides context and scenario
+Create two writing prompts that:
+- Are appropriate for ${level} level
+- Reflect Swedish cultural contexts (work, education, daily life)
+- Include clear instructions in Swedish
+- Specify word count requirements
+- Provide context and scenario
 
 Return ONLY valid JSON in this exact format:
 {
-  "task_type": "${taskType}",
-  "prompt": "The task instructions in Swedish...",
-  "word_count": "150-200 words",
-  "time_limit": "30 minutes",
-  "sample_answer": "Example response...",
-  "comments": "Assessment notes..."
+  "tasks": [
+    {
+      "task_type": "Informal Message",
+      "prompt": "The task instructions in Swedish...",
+      "word_count": "150-200 words",
+      "sample_answer": "Example response...",
+      "assessment_criteria": {
+        "task_fulfillment": "...",
+        "language_sophistication": "...",
+        "grammatical_accuracy": "..."
+      }
+    },
+    {
+      "task_type": "Formal Message",
+      "prompt": "The task instructions in Swedish...",
+      "word_count": "200-250 words",
+      "sample_answer": "Example response...",
+      "assessment_criteria": {
+        "task_fulfillment": "...",
+        "language_sophistication": "...",
+        "grammatical_accuracy": "..."
+      }
+    }
+  ]
 }`,
 
-  speaking: (level) => `Generate a Swedish speaking task for CEFR level ${level}.
+  speaking: (level) => `Generate TWO Swedish speaking tasks for CEFR level ${level}.
 
-Create a speaking prompt that:
-- Is appropriate for ${level} level
-- Includes a realistic Swedish scenario
-- Has clear instructions in Swedish
-- Provides 3-4 follow-up questions
+Create speaking prompts that:
+- Are appropriate for ${level} level
+- Include realistic Swedish scenarios
+- Have clear instructions in Swedish
+- Provide varied task types
 
 Return ONLY valid JSON in this exact format:
 {
-  "task_type": "monologue",
-  "prompt": "Speaking task description in Swedish...",
-  "time_limit": "2-3 minutes preparation, 2-3 minutes speaking",
-  "follow_up_questions": ["Question 1?", "Question 2?", "Question 3?"]
+  "tasks": [
+    {
+      "task_type": "Situational Response",
+      "prompt": "Speaking task description in Swedish...",
+      "time_limit": "30 seconds",
+      "sample_answer": "Example response in Swedish...",
+      "assessment": "Assessment criteria..."
+    },
+    {
+      "task_type": "Monologue",
+      "prompt": "Speaking task description in Swedish...",
+      "time_limit": "90 seconds",
+      "sample_answer": "Example response in Swedish...",
+      "assessment": "Assessment criteria..."
+    }
+  ]
 }`,
 
   listening: (level, wordCount) => `Generate a Swedish listening comprehension scenario for CEFR level ${level}.
@@ -155,7 +185,7 @@ async function callOpenAI(prompt) {
 
 Deno.serve(async (req) => {
   const corsHeaders = {
-    'Access-Control-Allow-Origin': Deno.env.get("APP_URL") || 'https://app.ykiprep.com',
+    'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   };
 
@@ -205,15 +235,19 @@ Deno.serve(async (req) => {
 
     const content = await callOpenAI(prompt);
 
-    // Ensure writing and speaking content is wrapped in a tasks array
-    let responseContent = { ...content };
-    if ((section === 'writing' || section === 'speaking') && !responseContent.tasks) {
-      // If it's a single task object, wrap it in tasks array
-      responseContent = { tasks: [responseContent] };
+    // Validate the response structure
+    if (section === 'reading' || section === 'listening') {
+      if (!content.questions || !Array.isArray(content.questions)) {
+        throw new Error(`Invalid ${section} content: missing questions array`);
+      }
+    } else if (section === 'writing' || section === 'speaking') {
+      if (!content.tasks || !Array.isArray(content.tasks)) {
+        throw new Error(`Invalid ${section} content: missing tasks array`);
+      }
     }
 
     return Response.json({
-      ...responseContent,
+      ...content,
       language: 'swedish',
       difficulty: level,
       topic: selectedTopic
