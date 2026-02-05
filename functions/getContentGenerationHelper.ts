@@ -34,14 +34,8 @@ Deno.serve(async (req) => {
       } else if (language === 'danish') {
         generationFunction = 'generateDanishContent';
       } else {
-        // For Finnish, we need to use the inline generation (no separate function exists)
-        // Fall back to returning an error for now
-        return Response.json({ 
-          error: 'YKI Finnish content generation not yet implemented as a separate function' 
-        }, { 
-          status: 501, 
-          headers: corsHeaders 
-        });
+        // Finnish is the default for YKI
+        generationFunction = 'generateFinnishContent';
       }
     } else if (testType === 'Swedex' || testType === 'TISUS' || testType === 'SFI') {
       generationFunction = 'generateSwedishContent';
