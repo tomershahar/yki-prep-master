@@ -55,6 +55,7 @@ import Changelog from './pages/Changelog';
 import Dashboard from './pages/Dashboard';
 import ExamContent from './pages/ExamContent';
 import ExamPoolManager from './pages/ExamPoolManager';
+import ExamReadiness from './pages/ExamReadiness';
 import Feedback from './pages/Feedback';
 import Flashcards from './pages/Flashcards';
 import FullExam from './pages/FullExam';
@@ -67,7 +68,6 @@ import Practice from './pages/Practice';
 import Settings from './pages/Settings';
 import TestBetaReset from './pages/TestBetaReset';
 import WordBank from './pages/WordBank';
-import ExamReadiness from './pages/ExamReadiness';
 import __Layout from './Layout.jsx';
 
 
@@ -80,6 +80,7 @@ export const PAGES = {
     "Dashboard": Dashboard,
     "ExamContent": ExamContent,
     "ExamPoolManager": ExamPoolManager,
+    "ExamReadiness": ExamReadiness,
     "Feedback": Feedback,
     "Flashcards": Flashcards,
     "FullExam": FullExam,
@@ -92,7 +93,6 @@ export const PAGES = {
     "Settings": Settings,
     "TestBetaReset": TestBetaReset,
     "WordBank": WordBank,
-    "ExamReadiness": ExamReadiness,
 }
 
 export const pagesConfig = {

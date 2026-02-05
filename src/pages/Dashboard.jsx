@@ -19,6 +19,7 @@ import { SafeRender, safeText, safeNumber } from "../components/dashboard/SafeRe
 import { UserVisit } from "@/entities/UserVisit";
 import TestTypeSwitcher from "../components/dashboard/TestTypeSwitcher";
 import { TestConfiguration } from "@/entities/TestConfiguration";
+import ReadinessWidget from "../components/dashboard/ReadinessWidget";
 
 
 const difficultyLevels = ["A1", "A2", "B1", "B2"];
@@ -581,6 +582,11 @@ export default function Dashboard() {
             
             {/* Test Type Switcher */}
             <TestTypeSwitcher currentUser={user} onTestChange={(config) => setTestConfig(config)} />
+            
+            {/* Readiness Widget */}
+            <ErrorBoundary>
+              <ReadinessWidget user={user} />
+            </ErrorBoundary>
             
             {/* Quick Actions Section */}
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">

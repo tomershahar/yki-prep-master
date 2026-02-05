@@ -112,6 +112,11 @@ export default function Layout({ children, currentPageName }) {
       icon: Timer,
     },
     {
+      title: "Exam Readiness",
+      url: createPageUrl("ExamReadiness"),
+      icon: Target,
+    },
+    {
       title: "Word Bank",
       url: createPageUrl("WordBank"),
       icon: Library,

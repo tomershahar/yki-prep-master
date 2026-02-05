@@ -19,6 +19,7 @@ import { getWritingWeakSpots } from '@/functions/getWritingWeakSpots';
 import { checkAndAwardAchievements } from '../components/shared/achievementUtils';
 import { useKeyboardShortcuts } from '../components/shared/KeyboardShortcuts';
 import ErrorBoundary from '../components/shared/ErrorBoundary';
+import { calculateReadinessScore } from '@/functions/calculateReadinessScore';
 
 const difficultyLevels = ["A1", "A2", "B1", "B2"];
 
@@ -656,6 +657,17 @@ Would you like to advance to level ${newLevel}?`)) {
         await checkAndAwardAchievements(currentUser);
       } catch (achievementError) {
         console.error('Error checking achievements:', achievementError);
+        // Don't throw here - not critical
+      }
+
+      // Calculate readiness score after practice completion
+      try {
+        await calculateReadinessScore({
+          userId: currentUser.id,
+          userEmail: currentUser.email
+        });
+      } catch (readinessError) {
+        console.error('Error calculating readiness score:', readinessError);
         // Don't throw here - not critical
       }
 
