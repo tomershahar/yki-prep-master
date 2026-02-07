@@ -36,11 +36,17 @@ export default function SituationPickerModal({ isOpen, onClose, onSelectSituatio
   const loadSituations = async () => {
     try {
       setLoading(true);
+      // Fetch all active situations
       const allSituations = await base44.entities.SpeakingSituation.filter({
-        languages: language,
         is_active: true
       });
-      setSituations(allSituations);
+      
+      // Filter by language on client side (since languages is an array)
+      const matchingSituations = allSituations.filter(s => 
+        s.languages && s.languages.includes(language)
+      );
+      
+      setSituations(matchingSituations);
     } catch (error) {
       console.error('Failed to load situations:', error);
     } finally {
