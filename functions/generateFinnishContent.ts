@@ -23,13 +23,23 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Unauthorized' }, { status: 401, headers: corsHeaders });
     }
 
-    const { section, level, language } = await req.json();
+    const { section, level, language, situation } = await req.json();
 
     if (!section || !level || !language) {
       return Response.json(
         { error: 'Missing required parameters: section, level, language' },
         { status: 400, headers: corsHeaders }
       );
+    }
+    
+    // Parse situation if provided
+    let parsedSituation = null;
+    if (situation) {
+      try {
+        parsedSituation = typeof situation === 'string' ? JSON.parse(situation) : situation;
+      } catch (e) {
+        console.error('Failed to parse situation:', e);
+      }
     }
 
     // Fetch knowledge base content for context
@@ -46,7 +56,7 @@ Deno.serve(async (req) => {
       }
     }
 
-    const systemPrompt = getSystemPrompt(section, level, knowledgeContext);
+    const systemPrompt = getSystemPrompt(section, level, knowledgeContext, parsedSituation);
 
     const completion = await openai.chat.completions.create({
       model: "gpt-4o",
@@ -70,7 +80,7 @@ Deno.serve(async (req) => {
   }
 });
 
-function getSystemPrompt(section, level, knowledgeContext) {
+function getSystemPrompt(section, level, knowledgeContext, situation = null) {
   const baseInstruction = `You are a YKI (Finnish National Certificate of Language Proficiency) Practice Generator. Your task is to generate high-quality practice content for CEFR level ${level} in Finnish. Ensure all content is culturally relevant, natural, and grammatically correct. Respond ONLY with valid JSON.${knowledgeContext}`;
 
   switch (section) {
@@ -182,6 +192,47 @@ INSTRUCTIONS:
 }`;
 
     case 'speaking':
+      if (situation) {
+        return `${baseInstruction}
+
+TASK: Create two distinct speaking tasks for level ${level} in Finnish.
+
+**SITUATIONAL CONTEXT:**
+- Situation: ${situation.title}
+- Context: ${situation.context}
+- Key Phrases to naturally incorporate: ${situation.key_phrases?.join(', ')}
+- Expected Elements to cover: ${situation.expected_elements?.join(', ')}
+- Category: ${situation.category}
+
+**INSTRUCTIONS:**
+1. Create tasks that are specifically relevant to this real-life situation
+2. The prompts should naturally lead the student to use the key phrases
+3. Design tasks that require covering the expected elements
+4. Ensure the scenario and language are appropriate for the situation context
+5. Make it realistic - as if this situation could actually happen in Finland
+6. Match CEFR level ${level} expectations
+
+3. Return valid JSON:
+{
+  "tasks": [
+    {
+      "task_type": "Situational Response",
+      "prompt": "Prompt in Finnish (specific to the situation)",
+      "sample_answer": "Example in Finnish",
+      "assessment": "Criteria in Finnish",
+      "time_limit": "30 seconds"
+    },
+    {
+      "task_type": "Monologue",
+      "prompt": "Extended prompt in Finnish (related to situation)",
+      "sample_answer": "Example in Finnish",
+      "assessment": "Criteria in Finnish",
+      "time_limit": "90 seconds"
+    }
+  ]
+}`;
+      }
+      
       return `${baseInstruction}
 
 TASK: Create two distinct speaking tasks for level ${level} in Finnish.
