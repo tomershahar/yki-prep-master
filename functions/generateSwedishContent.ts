@@ -113,6 +113,42 @@ Return ONLY valid JSON in this exact format:
   ]
 }`,
 
+  speakingWithSituation: (level, situation) => `Generate TWO Swedish speaking tasks for CEFR level ${level}.
+
+**SITUATIONAL CONTEXT:**
+- Situation: ${situation.title}
+- Context: ${situation.context}
+- Key Phrases to naturally incorporate: ${situation.key_phrases?.join(', ')}
+- Expected Elements to cover: ${situation.expected_elements?.join(', ')}
+- Category: ${situation.category}
+
+Create speaking prompts that:
+- Are specifically relevant to this real-life situation
+- Naturally lead the student to use the key phrases
+- Require covering the expected elements
+- Are appropriate for ${level} level
+- Are realistic for Swedish society
+
+Return ONLY valid JSON in this exact format:
+{
+  "tasks": [
+    {
+      "task_type": "Situational Response",
+      "prompt": "Task prompt in Swedish (specific to situation)...",
+      "time_limit": "30 seconds",
+      "sample_answer": "Example response in Swedish...",
+      "assessment": "Assessment criteria..."
+    },
+    {
+      "task_type": "Monologue",
+      "prompt": "Extended prompt in Swedish (related to situation)...",
+      "time_limit": "90 seconds",
+      "sample_answer": "Example response in Swedish...",
+      "assessment": "Assessment criteria..."
+    }
+  ]
+}`,
+
   listening: (level, wordCount) => `Generate a Swedish listening comprehension scenario for CEFR level ${level}.
 
 Create:
@@ -205,7 +241,17 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'OpenAI API key not configured' }, { status: 500, headers: corsHeaders });
     }
 
-    const { section, level, topic, wordCount, taskType } = await req.json();
+    const { section, level, topic, wordCount, taskType, situation } = await req.json();
+    
+    // Parse situation if provided
+    let parsedSituation = null;
+    if (situation) {
+      try {
+        parsedSituation = typeof situation === 'string' ? JSON.parse(situation) : situation;
+      } catch (e) {
+        console.error('Failed to parse situation:', e);
+      }
+    }
 
     if (!section || !level) {
       return Response.json({ error: 'Missing required fields: section, level' }, { status: 400, headers: corsHeaders });
@@ -224,7 +270,11 @@ Deno.serve(async (req) => {
         prompt = PROMPT_TEMPLATES.writing(level, taskType || 'email');
         break;
       case 'speaking':
-        prompt = PROMPT_TEMPLATES.speaking(level);
+        if (parsedSituation) {
+          prompt = PROMPT_TEMPLATES.speakingWithSituation(level, parsedSituation);
+        } else {
+          prompt = PROMPT_TEMPLATES.speaking(level);
+        }
         break;
       case 'listening':
         prompt = PROMPT_TEMPLATES.listening(level, wordCount || 200);
