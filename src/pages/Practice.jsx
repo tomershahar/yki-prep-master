@@ -21,6 +21,8 @@ import { useKeyboardShortcuts } from '../components/shared/KeyboardShortcuts';
 import ErrorBoundary from '../components/shared/ErrorBoundary';
 import { calculateReadinessScore } from '@/functions/calculateReadinessScore';
 import { toast } from "@/components/ui/use-toast";
+import SituationPickerModal from '../components/practice/SituationPickerModal';
+import SituationBanner from '../components/practice/SituationBanner';
 
 const difficultyLevels = ["A1", "A2", "B1", "B2"];
 
@@ -34,6 +36,9 @@ export default function Practice() {
   const [isCompleting, setIsCompleting] = useState(false);
   const [showGrammarTips, setShowGrammarTips] = useState(true);
   const [completionDialog, setCompletionDialog] = useState(null);
+  const [showSituationPicker, setShowSituationPicker] = useState(false);
+  const [selectedSituation, setSelectedSituation] = useState(null);
+  const [pendingSection, setPendingSection] = useState(null);
 
   // Keyboard shortcuts (only enable when practice is ready)
   useKeyboardShortcuts({
@@ -294,7 +299,7 @@ INSTRUCTIONS:
     }
   };
 
-  const generateQuickPractice = async (section, language, difficulty) => {
+  const generateQuickPractice = async (section, language, difficulty, situation = null) => {
     try {
       // Use the helper function to route to the correct generator
       const testType = testConfig?.test_name || 'YKI';
@@ -303,7 +308,8 @@ INSTRUCTIONS:
         testType,
         section: section.id,
         level: difficulty,
-        language
+        language,
+        situation: situation ? JSON.stringify(situation) : undefined
       });
       
       if (error || !data) {
@@ -389,6 +395,26 @@ INSTRUCTIONS:
   };
 
   const startPractice = async (section) => {
+    // For speaking practice, show situation picker first
+    if (section.id === 'speaking') {
+      setPendingSection(section);
+      setShowSituationPicker(true);
+      return;
+    }
+    
+    // For other sections, proceed directly
+    startPracticeWithSituation(section, null);
+  };
+
+  const handleSituationSelected = (situation) => {
+    if (pendingSection) {
+      setSelectedSituation(situation);
+      startPracticeWithSituation(pendingSection, situation);
+      setPendingSection(null);
+    }
+  };
+
+  const startPracticeWithSituation = async (section, situation) => {
     // Check for iOS Chrome microphone issues before starting speaking practice
     if (section.id === 'speaking') {
       const isIOSChrome = /CriOS/.test(navigator.userAgent) && /iPhone|iPad/.test(navigator.userAgent);
@@ -438,7 +464,7 @@ INSTRUCTIONS:
       for (let attempt = 1; attempt <= maxRetries; attempt++) {
         try {
           console.log(`AI generation attempt ${attempt}/${maxRetries}...`);
-          generatedContent = await generateQuickPractice(section, language, difficulty);
+          generatedContent = await generateQuickPractice(section, language, difficulty, situation);
 
           if (generatedContent && (generatedContent.questions || generatedContent.tasks)) {
             console.log('AI generation successful!');
@@ -509,7 +535,8 @@ INSTRUCTIONS:
         source: 'ai',
         practiceId: null,
         weak_spots: weakSpotsData || null,
-        testType: testConfig?.test_name || 'YKI'
+        testType: testConfig?.test_name || 'YKI',
+        situation: situation || null
       });
       setPracticeReady(true);
     } catch (error) {
@@ -532,6 +559,24 @@ INSTRUCTIONS:
     setIsCompleting(true);
 
     try {
+      // Track situation practice if applicable
+      if (selectedSituation && sessionData.section === 'speaking') {
+        const currentUser = await User.me();
+        const practiced = currentUser.practiced_situations || {};
+        const situationId = selectedSituation.id;
+        const situationData = practiced[situationId] || { count: 0, best_score: 0 };
+        
+        await User.updateMyUserData({
+          practiced_situations: {
+            ...practiced,
+            [situationId]: {
+              count: situationData.count + 1,
+              best_score: Math.max(situationData.best_score, sessionData.score || 0),
+              last_practiced: new Date().toISOString()
+            }
+          }
+        });
+      }
       console.log('=== PRACTICE COMPLETION DEBUG ===');
       console.log('Session data:', sessionData);
       console.log('Practice ID:', practiceId);
@@ -705,6 +750,7 @@ Would you like to advance to level ${newLevel}?`)) {
 
       setActiveExam(null);
       setActiveSection(null);
+      setSelectedSituation(null);
       await loadUserData();
 
       localStorage.setItem('dashboard_refresh_needed', 'true');
@@ -739,6 +785,7 @@ Would you like to advance to level ${newLevel}?`)) {
     if (confirm("Are you sure you want to exit the practice? Your progress will be lost.")) {
       setActiveExam(null);
       setActiveSection(null);
+      setSelectedSituation(null);
       setIsLoadingExam(false); // Make sure to exit loading state
       setPracticeReady(false);
       if (window.location.search.includes('start=')) {
@@ -800,11 +847,14 @@ Would you like to advance to level ${newLevel}?`)) {
         onReset={handlePracticeCancel}
       >
         <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white py-8">
-          <QuickPracticeSession
-            section={activeSection}
-            exam={activeExam}
-            onComplete={(sessionData, markAsCompleted) => handlePracticeComplete(sessionData, activeExam.practiceId, markAsCompleted)}
-            onCancel={handlePracticeCancel} />
+          <div className="max-w-5xl mx-auto px-4">
+            {selectedSituation && <SituationBanner situation={selectedSituation} />}
+            <QuickPracticeSession
+              section={activeSection}
+              exam={activeExam}
+              onComplete={(sessionData, markAsCompleted) => handlePracticeComplete(sessionData, activeExam.practiceId, markAsCompleted)}
+              onCancel={handlePracticeCancel} />
+          </div>
         </div>
       </ErrorBoundary>
     );
@@ -901,6 +951,19 @@ Would you like to advance to level ${newLevel}?`)) {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Situation Picker Modal */}
+      <SituationPickerModal
+        isOpen={showSituationPicker}
+        onClose={() => {
+          setShowSituationPicker(false);
+          setPendingSection(null);
+        }}
+        onSelectSituation={handleSituationSelected}
+        language={user?.test_language || 'finnish'}
+        userLevel={user?.speaking_level || 'A1'}
+        practicedSituations={user?.practiced_situations || {}}
+      />
     </>
   );
 }
