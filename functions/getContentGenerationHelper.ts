@@ -24,26 +24,31 @@ Deno.serve(async (req) => {
 
     const { testType, section, level, language, topic, wordCount, taskType } = await req.json();
 
-    // Route to appropriate generation function based on test type AND language
+    // Determine language from testType or language param
+    let detectedLanguage = language;
+    if (!detectedLanguage && testType) {
+      // Fallback: infer from testType if language not provided
+      if (testType === 'YKI') {
+        detectedLanguage = 'finnish'; // Default for YKI
+      } else if (testType === 'Swedex' || testType === 'TISUS' || testType === 'SFI') {
+        detectedLanguage = 'swedish';
+      } else if (testType === 'PD3' || testType === 'PD2') {
+        detectedLanguage = 'danish';
+      }
+    }
+
+    // Route to appropriate generation function
     let generationFunction;
     
-    if (testType === 'YKI') {
-      // YKI can be Finnish or Swedish - route based on language
-      if (language === 'swedish') {
-        generationFunction = 'generateSwedishContent';
-      } else if (language === 'danish') {
-        generationFunction = 'generateDanishContent';
-      } else {
-        // Finnish is the default for YKI
-        generationFunction = 'generateFinnishContent';
-      }
-    } else if (testType === 'Swedex' || testType === 'TISUS' || testType === 'SFI') {
+    if (detectedLanguage === 'finnish') {
+      generationFunction = 'generateFinnishContent';
+    } else if (detectedLanguage === 'swedish') {
       generationFunction = 'generateSwedishContent';
-    } else if (testType === 'PD3' || testType === 'PD2') {
+    } else if (detectedLanguage === 'danish') {
       generationFunction = 'generateDanishContent';
     } else {
       return Response.json({ 
-        error: `Unknown test type: ${testType}` 
+        error: `Cannot determine language for testType: ${testType}, language: ${language}` 
       }, { 
         status: 400, 
         headers: corsHeaders 
@@ -54,7 +59,7 @@ Deno.serve(async (req) => {
     const result = await base44.functions.invoke(generationFunction, {
       section,
       level,
-      language,
+      language: detectedLanguage,
       topic,
       wordCount,
       taskType
