@@ -113,13 +113,32 @@ Return ONLY valid JSON in this exact format:
   ]
 }`,
 
-  speakingWithSituation: (level, situation) => `Generate TWO Swedish speaking tasks for CEFR level ${level}.
+  speakingWithSituation: (level, situation) => {
+    // Handle both old and new format for multilingual fields
+    const getLocalizedContent = (content) => {
+      if (!content) return '';
+      if (typeof content === 'string') return content;
+      return content.swedish || content.finnish || '';
+    };
+    
+    const getLocalizedArray = (content) => {
+      if (!content) return [];
+      if (Array.isArray(content)) return content;
+      return content.swedish || content.finnish || [];
+    };
+    
+    const title = getLocalizedContent(situation.title);
+    const context = getLocalizedContent(situation.context);
+    const keyPhrases = getLocalizedArray(situation.key_phrases);
+    const expectedElements = getLocalizedArray(situation.expected_elements);
+    
+    return `Generate TWO Swedish speaking tasks for CEFR level ${level}.
 
 **SITUATIONAL CONTEXT:**
-- Situation: ${situation.title}
-- Context: ${situation.context}
-- Key Phrases to naturally incorporate: ${situation.key_phrases?.join(', ')}
-- Expected Elements to cover: ${situation.expected_elements?.join(', ')}
+- Situation: ${title}
+- Context: ${context}
+- Key Phrases to naturally incorporate: ${keyPhrases.join(', ')}
+- Expected Elements to cover: ${expectedElements.join(', ')}
 - Category: ${situation.category}
 
 Create speaking prompts that:

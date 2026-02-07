@@ -193,15 +193,33 @@ INSTRUCTIONS:
 
     case 'speaking':
       if (situation) {
+        // Handle both old and new format for multilingual fields
+        const getLocalizedContent = (content) => {
+          if (!content) return '';
+          if (typeof content === 'string') return content;
+          return content.finnish || content.swedish || '';
+        };
+        
+        const getLocalizedArray = (content) => {
+          if (!content) return [];
+          if (Array.isArray(content)) return content;
+          return content.finnish || content.swedish || [];
+        };
+        
+        const title = getLocalizedContent(situation.title);
+        const context = getLocalizedContent(situation.context);
+        const keyPhrases = getLocalizedArray(situation.key_phrases);
+        const expectedElements = getLocalizedArray(situation.expected_elements);
+        
         return `${baseInstruction}
 
 TASK: Create two distinct speaking tasks for level ${level} in Finnish.
 
 **SITUATIONAL CONTEXT:**
-- Situation: ${situation.title}
-- Context: ${situation.context}
-- Key Phrases to naturally incorporate: ${situation.key_phrases?.join(', ')}
-- Expected Elements to cover: ${situation.expected_elements?.join(', ')}
+- Situation: ${title}
+- Context: ${context}
+- Key Phrases to naturally incorporate: ${keyPhrases.join(', ')}
+- Expected Elements to cover: ${expectedElements.join(', ')}
 - Category: ${situation.category}
 
 **INSTRUCTIONS:**
