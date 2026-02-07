@@ -22,7 +22,7 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Unauthorized' }, { status: 401, headers: corsHeaders });
     }
 
-    const { testType, section, level, language, topic, wordCount, taskType } = await req.json();
+    const { testType, section, level, language, topic, wordCount, taskType, situation } = await req.json();
 
     // Determine language from testType or language param
     let detectedLanguage = language;
