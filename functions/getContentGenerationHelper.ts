@@ -62,7 +62,8 @@ Deno.serve(async (req) => {
       language: detectedLanguage,
       topic,
       wordCount,
-      taskType
+      taskType,
+      situation
     });
 
     // Extract data from the function invocation result
