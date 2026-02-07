@@ -117,6 +117,15 @@ export default function SituationPickerModal({ isOpen, onClose, onSelectSituatio
                 const CategoryIcon = categoryIcons[situation.category] || Home;
                 const practiced = practicedSituations[situation.id];
                 
+                const getLocalizedContent = (content) => {
+                  if (!content) return '';
+                  if (typeof content === 'string') return content;
+                  return content[language] || content.finnish || content.swedish || '';
+                };
+
+                const title = getLocalizedContent(situation.title);
+                const context = getLocalizedContent(situation.context);
+
                 return (
                   <Card 
                     key={situation.id}
@@ -130,10 +139,10 @@ export default function SituationPickerModal({ isOpen, onClose, onSelectSituatio
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-start justify-between gap-2 mb-2">
-                            <h3 className="font-semibold text-gray-900 leading-tight">{situation.title}</h3>
+                            <h3 className="font-semibold text-gray-900 leading-tight">{title}</h3>
                             <Badge variant="outline" className="flex-shrink-0">{situation.difficulty}</Badge>
                           </div>
-                          <p className="text-sm text-gray-600 line-clamp-2 mb-2">{situation.context}</p>
+                          <p className="text-sm text-gray-600 line-clamp-2 mb-2">{context}</p>
                           <div className="flex items-center justify-between">
                             <Badge className="text-xs">{situation.category}</Badge>
                             {practiced && (

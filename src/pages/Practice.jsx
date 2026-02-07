@@ -848,7 +848,7 @@ Would you like to advance to level ${newLevel}?`)) {
       >
         <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white py-8">
           <div className="max-w-5xl mx-auto px-4">
-            {selectedSituation && <SituationBanner situation={selectedSituation} />}
+            {selectedSituation && <SituationBanner situation={selectedSituation} language={user?.test_language || 'finnish'} />}
             <QuickPracticeSession
               section={activeSection}
               exam={activeExam}
