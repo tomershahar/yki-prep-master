@@ -87,11 +87,17 @@ export default function FeedbackButton() {
         let screenshotUrl = null;
 
         try {
+            // Try to upload screenshot, but don't fail if it doesn't work
             if (screenshotData) {
-                const blob = await (await fetch(screenshotData)).blob();
-                const file = new File([blob], "feedback-screenshot.png", { type: "image/png" });
-                const { file_url } = await UploadFile({ file });
-                screenshotUrl = file_url;
+                try {
+                    const blob = await (await fetch(screenshotData)).blob();
+                    const file = new File([blob], "feedback-screenshot.png", { type: "image/png" });
+                    const { file_url } = await UploadFile({ file });
+                    screenshotUrl = file_url;
+                } catch (uploadError) {
+                    console.warn("Screenshot upload failed, continuing without it:", uploadError);
+                    // Continue without screenshot - feedback is more important
+                }
             }
 
             const newFeedback = await Feedback.create({
