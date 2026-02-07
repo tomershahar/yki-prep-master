@@ -41,8 +41,7 @@ export default function InlineTranslator({ children, sourceLanguage, targetLangu
 Word: "${text}"`;
 
       const result = await InvokeLLM({ 
-        prompt,
-        model: "gpt-4o"
+        prompt
       });
       setTranslation(DOMPurify.sanitize(result, { ALLOWED_TAGS: [] }));
     } catch (err) {
@@ -96,8 +95,7 @@ Word: "${text}"`;
       
       console.log('Generating example sentence...');
       const exampleSentence = await InvokeLLM({ 
-        prompt: sentencePrompt,
-        model: "gpt-4o"
+        prompt: sentencePrompt
       });
       const sanitizedSentence = DOMPurify.sanitize(exampleSentence, { ALLOWED_TAGS: [] });
       
