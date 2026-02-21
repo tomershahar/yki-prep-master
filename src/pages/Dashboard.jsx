@@ -4,7 +4,7 @@ import { PracticeSession } from "@/entities/PracticeSession";
 import { Achievement } from "@/entities/Achievement";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { Clock, Target, Flame, Trophy, Loader2, BookOpen, Headphones, Mic, PenTool } from "lucide-react";
+import { Clock, Target, Flame, Trophy, Loader2, BookOpen, Headphones, Mic, PenTool, MessageSquare } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -542,27 +542,35 @@ export default function Dashboard() {
       <SafeRender>
         <div className="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
           <div className="max-w-7xl mx-auto p-4 md:p-8 space-y-8">
-            {/* Welcome Banner - Speech & Listening Fix */}
+            {/* Discord Community Banner */}
             {showWelcomeBanner && (
-              <div className="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-300 rounded-xl p-6 shadow-lg">
+              <div className="bg-gradient-to-r from-indigo-50 to-purple-50 border-2 border-indigo-300 rounded-xl p-6 shadow-lg">
                 <div className="flex items-start justify-between">
                   <div className="flex items-start gap-4">
-                    <div className="p-3 bg-green-500 rounded-full">
-                      <Headphones className="w-6 h-6 text-white" />
+                    <div className="p-3 bg-indigo-500 rounded-full">
+                      <MessageSquare className="w-6 h-6 text-white" />
                     </div>
                     <div>
-                      <h3 className="text-xl font-bold text-green-900 mb-2">
-                        🎉 Great News! Speech & Listening Features Are Now Fixed
+                      <h3 className="text-xl font-bold text-indigo-900 mb-2">
+                        🎉 Join Our Discord Community!
                       </h3>
-                      <p className="text-green-800 mb-3">
-                        We've resolved the issues with audio playback and speech recognition. You can now practice listening comprehension and speaking exercises without interruptions. Enjoy your improved learning experience!
+                      <p className="text-indigo-800 mb-3">
+                        Connect with other learners, get exam tips, share resources, and stay updated. Join our Discord server for YKI, Swedish, and Danish exam channels!
                       </p>
-                      <Button 
-                        onClick={dismissWelcomeBanner}
-                        className="bg-green-600 hover:bg-green-700 text-white"
-                      >
-                        Got it, thanks!
-                      </Button>
+                      <div className="flex gap-3">
+                        <a href="https://discord.gg/rsgNBTsr" target="_blank" rel="noopener noreferrer">
+                          <Button className="bg-indigo-600 hover:bg-indigo-700 text-white">
+                            Join Discord Server
+                          </Button>
+                        </a>
+                        <Button 
+                          variant="outline"
+                          onClick={dismissWelcomeBanner}
+                          className="border-indigo-300 text-indigo-700"
+                        >
+                          Dismiss
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 </div>
