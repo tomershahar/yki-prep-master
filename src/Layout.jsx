@@ -278,15 +278,22 @@ export default function Layout({ children, currentPageName }) {
                       <SidebarMenuButton
                         asChild
                         className={`mx-2 rounded-xl transition-all duration-300 ${
-                          location.pathname === item.url
+                          !item.external && location.pathname === item.url
                             ? 'bg-white/20 text-white shadow-lg'
                             : 'text-green-100 hover:bg-white/10 hover:text-white'
                         }`}
                       >
-                        <Link to={item.url} className="flex items-center gap-3 px-4 py-3" aria-label={`Navigate to ${item.title}`}>
-                          <item.icon className="w-5 h-5" />
-                          <span className="font-medium">{item.title}</span>
-                        </Link>
+                        {item.external ? (
+                          <a href={item.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 px-4 py-3" aria-label={`Navigate to ${item.title}`}>
+                            <item.icon className="w-5 h-5" />
+                            <span className="font-medium">{item.title}</span>
+                          </a>
+                        ) : (
+                          <Link to={item.url} className="flex items-center gap-3 px-4 py-3" aria-label={`Navigate to ${item.title}`}>
+                            <item.icon className="w-5 h-5" />
+                            <span className="font-medium">{item.title}</span>
+                          </Link>
+                        )}
                       </SidebarMenuButton>
                     </SidebarMenuItem>
                   ))}
