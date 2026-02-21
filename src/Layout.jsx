@@ -142,6 +142,12 @@ export default function Layout({ children, currentPageName }) {
       url: createPageUrl("Settings"),
       icon: Settings,
     },
+    {
+      title: "Discord Community",
+      url: "https://discord.gg/rsgNBTsr",
+      icon: MessageSquare,
+      external: true,
+    },
   ];
 
   // Add admin pages for admin users only
