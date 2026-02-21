@@ -12,11 +12,11 @@ import {
   Database,
   Zap,
   Timer,
-  MessageSquare, // Added Feedback icon
-  Wand2, // Added Model Evaluation icon
-  ClipboardList, // Added Changelog icon
-  Library, // Added Word Bank icon
-  Target // Added Exam Readiness icon
+  MessageSquare,
+  Wand2,
+  ClipboardList,
+  Library,
+  Target
 } from "lucide-react";
 import {
   Sidebar,
@@ -141,12 +141,6 @@ export default function Layout({ children, currentPageName }) {
       title: "Settings",
       url: createPageUrl("Settings"),
       icon: Settings,
-    },
-    {
-      title: "Discord Community",
-      url: "https://discord.gg/rsgNBTsr",
-      icon: MessageSquare,
-      external: true,
     },
   ];
 

@@ -542,7 +542,7 @@ export default function Dashboard() {
       <SafeRender>
         <div className="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
           <div className="max-w-7xl mx-auto p-4 md:p-8 space-y-8">
-            {/* Discord Community Banner */}
+            {/* Welcome Banner - Speech & Listening Fix */}
             {showWelcomeBanner && (
               <div className="bg-gradient-to-r from-indigo-50 to-purple-50 border-2 border-indigo-300 rounded-xl p-6 shadow-lg">
                 <div className="flex items-start justify-between">
@@ -552,15 +552,15 @@ export default function Dashboard() {
                     </div>
                     <div>
                       <h3 className="text-xl font-bold text-indigo-900 mb-2">
-                        🎉 Join Our Discord Community!
+                        💬 Join Our Discord Community!
                       </h3>
                       <p className="text-indigo-800 mb-3">
-                        Connect with other learners, get exam tips, share resources, and stay updated. Join our Discord server for YKI, Swedish, and Danish exam channels!
+                        Connect with other learners, get help with your exam prep, and stay up to date with the latest app news. Join our Discord server today!
                       </p>
                       <div className="flex gap-3">
                         <a href="https://discord.gg/rsgNBTsr" target="_blank" rel="noopener noreferrer">
                           <Button className="bg-indigo-600 hover:bg-indigo-700 text-white">
-                            Join Discord Server
+                            Join Discord
                           </Button>
                         </a>
                         <Button 
