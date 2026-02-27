@@ -146,21 +146,41 @@ export default function PreGeneratedExamSession({ section, exam, useTimer, onCom
         const parsedContent = JSON.parse(exam.content);
         
         // NORMALIZATION STEP: Align AI output with component expectations.
-        // The full exam generator creates a `sections` key.
-        // This component was built expecting `parts` (for reading) and `clips` (for listening).
-        // Let's normalize the data here to make them compatible.
+        // This component expects `parts` (reading), `clips` (listening), or `tasks` (writing/speaking).
+        // Generators may return different shapes — normalize all known formats here.
+
+        // Shape 1: { sections: [...] } — from full exam generator
         if (parsedContent.sections) {
             if (section.id === 'reading') {
-                // Map `text` property to `content` for each section
                 parsedContent.parts = parsedContent.sections.map(s => ({...s, content: s.text }));
             } else if (section.id === 'listening') {
-                // Ensure a `scenario_description` exists and map to `clips`
                 parsedContent.clips = parsedContent.sections.map(s => ({
-                    ...s, 
+                    ...s,
                     scenario_description: s.scenario_description || s.title || "Listening task"
                 }));
             }
-            delete parsedContent.sections; // Clean up the original key
+            delete parsedContent.sections;
+        }
+
+        // Shape 2: { text, questions } — single-passage format from practice generators / content pool
+        if (section.id === 'reading' && parsedContent.text && !parsedContent.parts) {
+            parsedContent.parts = [{
+                title: '',
+                content: parsedContent.text,
+                text: parsedContent.text,
+                questions: parsedContent.questions || []
+            }];
+        }
+
+        // Shape 3: { audio_script, questions } — single-clip format from practice generators / content pool
+        if (section.id === 'listening' && parsedContent.audio_script && !parsedContent.clips) {
+            parsedContent.clips = [{
+                title: '',
+                audio_script: parsedContent.audio_script,
+                audio_base64: parsedContent.audio_base64,
+                scenario_description: parsedContent.scenario_description || 'Listening task',
+                questions: parsedContent.questions || []
+            }];
         }
         
         setExamContent(parsedContent);
