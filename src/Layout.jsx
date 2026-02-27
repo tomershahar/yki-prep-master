@@ -203,50 +203,54 @@ export default function Layout({ children, currentPageName }) {
       <style>
         {`
           :root {
-            --forest-green: #2D5A3D;
-            --amber: #F4A261;
-            --nordic-blue: #4A90A4;
-            --light-sage: #E8F5E8;
-            --warm-white: #FEFEFE;
-            --soft-gray: #F8F9FA;
-            --text-dark: #1A1A1A;
-            --text-medium: #4A5568;
-            --text-light: #718096;
+            --nordic-deep: #1B2A4A;
+            --nordic-mid: #2C4270;
+            --nordic-accent: #4A7FBA;
+            --nordic-light: #7EB8D4;
+            --ice-white: #F0F5FA;
+            --crisp-white: #FFFFFF;
+            --slate-50: #F8FAFC;
+            --slate-100: #F1F5F9;
+            --text-dark: #0F172A;
+            --text-medium: #334155;
+            --text-light: #64748B;
           }
 
           .dark {
-            --forest-green: #1A4A2E;
-            --amber: #F4A261;
-            --nordic-blue: #4A90A4;
-            --light-sage: #2D4A3D;
-            --warm-white: #1A1A1A;
-            --soft-gray: #2D2D2D;
-            --text-dark: #E5E5E5;
-            --text-medium: #B8B8B8;
-            --text-light: #9A9A9A;
+            --nordic-deep: #0F1A2E;
+            --nordic-mid: #1E2D4A;
+            --nordic-accent: #4A7FBA;
+            --nordic-light: #7EB8D4;
+            --ice-white: #1E2A3A;
+            --crisp-white: #0F1A2E;
+            --slate-50: #1A2535;
+            --slate-100: #1E2D40;
+            --text-dark: #E2E8F0;
+            --text-medium: #94A3B8;
+            --text-light: #64748B;
           }
 
           body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-            background: linear-gradient(135deg, var(--soft-gray) 0%, var(--warm-white) 100%);
+            background: linear-gradient(135deg, #EEF4FB 0%, #F8FAFC 60%, #E8F0F8 100%);
             color: var(--text-dark);
             transition: background-color 0.3s ease, color 0.3s ease;
           }
 
           .sidebar-gradient {
-            background: linear-gradient(180deg, var(--forest-green) 0%, #234A32 100%);
+            background: linear-gradient(180deg, #1B2A4A 0%, #162240 50%, #1A2E58 100%);
           }
 
           .dark .sidebar-gradient {
-            background: linear-gradient(180deg, var(--forest-green) 0%, #1A3A27 100%);
+            background: linear-gradient(180deg, #0F1A2E 0%, #0C1525 50%, #111E35 100%);
           }
 
           .achievement-glow {
-            box-shadow: 0 0 20px rgba(244, 162, 97, 0.3);
+            box-shadow: 0 0 20px rgba(74, 127, 186, 0.35);
           }
 
           .progress-shimmer {
-            background: linear-gradient(90deg, var(--nordic-blue) 0%, var(--amber) 100%);
+            background: linear-gradient(90deg, #4A7FBA 0%, #7EB8D4 100%);
           }
         `}
       </style>
