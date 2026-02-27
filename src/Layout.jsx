@@ -258,12 +258,12 @@ export default function Layout({ children, currentPageName }) {
         <Sidebar className="border-r-0 shadow-xl">
           <SidebarHeader className="p-6 sidebar-gradient">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl flex items-center justify-center shadow-lg">
+              <div className="w-10 h-10 bg-gradient-to-br from-sky-400 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
                 <Languages className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h2 className="font-bold text-white text-lg">Nordic Test Prep</h2>
-                <p className="text-xs text-green-100">
+                <h2 className="font-bold text-white text-lg tracking-tight">Nordic Test Prep</h2>
+                <p className="text-xs text-blue-200">
                   {user?.target_test || 'Language'} Exam Preparation
                 </p>
               </div>
