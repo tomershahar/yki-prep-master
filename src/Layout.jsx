@@ -326,7 +326,7 @@ export default function Layout({ children, currentPageName }) {
         </Sidebar>
 
         <main className="flex-1 flex flex-col">
-          <header className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border-b border-gray-100 dark:border-gray-700 px-6 py-4 md:hidden">
+          <header className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm border-b border-slate-200/60 dark:border-slate-700 px-6 py-4 md:hidden">
             <div className="flex items-center gap-4">
               <SidebarTrigger className="hover:bg-gray-100 dark:hover:bg-gray-800 p-2 rounded-lg transition-colors duration-200" aria-label="Toggle sidebar" />
               <h1 className="text-xl font-bold text-gray-900 dark:text-white">Nordic Test Prep</h1>
