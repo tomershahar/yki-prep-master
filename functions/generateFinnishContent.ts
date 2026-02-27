@@ -149,19 +149,20 @@ INSTRUCTIONS:
     case 'writing':
       return `${baseInstruction}
 
-TASK: Create two distinct writing tasks for level ${level} in Finnish.
+TASK: Create three distinct writing tasks for level ${level} in Finnish, matching the actual YKI exam structure.
 
 INSTRUCTIONS:
-1. Generate two tasks with VARIED TOPICS:
-   - Task 1: Informal Message (email to friend, text message, social media post, note)
-   - Task 2: Formal Message (official email, letter, opinion piece, report)
-   - SELECT DIFFERENT THEMES: work, education, health, environment, culture, technology
+1. Generate exactly three tasks:
+   - Task 1: Informal Message (viesti ystävälle, tekstiviesti, sosiaalisen median viesti, muistilappu)
+   - Task 2: Formal Message (virallinen sähköposti, kirje viranomaiselle, reklamaatio, hakemus)
+   - Task 3: Opinion/Essay (mielipidekirjoitus, essee, argumentoiva teksti lehdelle tai foorumille)
+   - SELECT DIFFERENT THEMES across tasks: work, education, health, environment, culture, technology
 
 2. Match CEFR word counts:
-   - A1: 30-50 words per task
+   - A1: 20-40 words per task
    - A2: 40-60 words per task
    - B1: 60-100 words per task
-   - B2: 80-120 words per task
+   - B2: 100-150 words per task
 
 3. Return valid JSON:
 {
@@ -169,7 +170,7 @@ INSTRUCTIONS:
     {
       "task_type": "Informal Message",
       "prompt": "Prompt in Finnish",
-      "word_count": "30-50 words",
+      "word_count": "40-60 words",
       "sample_answer": "Example in Finnish",
       "assessment_criteria": {
         "task_fulfillment": "...",
@@ -179,6 +180,17 @@ INSTRUCTIONS:
     },
     {
       "task_type": "Formal Message",
+      "prompt": "Prompt in Finnish",
+      "word_count": "60-100 words",
+      "sample_answer": "Example in Finnish",
+      "assessment_criteria": {
+        "task_fulfillment": "...",
+        "language_sophistication": "...",
+        "grammatical_accuracy": "..."
+      }
+    },
+    {
+      "task_type": "Opinion/Essay",
       "prompt": "Prompt in Finnish",
       "word_count": "80-120 words",
       "sample_answer": "Example in Finnish",
