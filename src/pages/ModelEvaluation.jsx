@@ -132,15 +132,20 @@ export default function ModelEvaluation() {
         setSeedResult(null);
         setSeedProgress(null);
 
+        // Danish exams (PD3/PD2) are B2-only — never seed A1/A2/B1 for Danish
+        const LEVELS_FOR_LANGUAGE = { danish: ['B2'] };
+
         const languages = seedParams.language !== 'all' ? [seedParams.language] : ALL_LANGUAGES;
         const sections = seedParams.section !== 'all' ? [seedParams.section] : ALL_SECTIONS;
-        const levels = seedParams.level !== 'all' ? [seedParams.level] : ALL_LEVELS;
         const count = Number(seedParams.count) || 5;
 
         const combos = [];
         for (const lang of languages) {
+            const validLevels = seedParams.level !== 'all'
+                ? [seedParams.level]
+                : (LEVELS_FOR_LANGUAGE[lang] || ALL_LEVELS);
             for (const sec of sections) {
-                for (const lvl of levels) {
+                for (const lvl of validLevels) {
                     combos.push({ language: lang, section: sec, level: lvl });
                 }
             }
