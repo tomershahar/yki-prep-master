@@ -17,6 +17,7 @@ import { Achievement } from "@/entities/Achievement";
 import { generateSpeech } from '@/functions/generateSpeech';
 import { checkAndAwardAchievements } from '../components/shared/achievementUtils';
 import { toast } from "@/components/ui/use-toast";
+import ErrorBoundary from '../components/shared/ErrorBoundary';
 
 const difficultyLevels = ["A1", "A2", "B1", "B2"];
 const difficultyMap = { A1: 1, A2: 2, B1: 3, B2: 4 };
