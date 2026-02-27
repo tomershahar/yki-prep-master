@@ -281,10 +281,10 @@ export default function Layout({ children, currentPageName }) {
                     <SidebarMenuItem key={item.title}>
                       <SidebarMenuButton
                         asChild
-                        className={`mx-2 rounded-xl transition-all duration-300 ${
+                        className={`mx-2 rounded-xl transition-all duration-200 ${
                           !item.external && location.pathname === item.url
-                            ? 'bg-white/20 text-white shadow-lg'
-                            : 'text-green-100 hover:bg-white/10 hover:text-white'
+                            ? 'bg-blue-500/30 text-white shadow-md border border-blue-400/20'
+                            : 'text-blue-100/80 hover:bg-white/10 hover:text-white'
                         }`}
                       >
                         {item.external ? (
