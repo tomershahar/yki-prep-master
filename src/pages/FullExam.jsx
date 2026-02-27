@@ -179,13 +179,20 @@ INSTRUCTIONS:
       case 'writing':
         return `${baseSystemInstruction}
 
-TASK: Create a complete writing exam section with three distinct tasks for level ${difficulty} in ${languageName}.
+TASK: Create a complete YKI writing exam section with exactly three tasks for level ${difficulty} in ${languageName}, matching the real YKI exam structure.
 
 INSTRUCTIONS:
-1. Generate three writing tasks with increasing complexity.
-   - e.g., Task 1: Informal Message, Task 2: Formal Email, Task 3: Opinion Piece.
+1. Generate exactly three writing tasks:
+   - Task 1: Informal Message (personal email, text message, note to a friend)
+   - Task 2: Formal Message (official email, complaint letter, application, report to an authority)
+   - Task 3: Opinion/Essay (opinion article for a newspaper or forum, argumentative essay)
+   - Use different topics across the three tasks (e.g., work, health, environment, education)
 
-2. Match the CEFR level expectations for prompts and word counts.
+2. Match the CEFR level expectations for prompts and word counts:
+   - A1: 20-40 words per task
+   - A2: 40-60 words per task
+   - B1: 60-100 words per task
+   - B2: 100-150 words per task
 
 3. Return a valid JSON object with this exact structure:
 {
@@ -193,15 +200,15 @@ INSTRUCTIONS:
     {
       "task_type": "Informal Message",
       "prompt": "Prompt in ${languageName}",
-      "word_count": "e.g., 30-50 words"
+      "word_count": "e.g., 40-60 words"
     },
     {
-      "task_type": "Formal Email",
+      "task_type": "Formal Message",
       "prompt": "Prompt in ${languageName}",
       "word_count": "e.g., 60-100 words"
     },
     {
-      "task_type": "Opinion Piece",
+      "task_type": "Opinion/Essay",
       "prompt": "Prompt in ${languageName}",
       "word_count": "e.g., 80-120 words"
     }
