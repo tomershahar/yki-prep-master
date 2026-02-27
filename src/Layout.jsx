@@ -306,18 +306,18 @@ export default function Layout({ children, currentPageName }) {
             </SidebarGroup>
           </SidebarContent>
 
-          <SidebarFooter className="p-6 sidebar-gradient border-t border-white/10">
+          <SidebarFooter className="p-5 sidebar-gradient border-t border-white/10">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center">
+              <div className="w-9 h-9 bg-gradient-to-br from-sky-400 to-blue-600 rounded-full flex items-center justify-center ring-2 ring-blue-400/30">
                 <span className="text-white font-bold text-sm">
                   {user?.full_name?.charAt(0) || 'U'}
                 </span>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="font-medium text-white text-sm truncate">
+                <p className="font-semibold text-white text-sm truncate">
                   {user?.full_name || 'Language Learner'}
                 </p>
-                <p className="text-xs text-green-100 truncate">
+                <p className="text-xs text-blue-200 truncate">
                   {user?.role === 'admin' ? 'Administrator' : 'Keep up the great work!'}
                 </p>
               </div>
