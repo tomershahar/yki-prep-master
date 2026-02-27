@@ -272,7 +272,7 @@ export default function Layout({ children, currentPageName }) {
 
           <SidebarContent className="sidebar-gradient">
             <SidebarGroup>
-              <SidebarGroupLabel className="text-xs font-medium text-green-100 uppercase tracking-wider px-4 py-3">
+              <SidebarGroupLabel className="text-xs font-medium text-blue-200 uppercase tracking-widest px-4 py-3 opacity-70">
                 Navigation
               </SidebarGroupLabel>
               <SidebarGroupContent>
