@@ -57,13 +57,18 @@ export default function ModelEvaluation() {
     const [poolStats, setPoolStats] = useState([]);
     const [isLoadingPoolStats, setIsLoadingPoolStats] = useState(false);
     const [isSeeding, setIsSeeding] = useState(false);
+    const [seedProgress, setSeedProgress] = useState(null); // { done, total, current }
     const [seedResult, setSeedResult] = useState(null);
     const [seedParams, setSeedParams] = useState({
         language: 'all',
         section: 'all',
         level: 'all',
-        count: 15,
+        count: 5,
     });
+
+    const ALL_LANGUAGES = ['finnish', 'swedish', 'danish'];
+    const ALL_SECTIONS = ['reading', 'listening', 'speaking', 'writing'];
+    const ALL_LEVELS = ['A1', 'A2', 'B1', 'B2'];
 
     useEffect(() => {
         const checkAccess = async () => {
@@ -125,17 +130,44 @@ export default function ModelEvaluation() {
     const handleSeedPool = async () => {
         setIsSeeding(true);
         setSeedResult(null);
+        setSeedProgress(null);
+
+        const languages = seedParams.language !== 'all' ? [seedParams.language] : ALL_LANGUAGES;
+        const sections = seedParams.section !== 'all' ? [seedParams.section] : ALL_SECTIONS;
+        const levels = seedParams.level !== 'all' ? [seedParams.level] : ALL_LEVELS;
+        const count = Number(seedParams.count) || 5;
+
+        const combos = [];
+        for (const lang of languages) {
+            for (const sec of sections) {
+                for (const lvl of levels) {
+                    combos.push({ language: lang, section: sec, level: lvl });
+                }
+            }
+        }
+
+        let totalSeeded = 0;
+        let totalErrors = 0;
+
         try {
-            const params = {
-                count: Number(seedParams.count) || 15,
-                ...(seedParams.language !== 'all' && { language: seedParams.language }),
-                ...(seedParams.section !== 'all' && { section: seedParams.section }),
-                ...(seedParams.level !== 'all' && { level: seedParams.level }),
-            };
-            const { data, error } = await seedContentPool(params);
-            if (error) throw new Error(error.message || String(error));
-            setSeedResult(data);
-            toast({ title: 'Pool seeded!', description: `${data.seeded} items added across ${data.combinations} combinations.` });
+            for (let i = 0; i < combos.length; i++) {
+                const combo = combos[i];
+                setSeedProgress({ done: i, total: combos.length, current: `${combo.language}/${combo.section}/${combo.level}` });
+                try {
+                    const { data, error } = await seedContentPool({ ...combo, count });
+                    if (error) throw new Error(error.message || String(error));
+                    totalSeeded += data?.seeded || 0;
+                    totalErrors += data?.errors?.length || 0;
+                } catch (err) {
+                    console.error(`Seeding failed for ${combo.language}/${combo.section}/${combo.level}:`, err);
+                    totalErrors++;
+                }
+            }
+
+            setSeedProgress({ done: combos.length, total: combos.length, current: null });
+            const result = { seeded: totalSeeded, combinations: combos.length, errors: totalErrors };
+            setSeedResult(result);
+            toast({ title: 'Pool seeded!', description: `${totalSeeded} items added across ${combos.length} combinations.` });
             loadPoolStats();
         } catch (error) {
             console.error('Seeding failed:', error);
@@ -322,6 +354,7 @@ export default function ModelEvaluation() {
                                         <SelectTrigger><SelectValue /></SelectTrigger>
                                         <SelectContent>
                                             <SelectItem value="all">All Languages</SelectItem>
+                                            <SelectItem value="finnish">Finnish</SelectItem>
                                             <SelectItem value="swedish">Swedish</SelectItem>
                                             <SelectItem value="danish">Danish</SelectItem>
                                         </SelectContent>
@@ -372,14 +405,14 @@ export default function ModelEvaluation() {
                                 </Button>
                             </div>
 
-                            {isSeeding && (
-                                <Alert>
-                                    <Loader2 className="h-4 w-4 animate-spin" />
-                                    <AlertTitle>Seeding in Progress</AlertTitle>
-                                    <AlertDescription>
-                                        Generating content items and saving to the pool. This may take several minutes for large batches. Please keep this tab open.
-                                    </AlertDescription>
-                                </Alert>
+                            {isSeeding && seedProgress && (
+                                <div className="space-y-2">
+                                    <div className="flex items-center justify-between text-sm text-gray-600">
+                                        <span className="flex items-center gap-2"><Loader2 className="w-4 h-4 animate-spin" /> Seeding {seedProgress.current}…</span>
+                                        <span>{seedProgress.done}/{seedProgress.total} combinations</span>
+                                    </div>
+                                    <Progress value={Math.round((seedProgress.done / seedProgress.total) * 100)} className="h-2" />
+                                </div>
                             )}
 
                             {seedResult && !isSeeding && (
@@ -387,9 +420,9 @@ export default function ModelEvaluation() {
                                     <AlertCircle className="h-4 w-4 text-green-600" />
                                     <AlertTitle className="text-green-800">Seeding Complete</AlertTitle>
                                     <AlertDescription className="text-green-700">
-                                        {seedResult.message}
-                                        {seedResult.errors && seedResult.errors.length > 0 && (
-                                            <span className="ml-2 text-amber-700">({seedResult.errors.length} errors — check function logs)</span>
+                                        {seedResult.seeded} items added across {seedResult.combinations} combinations.
+                                        {seedResult.errors > 0 && (
+                                            <span className="ml-2 text-amber-700">({seedResult.errors} errors — check function logs)</span>
                                         )}
                                     </AlertDescription>
                                 </Alert>
