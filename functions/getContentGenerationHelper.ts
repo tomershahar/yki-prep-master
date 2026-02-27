@@ -41,61 +41,71 @@ Deno.serve(async (req) => {
       }
     }
 
-    // --- POOL-FIRST LOGIC ---
-    // 1. Query pool for matching active items
-    const poolItems = await base44.entities.ContentPool.filter({
-      language: detectedLanguage,
-      section,
-      level,
-      is_active: true
-    });
-
-    const seenIds: string[] = user.used_content_pool_ids || [];
-
-    // 2. Filter out already-seen items
-    let availableItems = (poolItems || []).filter((item) => !seenIds.includes(item.id));
-
-    // 3. If all seen (cycle reset): clear seen IDs for this combo and retry
-    if (availableItems.length === 0 && poolItems && poolItems.length > 0) {
-      console.log(`[ContentPool] All items seen for ${detectedLanguage}/${section}/${level} — resetting seen list for this combo`);
-      const filteredSeenIds = seenIds.filter((id) => {
-        return !poolItems.some((item) => item.id === id);
+    // --- POOL-FIRST LOGIC (wrapped in try/catch — any pool error falls through to live AI) ---
+    try {
+      // 1. Query pool for matching active items
+      const poolItems = await base44.entities.ContentPool.filter({
+        language: detectedLanguage,
+        section,
+        level,
+        is_active: true
       });
-      await base44.auth.updateMe({ used_content_pool_ids: filteredSeenIds });
-      availableItems = poolItems;
-    }
 
-    // 4. If pool has items, serve from pool
-    if (availableItems.length > 0) {
-      const randomIndex = Math.floor(Math.random() * availableItems.length);
-      const selected = availableItems[randomIndex];
+      const seenIds: string[] = user.used_content_pool_ids || [];
 
-      // Update user's seen list and increment used_count (non-blocking background updates)
-      const updatedSeenIds = [...(user.used_content_pool_ids || []), selected.id];
+      // 2. Filter out already-seen items
+      let availableItems = (poolItems || []).filter((item) => !seenIds.includes(item.id));
 
-      Promise.all([
-        base44.auth.updateMe({ used_content_pool_ids: updatedSeenIds }),
-        base44.entities.ContentPool.update(selected.id, { used_count: (selected.used_count || 0) + 1 })
-      ]).catch((err) => console.error('[ContentPool] Error updating after pool serve:', err));
-
-      // 5. If pool is running low, trigger background replenishment
-      const remainingCount = availableItems.length - 1;
-      if (remainingCount < LOW_POOL_THRESHOLD) {
-        console.log(`[ContentPool] Low pool (${remainingCount} remaining) for ${detectedLanguage}/${section}/${level} — triggering background refill`);
-        base44.functions.invoke('seedContentPool', {
-          language: detectedLanguage,
-          section,
-          level,
-          count: 15
-        }).catch((err) => console.error('[ContentPool] Background seed failed:', err));
+      // 3. If all seen (cycle reset): clear seen IDs for this combo and retry
+      if (availableItems.length === 0 && poolItems && poolItems.length > 0) {
+        console.log(`[ContentPool] All items seen for ${detectedLanguage}/${section}/${level} — resetting seen list for this combo`);
+        const filteredSeenIds = seenIds.filter((id) => {
+          return !poolItems.some((item) => item.id === id);
+        });
+        await base44.auth.updateMe({ used_content_pool_ids: filteredSeenIds });
+        availableItems = poolItems;
       }
 
-      console.log(`[ContentPool] Served item ${selected.id} from pool (${availableItems.length} available)`);
-      return Response.json(selected.content, { headers: corsHeaders });
+      // 4. If pool has items, serve from pool
+      if (availableItems.length > 0) {
+        const randomIndex = Math.floor(Math.random() * availableItems.length);
+        const selected = availableItems[randomIndex];
+
+        // Update user's seen list and increment used_count (non-blocking background updates)
+        const updatedSeenIds = [...(user.used_content_pool_ids || []), selected.id];
+
+        Promise.all([
+          base44.auth.updateMe({ used_content_pool_ids: updatedSeenIds }),
+          base44.entities.ContentPool.update(selected.id, { used_count: (selected.used_count || 0) + 1 })
+        ]).catch((err) => console.error('[ContentPool] Error updating after pool serve:', err));
+
+        // 5. If pool is running low, trigger background replenishment
+        const remainingCount = availableItems.length - 1;
+        if (remainingCount < LOW_POOL_THRESHOLD) {
+          console.log(`[ContentPool] Low pool (${remainingCount} remaining) for ${detectedLanguage}/${section}/${level} — triggering background refill`);
+          base44.functions.invoke('seedContentPool', {
+            language: detectedLanguage,
+            section,
+            level,
+            count: 15
+          }).catch((err) => console.error('[ContentPool] Background seed failed:', err));
+        }
+
+        // content may be stored as an object or a JSON string — normalise
+        const content = typeof selected.content === 'string'
+          ? JSON.parse(selected.content)
+          : selected.content;
+
+        console.log(`[ContentPool] Served item ${selected.id} from pool (${availableItems.length} available)`);
+        return Response.json(content, { headers: corsHeaders });
+      }
+    } catch (poolError) {
+      // Pool is unavailable or misconfigured — log and fall through to live AI
+      console.warn('[ContentPool] Pool lookup failed, falling back to live AI generation:', poolError.message);
     }
 
     // --- FALLBACK: Live AI generation ---
-    console.log(`[ContentPool] Pool empty for ${detectedLanguage}/${section}/${level} — falling back to live AI generation`);
+    console.log(`[ContentPool] Falling back to live AI generation for ${detectedLanguage}/${section}/${level}`);
 
     // Route to appropriate generation function based on detected language
     let generationFunction;
