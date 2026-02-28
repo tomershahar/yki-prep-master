@@ -5,13 +5,16 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { 
-    Target, TrendingUp, Calendar, BookOpen, 
+import {
+    Target, TrendingUp, Calendar,
     Loader2, RefreshCw, CheckCircle, AlertCircle,
-    ArrowRight, Sparkles
+    ArrowRight, Sparkles, Share2
 } from 'lucide-react';
 import { createPageUrl } from '@/utils';
 import { Link } from 'react-router-dom';
+import { differenceInCalendarDays } from "date-fns";
+import { useReadinessShareCard, ReadinessShareCardTemplate } from "@/components/dashboard/ReadinessShareCard";
+import { toast } from "@/components/ui/use-toast";
 
 export default function ExamReadiness() {
     const [loading, setLoading] = useState(true);
@@ -20,6 +23,12 @@ export default function ExamReadiness() {
     const [analysis, setAnalysis] = useState(null);
     const [user, setUser] = useState(null);
     const [error, setError] = useState(null);
+
+    const { cardRef, shareCard } = useReadinessShareCard();
+
+    const daysLeft = user?.exam_date
+        ? differenceInCalendarDays(new Date(user.exam_date), new Date())
+        : null;
 
     useEffect(() => {
         loadReadinessData();
@@ -186,6 +195,17 @@ Provide personalized analysis and recommendations in JSON format.
         return 'bg-gray-600';
     };
 
+    const handleShare = async () => {
+        try {
+            await shareCard({
+                score: readinessScore.score,
+                targetTest: user?.target_test || "YKI",
+            });
+        } catch (_err) {
+            toast({ title: "Could not share", description: "Try again or take a screenshot.", variant: "destructive" });
+        }
+    };
+
     if (loading) {
         return (
             <div className="flex items-center justify-center min-h-screen">
@@ -237,6 +257,21 @@ Provide personalized analysis and recommendations in JSON format.
                 </Button>
             </div>
 
+            {/* Exam Countdown Banner */}
+            {daysLeft !== null && daysLeft >= 0 && (
+                <Card className="bg-gradient-to-r from-orange-500 to-red-500 text-white border-0">
+                    <CardContent className="p-4 flex items-center gap-3">
+                        <Calendar className="w-6 h-6 flex-shrink-0" />
+                        <div>
+                            <div className="font-bold text-lg">{daysLeft} days until your exam</div>
+                            <div className="text-sm text-orange-100">
+                                {user.target_test} on {new Date(user.exam_date).toLocaleDateString()}
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+            )}
+
             {/* Current Level Card */}
             <Card className="border-2">
                 <CardHeader>
@@ -259,11 +294,17 @@ Provide personalized analysis and recommendations in JSON format.
                             <span className="text-2xl font-bold">{readinessScore?.score}%</span>
                             <span className="text-sm text-gray-500">Target: {readinessScore?.target_level} Level</span>
                         </div>
-                        <Progress 
-                            value={readinessScore?.score} 
+                        <Progress
+                            value={readinessScore?.score}
                             className="h-3"
                             style={{ '--progress-background': getProgressColor(readinessScore?.score) }}
                         />
+                        <div className="mt-4">
+                            <Button onClick={handleShare} variant="outline" className="gap-2">
+                                <Share2 className="w-4 h-4" />
+                                Share Your Progress
+                            </Button>
+                        </div>
                     </div>
 
                     {/* Section Breakdown */}
@@ -384,6 +425,18 @@ Provide personalized analysis and recommendations in JSON format.
                     )}
                 </>
             ) : null}
+
+            {readinessScore && user && (
+                <ReadinessShareCardTemplate
+                    cardRef={cardRef}
+                    score={readinessScore.score}
+                    level={readinessScore.level}
+                    sectionScores={readinessScore.section_scores}
+                    examDate={user.exam_date}
+                    targetTest={user.target_test || "YKI"}
+                    userName={user.full_name?.split(" ")[0]}
+                />
+            )}
         </div>
     );
 }
