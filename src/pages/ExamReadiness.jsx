@@ -300,7 +300,7 @@ Provide personalized analysis and recommendations in JSON format.
                             style={{ '--progress-background': getProgressColor(readinessScore?.score) }}
                         />
                         <div className="mt-4">
-                            <Button onClick={handleShare} variant="outline" className="gap-2">
+                            <Button onClick={handleShare} variant="outline" className="gap-2" disabled={!readinessScore}>
                                 <Share2 className="w-4 h-4" />
                                 Share Your Progress
                             </Button>
@@ -426,15 +426,15 @@ Provide personalized analysis and recommendations in JSON format.
                 </>
             ) : null}
 
-            {readinessScore && user && (
+            {readinessScore && (
                 <ReadinessShareCardTemplate
                     cardRef={cardRef}
                     score={readinessScore.score}
                     level={readinessScore.level}
                     sectionScores={readinessScore.section_scores}
-                    examDate={user.exam_date}
-                    targetTest={user.target_test || "YKI"}
-                    userName={user.full_name?.split(" ")[0]}
+                    examDate={user?.exam_date}
+                    targetTest={user?.target_test || "YKI"}
+                    userName={user?.full_name?.split(" ")[0]}
                 />
             )}
         </div>
