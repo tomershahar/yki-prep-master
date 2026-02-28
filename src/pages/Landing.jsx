@@ -4,7 +4,7 @@ import { User } from "@/entities/User";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { BookOpen, Headphones, Mic, PenTool, CheckCircle, Target, TrendingUp, Award } from "lucide-react";
+import { BookOpen, Headphones, Mic, PenTool, CheckCircle, Target, TrendingUp, Award, Globe } from "lucide-react";
 import { createPageUrl } from "@/utils";
 
 export default function Landing() {
@@ -103,13 +103,22 @@ export default function Landing() {
             >
               Start Practicing Free
             </Button>
-            <Button 
-              size="lg" 
+            <Button
+              size="lg"
               variant="outline"
               className="px-8 py-6 text-lg"
               onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
             >
               Learn More
+            </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              className="border-blue-600 text-blue-700 hover:bg-blue-50"
+              onClick={() => navigate(createPageUrl("FreeTest"))}
+            >
+              <Globe className="mr-2 w-5 h-5" />
+              Try a Free Mini-Test
             </Button>
           </div>
         </div>
