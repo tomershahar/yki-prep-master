@@ -114,7 +114,7 @@ export default function Landing() {
             <Button
               size="lg"
               variant="outline"
-              className="border-blue-600 text-blue-700 hover:bg-blue-50"
+              className="border-blue-600 text-blue-700 hover:bg-blue-50 px-8 py-6 text-lg"
               onClick={() => navigate(createPageUrl("FreeTest"))}
             >
               <Globe className="mr-2 w-5 h-5" />
