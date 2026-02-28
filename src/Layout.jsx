@@ -186,7 +186,7 @@ export default function Layout({ children, currentPageName }) {
   ] : navigationItems;
 
   // Pages that don't need the sidebar layout
-  if (currentPageName === 'Onboarding' || currentPageName === 'BetaDisclaimer') {
+  if (['Onboarding', 'BetaDisclaimer', 'Landing', 'FreeTest'].includes(currentPageName)) {
     return <>{children}</>;
   }
 

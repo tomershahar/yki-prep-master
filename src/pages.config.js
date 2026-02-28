@@ -58,6 +58,7 @@ import ExamPoolManager from './pages/ExamPoolManager';
 import ExamReadiness from './pages/ExamReadiness';
 import Feedback from './pages/Feedback';
 import Flashcards from './pages/Flashcards';
+import FreeTest from './pages/FreeTest';
 import FullExam from './pages/FullExam';
 import History from './pages/History';
 import KnowledgeBase from './pages/KnowledgeBase';
@@ -83,6 +84,7 @@ export const PAGES = {
     "ExamReadiness": ExamReadiness,
     "Feedback": Feedback,
     "Flashcards": Flashcards,
+    "FreeTest": FreeTest,
     "FullExam": FullExam,
     "History": History,
     "KnowledgeBase": KnowledgeBase,
