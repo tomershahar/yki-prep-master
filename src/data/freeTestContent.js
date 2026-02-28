@@ -9,19 +9,19 @@ Tänään kaupassa on ale: appelsiinit maksavat vain 1,50 euroa kilolta. Maija o
 Kassalla hän maksaa kortilla. Kaikki maksaa yhteensä 18 euroa. Maija on tyytyväinen.`,
       questions: [
         {
-          id: "r1",
+          id: "fi_r1",
           question: "Kuinka usein Maija käy kaupassa?",
           options: ["Joka päivä", "Joka viikko", "Joka kuukausi", "Harvoin"],
           correct: 1
         },
         {
-          id: "r2",
+          id: "fi_r2",
           question: "Mitä Maija ostaa tänään erikseen?",
           options: ["Maitoa", "Leipää", "Appelsiineja", "Vihanneksia"],
           correct: 2
         },
         {
-          id: "r3",
+          id: "fi_r3",
           question: "Miten Maija maksaa?",
           options: ["Käteisellä", "Kortilla", "Puhelimella", "Laskulla"],
           correct: 1
@@ -38,19 +38,19 @@ Mies: Kiitos paljon!
 Nainen: Ole hyvä!`,
       questions: [
         {
-          id: "l1",
+          id: "fi_l1",
           question: "Mihin kaupunkiin mies haluaa matkustaa?",
           options: ["Helsinkiin", "Turkuun", "Tampereelle", "Ouluun"],
           correct: 2
         },
         {
-          id: "l2",
+          id: "fi_l2",
           question: "Milloin bussi lähtee?",
           options: ["Kello 12:30", "Kello 13:00", "Kello 14:30", "Kello 15:00"],
           correct: 2
         },
         {
-          id: "l3",
+          id: "fi_l3",
           question: "Kuinka kauan matka kestää?",
           options: ["Tunti", "Puolitoista tuntia", "Kaksi tuntia", "Kolme tuntia"],
           correct: 2
@@ -73,19 +73,19 @@ Anna rekommenderar tre böcker och visar honom hur han kan låna dem med sitt bi
 Mannen är nöjd och tackar Anna för hjälpen.`,
       questions: [
         {
-          id: "r1",
+          id: "sv_r1",
           question: "Var arbetar Anna?",
           options: ["På en skola", "På ett bibliotek", "På ett café", "På ett kontor"],
           correct: 1
         },
         {
-          id: "r2",
+          id: "sv_r2",
           question: "Vad frågar mannen efter?",
           options: ["Tidningar", "Datorhjälp", "Böcker på svenska för nybörjare", "Öppettider"],
           correct: 2
         },
         {
-          id: "r3",
+          id: "sv_r3",
           question: "Hur kan mannen låna böckerna?",
           options: ["Med kontanter", "Med ett bibliotekskort", "Med ett ID-kort", "Gratis"],
           correct: 1
@@ -102,19 +102,19 @@ Kassörska: Ja, all mjölk är 20% billigare idag.
 Kund: Utmärkt! Då tar jag två liter.`,
       questions: [
         {
-          id: "l1",
+          id: "sv_l1",
           question: "Vad frågar kunden om?",
           options: ["Öppettider", "Erbjudanden", "Parkering", "Kundservice"],
           correct: 1
         },
         {
-          id: "l2",
+          id: "sv_l2",
           question: "Hur mycket rabatt är det på mjölken?",
           options: ["10%", "15%", "20%", "25%"],
           correct: 2
         },
         {
-          id: "l3",
+          id: "sv_l3",
           question: "Hur mycket mjölk köper kunden?",
           options: ["En liter", "Två liter", "Tre liter", "En halvliter"],
           correct: 1
@@ -137,19 +137,19 @@ Han elsker sin by og bruger weekenderne på at udforske nye cafeer og parker.
 Særligt Nørreport-kvarteret er hans yndlingssted, fordi der altid er liv og musik.`,
       questions: [
         {
-          id: "r1",
+          id: "da_r1",
           question: "Hvad arbejder Thomas som?",
           options: ["Læge", "Sygeplejerske", "Tandlæge", "Apoteker"],
           correct: 1
         },
         {
-          id: "r2",
+          id: "da_r2",
           question: "Hvordan kommer Thomas på arbejde?",
           options: ["Med bus", "Med tog", "Med cykel", "Til fods"],
           correct: 2
         },
         {
-          id: "r3",
+          id: "da_r3",
           question: "Hvad kan man finde i Nørreport-kvarteret?",
           options: ["Ro og stilhed", "Liv og musik", "Stor park", "Mange butikker"],
           correct: 1
@@ -166,19 +166,19 @@ Tjener: Skal det være med mælk?
 Gæst: Ja tak, gerne med lidt mælk.`,
       questions: [
         {
-          id: "l1",
+          id: "da_l1",
           question: "Hvad anbefaler tjeneren?",
           options: ["Suppe", "Smørrebrød", "Pizza", "Salat"],
           correct: 1
         },
         {
-          id: "l2",
+          id: "da_l2",
           question: "Hvad bestiller gæsten at drikke?",
           options: ["Te", "Juice", "Kaffe", "Vand"],
           correct: 2
         },
         {
-          id: "l3",
+          id: "da_l3",
           question: "Hvad vil gæsten have i sin kaffe?",
           options: ["Sukker", "Ingenting", "Mælk", "Fløde"],
           correct: 2
