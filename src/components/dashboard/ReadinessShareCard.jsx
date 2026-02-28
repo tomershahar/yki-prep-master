@@ -10,7 +10,7 @@ import html2canvas from "html2canvas";
 export function useReadinessShareCard() {
   const cardRef = useRef(null);
 
-  const shareCard = async ({ score, level, sectionScores, examDate, targetTest, userName }) => {
+  const shareCard = async ({ score, targetTest }) => {
     if (!cardRef.current) return;
 
     const canvas = await html2canvas(cardRef.current, {
@@ -35,8 +35,9 @@ export function useReadinessShareCard() {
           await navigator.share(shareData);
           return;
         }
-      } catch {
-        // fall through to download
+      } catch (err) {
+        if (err?.name === "AbortError") return;
+        // fall through to download for other errors
       }
     }
 
