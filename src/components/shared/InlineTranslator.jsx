@@ -106,7 +106,6 @@ Word: "${text}"`;
         language: sourceLanguage,
         translation: DOMPurify.sanitize(translation, { ALLOWED_TAGS: [] }),
         example_sentence: sanitizedSentence,
-        user_id: user?.id,
       };
       
       console.log('Creating WordBankEntry with data:', wordData);
