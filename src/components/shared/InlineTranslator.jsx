@@ -90,9 +90,7 @@ Word: "${text}"`;
       const sentencePrompt = `Create a simple, clear, and contextually relevant example sentence in ${sourceLanguage} using the word "${selectedText}". The sentence should be easy for a language learner to understand. Respond with ONLY the sentence.`;
       
       console.log('Generating example sentence...');
-      const exampleSentence = await InvokeLLM({ 
-        prompt: sentencePrompt
-      });
+      const exampleSentence = await base44.integrations.Core.InvokeLLM({ prompt: sentencePrompt });
       const sanitizedSentence = DOMPurify.sanitize(exampleSentence, { ALLOWED_TAGS: [] });
       
       console.log('Example sentence generated:', sanitizedSentence);
