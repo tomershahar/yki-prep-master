@@ -1,6 +1,6 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.6';
 
-const RATE_LIMIT = 20; // calls per hour
+const RATE_LIMIT = 50; // calls per hour
 const RATE_LIMIT_WINDOW = 60 * 60 * 1000; // 1 hour in milliseconds
 
 Deno.serve(async (req) => {
