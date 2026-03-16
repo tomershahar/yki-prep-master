@@ -23,17 +23,15 @@ export default function InlineTranslator({ children, sourceLanguage, targetLangu
   useEffect(() => {
     // Pre-fetch existing words to avoid duplicates
     const fetchExistingWords = async () => {
-      if (!user?.id) return;
       try {
-        const words = await base44.entities.WordBankEntry.filter({ user_id: user.id });
+        const words = await base44.entities.WordBankEntry.list();
         setExistingWords(new Set(words.map(w => w.word.toLowerCase())));
       } catch (e) {
         console.error("Failed to fetch word bank", e);
-        // Don't set error state here as it's not critical
       }
     };
     fetchExistingWords();
-  }, [user?.id]);
+  }, []);
 
   const fetchTranslation = useCallback(async (text) => {
     try {
