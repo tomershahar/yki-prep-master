@@ -76,14 +76,14 @@ Deno.serve(async (req) => {
 
         Promise.all([
           base44.auth.updateMe({ used_content_pool_ids: updatedSeenIds }),
-          base44.entities.ContentPool.update(selected.id, { used_count: (selected.used_count || 0) + 1 })
+          base44.asServiceRole.entities.ContentPool.update(selected.id, { used_count: (selected.used_count || 0) + 1 })
         ]).catch((err) => console.error('[ContentPool] Error updating after pool serve:', err));
 
         // 5. If pool is running low, trigger background replenishment
         const remainingCount = availableItems.length - 1;
         if (remainingCount < LOW_POOL_THRESHOLD) {
           console.log(`[ContentPool] Low pool (${remainingCount} remaining) for ${detectedLanguage}/${section}/${level} — triggering background refill`);
-          base44.functions.invoke('seedContentPool', {
+          base44.asServiceRole.functions.invoke('seedContentPool', {
             language: detectedLanguage,
             section,
             level,
