@@ -6,8 +6,10 @@ import { Loader2, Languages, Bookmark, CheckCircle } from 'lucide-react';
 import { base44 } from "@/api/base44Client";
 import { InvokeLLM } from "@/integrations/Core";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useAuth } from '@/lib/AuthContext';
 
 export default function InlineTranslator({ children, sourceLanguage, targetLanguage = 'english' }) {
+  const { user } = useAuth();
   const [selectedText, setSelectedText] = useState('');
   const [translation, setTranslation] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -23,8 +25,9 @@ export default function InlineTranslator({ children, sourceLanguage, targetLangu
   useEffect(() => {
     // Pre-fetch existing words to avoid duplicates
     const fetchExistingWords = async () => {
+      if (!user?.id) return;
       try {
-        const words = await base44.entities.WordBankEntry.list();
+        const words = await base44.entities.WordBankEntry.filter({ user_id: user.id });
         setExistingWords(new Set(words.map(w => w.word.toLowerCase())));
       } catch (e) {
         console.error("Failed to fetch word bank", e);
@@ -32,7 +35,7 @@ export default function InlineTranslator({ children, sourceLanguage, targetLangu
       }
     };
     fetchExistingWords();
-  }, []);
+  }, [user?.id]);
 
   const fetchTranslation = useCallback(async (text) => {
     try {
@@ -107,6 +110,7 @@ Word: "${text}"`;
         language: sourceLanguage,
         translation: DOMPurify.sanitize(translation, { ALLOWED_TAGS: [] }),
         example_sentence: sanitizedSentence,
+        user_id: user?.id,
       };
       
       console.log('Creating WordBankEntry with data:', wordData);
