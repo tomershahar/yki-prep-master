@@ -173,10 +173,21 @@ Word: "${text}"`;
             </div>
             <div className="min-h-[2rem] flex items-center justify-center mb-3">
               {isLoading && <Loader2 className="w-5 h-5 animate-spin text-blue-600" />}
-              {error && !isLoading && <p className="text-sm text-red-600">{error}</p>}
               {translation && !isLoading && <p className="text-lg font-semibold text-blue-700">{translation}</p>}
+              {translationFailed && !isLoading && (
+                <div className="w-full">
+                  <p className="text-xs text-gray-500 mb-1">Auto-translation unavailable. Enter manually:</p>
+                  <Input
+                    value={manualTranslation}
+                    onChange={(e) => setManualTranslation(e.target.value)}
+                    placeholder="Enter translation..."
+                    className="text-sm h-8"
+                    autoFocus
+                  />
+                </div>
+              )}
             </div>
-            {!isLoading && !error && translation && (
+            {!isLoading && (translation || (translationFailed && manualTranslation)) && (
               <Button 
                 onClick={handleSaveWord} 
                 disabled={isSaving || isSaved} 
