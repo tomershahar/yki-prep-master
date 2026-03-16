@@ -6,6 +6,7 @@ import { Loader2, Languages, Bookmark, CheckCircle } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { base44 } from "@/api/base44Client";
 import { InvokeLLM } from "@/integrations/Core";
+import { useAuth } from '@/lib/AuthContext';
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export default function InlineTranslator({ children, sourceLanguage, targetLanguage = 'english' }) {
