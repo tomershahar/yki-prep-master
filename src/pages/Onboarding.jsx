@@ -180,7 +180,6 @@ export default function Onboarding() {
                     <div className="flex items-center gap-2 mb-2">
                       <span className="text-2xl">🇩🇰</span>
                       <h3 className="font-bold text-lg">Prøve i Dansk (PD3) - Danish Test</h3>
-                      <Badge variant="secondary" className="ml-2">Coming Soon</Badge>
                     </div>
                     <p className="text-sm text-gray-600">Danish language proficiency for residence/citizenship</p>
                   </div>
