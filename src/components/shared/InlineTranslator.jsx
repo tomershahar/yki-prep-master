@@ -10,6 +10,7 @@ import { useAuth } from '@/lib/AuthContext';
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export default function InlineTranslator({ children, sourceLanguage, targetLanguage = 'english' }) {
+  const { user } = useAuth();
   const [selectedText, setSelectedText] = useState('');
   const [translation, setTranslation] = useState('');
   const [manualTranslation, setManualTranslation] = useState('');
