@@ -38,9 +38,7 @@ export default function InlineTranslator({ children, sourceLanguage, targetLangu
 
 Word: "${text}"`;
 
-      const result = await InvokeLLM({ 
-        prompt
-      });
+      const result = await base44.integrations.Core.InvokeLLM({ prompt });
       setTranslation(DOMPurify.sanitize(result, { ALLOWED_TAGS: [] }));
     } catch (err) {
       console.error("Translation error:", err);
