@@ -10,6 +10,8 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 export default function InlineTranslator({ children, sourceLanguage, targetLanguage = 'english' }) {
   const [selectedText, setSelectedText] = useState('');
   const [translation, setTranslation] = useState('');
+  const [manualTranslation, setManualTranslation] = useState('');
+  const [translationFailed, setTranslationFailed] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
