@@ -48,7 +48,11 @@ export default function ExamSummary({ section, examContent, answers, scoreData, 
                         </CardHeader>
                         <CardContent className="space-y-3">
                             <p><strong>Your answer:</strong> <span className={isCorrect ? 'text-green-700' : 'text-red-700'}>{userAnswer}</span></p>
-                            {!isCorrect && <p><strong>Correct answer:</strong> <span className="text-green-700">{question.correct_answer}</span></p>}
+                            {!isCorrect && <p><strong>Correct answer:</strong> <span className="text-green-700">
+                                {question.question_type === 'multiple_choice' && question.correct_answer?.length === 1 && question.correct_answer.toUpperCase() >= 'A' && question.correct_answer.toUpperCase() <= 'Z'
+                                    ? (question.options?.[question.correct_answer.toUpperCase().charCodeAt(0) - 65] || question.correct_answer)
+                                    : question.correct_answer}
+                            </span></p>}
                             <p className="text-sm text-gray-600"><strong>Explanation:</strong> <InlineTranslator sourceLanguage={examContent.language}>{question.explanation}</InlineTranslator></p>
                         </CardContent>
                     </Card>
