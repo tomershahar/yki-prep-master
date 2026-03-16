@@ -73,9 +73,9 @@ export default function Onboarding() {
   const handleFinish = async () => {
     setIsSaving(true);
     try {
-      await User.updateMyUserData({
+      await base44.auth.updateMe({
         ...formData,
-        onboarding_completed: true,
+        has_completed_onboarding: true,
       });
       navigate(createPageUrl('Dashboard'));
     } catch (error) {
