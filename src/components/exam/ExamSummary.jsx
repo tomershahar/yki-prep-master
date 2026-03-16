@@ -13,11 +13,25 @@ export default function ExamSummary({ section, examContent, answers, scoreData, 
         return str.trim().replace(/[\u201C\u201D]/g, '"').replace(/[\u2018\u2019]/g, "'").replace(/\s+/g, ' ').toLowerCase();
     };
 
+    const checkIsCorrect = (question, userAnswer) => {
+        if (!userAnswer || userAnswer === 'No answer submitted.') return false;
+        const correctAnswer = question.correct_answer;
+        if (question.question_type === 'multiple_choice' && correctAnswer && correctAnswer.length === 1 && correctAnswer.toUpperCase() >= 'A' && correctAnswer.toUpperCase() <= 'Z') {
+            // correct_answer is a letter (e.g. "B") — look up the full option text
+            const correctOptionIndex = correctAnswer.toUpperCase().charCodeAt(0) - 65;
+            const correctOptionText = question.options?.[correctOptionIndex];
+            if (correctOptionText) return normalizeString(userAnswer) === normalizeString(correctOptionText);
+            // Fallback: also accept if user answer starts with the correct letter
+            return normalizeString(userAnswer).startsWith(correctAnswer.toLowerCase());
+        }
+        return normalizeString(userAnswer) === normalizeString(correctAnswer);
+    };
+
     const renderReadingListeningSummary = () => (
         <div className="space-y-6">
             {(examContent?.questions || []).map((question, index) => {
                 const userAnswer = answers?.[index] || 'No answer submitted.';
-                const isCorrect = normalizeString(userAnswer) === normalizeString(question.correct_answer);
+                const isCorrect = checkIsCorrect(question, userAnswer);
                 return (
                     <Card key={index} className={`bg-white/70 ${isCorrect ? 'border-green-300' : 'border-red-300'}`}>
                         <CardHeader>
