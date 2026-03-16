@@ -8,7 +8,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Languages, Flag, BookOpen, Headphones, Mic, PenTool, ArrowRight, CheckCircle } from 'lucide-react';
+import { Languages, BookOpen, Headphones, Mic, PenTool, ArrowRight, CheckCircle } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 import { createPageUrl } from '@/utils';
 
 const steps = [
