@@ -29,8 +29,8 @@ export default function InlineTranslator({ children, sourceLanguage, targetLangu
     // Pre-fetch existing words to avoid duplicates
     const fetchExistingWords = async () => {
       try {
-        const words = user?.id
-          ? await base44.entities.WordBankEntry.filter({ user_id: user.id })
+        const words = user?.email
+          ? await base44.entities.WordBankEntry.filter({ created_by: user.email })
           : await base44.entities.WordBankEntry.list();
         setExistingWords(new Set(words.map(w => w.word.toLowerCase())));
       } catch (e) {
@@ -117,7 +117,7 @@ Word: "${text}"`;
         language: sourceLanguage,
         translation: DOMPurify.sanitize(finalTranslation, { ALLOWED_TAGS: [] }),
         example_sentence: sanitizedSentence,
-        user_id: user?.id,
+
       };
       
       console.log('Creating WordBankEntry with data:', wordData);
