@@ -82,8 +82,9 @@ Word: "${text}"`;
   }, [existingWords, fetchTranslation]);
 
   const handleSaveWord = async () => {
-    if (!translation) {
-      setError('No translation available to save.');
+    const finalTranslation = translation || manualTranslation;
+    if (!finalTranslation) {
+      setError('Please enter a translation first.');
       return;
     }
     
