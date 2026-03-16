@@ -24,7 +24,7 @@ export default function InlineTranslator({ children, sourceLanguage, targetLangu
     // Pre-fetch existing words to avoid duplicates
     const fetchExistingWords = async () => {
       try {
-        const words = await WordBankEntry.list();
+        const words = await base44.entities.WordBankEntry.list();
         setExistingWords(new Set(words.map(w => w.word.toLowerCase())));
       } catch (e) {
         console.error("Failed to fetch word bank", e);
@@ -110,7 +110,7 @@ Word: "${text}"`;
       };
       
       console.log('Creating WordBankEntry with data:', wordData);
-      const savedWord = await WordBankEntry.create(wordData);
+      const savedWord = await base44.entities.WordBankEntry.create(wordData);
       console.log('Word saved successfully:', savedWord);
 
       // Update local state

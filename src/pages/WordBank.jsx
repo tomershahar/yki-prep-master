@@ -63,7 +63,7 @@ export default function WordBank() {
     const loadWords = async () => {
         setIsLoading(true);
         try {
-            const entries = await WordBankEntry.list('-created_date');
+            const entries = await base44.entities.WordBankEntry.list('-created_date');
             setWords(entries);
         } catch (error) {
             console.error("Failed to load word bank:", error);
@@ -75,7 +75,7 @@ export default function WordBank() {
     const handleDelete = async (id) => {
         if (confirm('Are you sure you want to delete this word?')) {
             try {
-                await WordBankEntry.delete(id);
+                await base44.entities.WordBankEntry.delete(id);
                 setWords(words.filter(w => w.id !== id));
             } catch (error) {
                 console.error("Failed to delete word:", error);
