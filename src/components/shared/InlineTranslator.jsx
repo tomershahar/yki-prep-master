@@ -3,8 +3,8 @@ import DOMPurify from 'isomorphic-dompurify';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
 import { Loader2, Languages, Bookmark, CheckCircle } from 'lucide-react';
+import { base44 } from "@/api/base44Client";
 import { InvokeLLM } from "@/integrations/Core";
-import { WordBankEntry } from "@/entities/WordBankEntry";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export default function InlineTranslator({ children, sourceLanguage, targetLanguage = 'english' }) {

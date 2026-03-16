@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import DOMPurify from 'isomorphic-dompurify';
-import { WordBankEntry } from '@/entities/WordBankEntry';
+import { base44 } from '@/api/base44Client';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { Button } from '@/components/ui/button';
