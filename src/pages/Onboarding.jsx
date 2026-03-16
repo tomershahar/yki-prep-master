@@ -50,7 +50,7 @@ export default function Onboarding() {
   useEffect(() => {
     const checkBetaAgreement = async () => {
       try {
-        const currentUser = await User.me();
+        const currentUser = await base44.auth.me();
         if (!currentUser.has_agreed_to_beta_terms) {
           navigate(createPageUrl("BetaDisclaimer"));
           return;
