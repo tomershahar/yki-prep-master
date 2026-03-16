@@ -3,6 +3,7 @@ import DOMPurify from 'isomorphic-dompurify';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
 import { Loader2, Languages, Bookmark, CheckCircle } from 'lucide-react';
+import { Input } from '@/components/ui/input';
 import { base44 } from "@/api/base44Client";
 import { InvokeLLM } from "@/integrations/Core";
 import { Alert, AlertDescription } from "@/components/ui/alert";
