@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import DOMPurify from 'isomorphic-dompurify';
 import { base44 } from '@/api/base44Client';
+import { useAuth } from '@/lib/AuthContext';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { Button } from '@/components/ui/button';
@@ -51,19 +52,20 @@ const WordCard = ({ entry, onDelete, onPlayAudio }) => {
 };
 
 export default function WordBank() {
+    const { user } = useAuth();
     const [words, setWords] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [audio, setAudio] = useState(null);
     const [isAudioLoading, setIsAudioLoading] = useState(false);
 
     useEffect(() => {
-        loadWords();
-    }, []);
+        if (user?.id) loadWords();
+    }, [user?.id]);
 
     const loadWords = async () => {
         setIsLoading(true);
         try {
-            const entries = await base44.entities.WordBankEntry.list('-created_date');
+            const entries = await base44.entities.WordBankEntry.filter({ user_id: user.id }, '-created_date');
             setWords(entries);
         } catch (error) {
             console.error("Failed to load word bank:", error);
