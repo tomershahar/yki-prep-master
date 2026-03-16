@@ -558,7 +558,7 @@ export default function Dashboard() {
                         Connect with other learners, get help with your exam prep, and stay up to date with the latest app news. Join our Discord server today!
                       </p>
                       <div className="flex gap-3">
-                        <a href="https://discord.gg/rsgNBTsr" target="_blank" rel="noopener noreferrer">
+                        <a href="https://discord.gg/RnyuNWcg" target="_blank" rel="noopener noreferrer">
                           <Button className="bg-indigo-600 hover:bg-indigo-700 text-white">
                             Join Discord
                           </Button>

@@ -144,7 +144,7 @@ export default function Layout({ children, currentPageName }) {
     },
     {
       title: "Discord Community",
-      url: "https://discord.gg/rsgNBTsr",
+      url: "https://discord.gg/RnyuNWcg",
       icon: MessageSquare,
       external: true,
     },
