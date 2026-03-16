@@ -6,10 +6,8 @@ import { Loader2, Languages, Bookmark, CheckCircle } from 'lucide-react';
 import { base44 } from "@/api/base44Client";
 import { InvokeLLM } from "@/integrations/Core";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { useAuth } from '@/lib/AuthContext';
 
 export default function InlineTranslator({ children, sourceLanguage, targetLanguage = 'english' }) {
-  const { user } = useAuth();
   const [selectedText, setSelectedText] = useState('');
   const [translation, setTranslation] = useState('');
   const [isLoading, setIsLoading] = useState(false);
