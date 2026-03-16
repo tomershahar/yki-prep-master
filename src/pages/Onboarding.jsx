@@ -168,7 +168,7 @@ export default function Onboarding() {
               </Card>
 
               <Card
-                className={`p-6 cursor-pointer border-2 transition-all ${formData.target_country === 'DK' ? 'border-red-500 bg-red-50 shadow-lg' : 'hover:border-gray-300 opacity-60'}`}
+                className={`p-6 cursor-pointer border-2 transition-all ${formData.target_country === 'DK' ? 'border-red-500 bg-red-50 shadow-lg' : 'hover:border-gray-300'}`}
                 onClick={() => {
                   handleUpdate('target_country', 'DK');
                   handleUpdate('target_test', 'PD3');
