@@ -65,7 +65,7 @@ export default function WordBank() {
     const loadWords = async () => {
         setIsLoading(true);
         try {
-            const entries = await base44.entities.WordBankEntry.filter({ created_by: user.email }, '-created_date');
+            const entries = await base44.entities.WordBankEntry.list('-created_date');
             setWords(entries);
         } catch (error) {
             console.error("Failed to load word bank:", error);
