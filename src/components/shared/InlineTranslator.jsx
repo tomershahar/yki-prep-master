@@ -29,14 +29,16 @@ export default function InlineTranslator({ children, sourceLanguage, targetLangu
     // Pre-fetch existing words to avoid duplicates
     const fetchExistingWords = async () => {
       try {
-        const words = await base44.entities.WordBankEntry.list();
+        const words = user?.id
+          ? await base44.entities.WordBankEntry.filter({ user_id: user.id })
+          : await base44.entities.WordBankEntry.list();
         setExistingWords(new Set(words.map(w => w.word.toLowerCase())));
       } catch (e) {
         console.error("Failed to fetch word bank", e);
       }
     };
     fetchExistingWords();
-  }, []);
+  }, [user?.id]);
 
   const fetchTranslation = useCallback(async (text) => {
     try {
