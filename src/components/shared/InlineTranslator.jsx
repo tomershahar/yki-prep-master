@@ -110,7 +110,7 @@ Word: "${text}"`;
       const wordData = {
         word: DOMPurify.sanitize(selectedText, { ALLOWED_TAGS: [] }),
         language: sourceLanguage,
-        translation: DOMPurify.sanitize(translation, { ALLOWED_TAGS: [] }),
+        translation: DOMPurify.sanitize(finalTranslation, { ALLOWED_TAGS: [] }),
         example_sentence: sanitizedSentence,
       };
       
