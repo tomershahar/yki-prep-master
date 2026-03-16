@@ -64,6 +64,8 @@ Word: "${text}"`;
 
       setSelectedText(text);
       setTranslation('');
+      setTranslationFailed(false);
+      setManualTranslation('');
       setError(null);
       setIsLoading(true);
       setIsSaved(existingWords.has(text));
