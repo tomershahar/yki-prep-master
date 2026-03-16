@@ -38,7 +38,7 @@ export default function InlineTranslator({ children, sourceLanguage, targetLangu
       }
     };
     fetchExistingWords();
-  }, [user?.id]);
+  }, [user?.email]);
 
   const fetchTranslation = useCallback(async (text) => {
     try {
