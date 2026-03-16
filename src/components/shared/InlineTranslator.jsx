@@ -87,16 +87,19 @@ Word: "${text}"`;
     try {
       console.log('Saving word to Word Bank:', { word: selectedText, language: sourceLanguage, translation });
       
-      // First, generate example sentence
-      const sentencePrompt = `Create a simple, clear, and contextually relevant example sentence in ${sourceLanguage} using the word "${selectedText}". The sentence should be easy for a language learner to understand. Respond with ONLY the sentence.`;
-      
-      console.log('Generating example sentence...');
-      const exampleSentence = await base44.integrations.Core.InvokeLLM({ prompt: sentencePrompt });
-      const sanitizedSentence = DOMPurify.sanitize(exampleSentence, { ALLOWED_TAGS: [] });
-      
-      console.log('Example sentence generated:', sanitizedSentence);
+      // Try to generate example sentence, but don't block saving if it fails
+      let sanitizedSentence = `${selectedText} - example sentence unavailable.`;
+      try {
+        const sentencePrompt = `Create a simple example sentence in ${sourceLanguage} using the word "${selectedText}". Respond with ONLY the sentence.`;
+        const exampleSentence = await InvokeLLM({ prompt: sentencePrompt });
+        if (exampleSentence) {
+          sanitizedSentence = DOMPurify.sanitize(exampleSentence, { ALLOWED_TAGS: [] });
+        }
+      } catch (sentenceErr) {
+        console.warn('Example sentence generation failed, saving without it:', sentenceErr);
+      }
 
-      // Then save the word
+      // Save the word
       const wordData = {
         word: DOMPurify.sanitize(selectedText, { ALLOWED_TAGS: [] }),
         language: sourceLanguage,
