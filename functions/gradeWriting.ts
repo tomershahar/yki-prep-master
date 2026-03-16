@@ -75,21 +75,25 @@ Deno.serve(async (req) => {
             });
         }
 
-        // Check rate limit
-        const rateLimitCheck = await base44.functions.invoke('checkAIRateLimit', { 
-            functionName: 'gradeWriting' 
-        });
-        
-        if (!rateLimitCheck.allowed) {
-            return new Response(JSON.stringify({ 
-                error: 'Rate limit exceeded',
-                message: rateLimitCheck.message,
-                resetTime: rateLimitCheck.resetTime,
-                minutesUntilReset: rateLimitCheck.minutesUntilReset
-            }), { 
-                status: 429, 
-                headers: { "Content-Type": "application/json", ...corsHeaders }
+        // Check rate limit (fail open - if check fails, allow the request)
+        try {
+            const rateLimitCheck = await base44.functions.invoke('checkAIRateLimit', { 
+                functionName: 'gradeWriting' 
             });
+            
+            if (rateLimitCheck.allowed === false && rateLimitCheck.resetTime) {
+                return new Response(JSON.stringify({ 
+                    error: 'Rate limit exceeded',
+                    message: rateLimitCheck.message,
+                    resetTime: rateLimitCheck.resetTime,
+                    minutesUntilReset: rateLimitCheck.minutesUntilReset
+                }), { 
+                    status: 429, 
+                    headers: { "Content-Type": "application/json", ...corsHeaders }
+                });
+            }
+        } catch (rateLimitError) {
+            console.warn('Rate limit check failed, allowing request:', rateLimitError.message);
         }
 
         const { task, userResponse, difficulty, language, weakSpots, testType } = await req.json();
