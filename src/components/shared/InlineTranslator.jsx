@@ -43,9 +43,11 @@ Word: "${text}"`;
 
       const result = await InvokeLLM({ prompt });
       setTranslation(DOMPurify.sanitize(result, { ALLOWED_TAGS: [] }));
+      setTranslationFailed(false);
     } catch (err) {
       console.error("Translation error:", err);
-      setError('Translation failed.');
+      setTranslationFailed(true);
+      setManualTranslation('');
     } finally {
       setIsLoading(false);
     }
