@@ -120,12 +120,14 @@ function calculateSectionScores(sessions, targetLevel) {
 
         const avgScore = sectionSessions.reduce((sum, s) => sum + (s.score || 0), 0) / sectionSessions.length;
         
-        // Apply difficulty level factor
-        const difficultyFactor = sectionSessions[0]?.difficulty_level 
-            ? targetLevelFactors[sectionSessions[0].difficulty_level] / targetFactor
+        // Apply difficulty level factor - default to 1.0 if difficulty level is unrecognized
+        const difficultyLevel = sectionSessions[0]?.difficulty_level;
+        const difficultyFactor = (difficultyLevel && targetLevelFactors[difficultyLevel])
+            ? targetLevelFactors[difficultyLevel] / targetFactor
             : 1.0;
 
-        scores[section] = Math.min(100, Math.round(avgScore * difficultyFactor));
+        const computed = Math.min(100, Math.round(avgScore * difficultyFactor));
+        scores[section] = isNaN(computed) ? 0 : computed;
     }
 
     return scores;
