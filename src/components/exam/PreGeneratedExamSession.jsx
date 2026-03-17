@@ -1127,14 +1127,23 @@ Output must be in the following JSON format:
                 <h3 className="font-semibold mb-2"><InlineTranslator sourceLanguage={exam.language}>Listening Scenario:</InlineTranslator></h3>
                 <p className="text-sm text-gray-600 mb-3"><InlineTranslator sourceLanguage={exam.language}>{currentMainItem.scenario_description}</InlineTranslator></p>
                 <div className="flex items-center gap-4">
-                  <AudioPlayer
-                    audioBase64={currentMainItem.audio_base64}
-                    isDialogue={false}
-                    className="text-lg"
-                  />
-                  <span className="text-sm text-gray-500">
-                    Click to hear the audio
-                  </span>
+                  {generatingAudio ? (
+                    <div className="flex items-center gap-2 text-blue-600 py-4">
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      <span className="text-sm">Generating audio...</span>
+                    </div>
+                  ) : (
+                    <AudioPlayer
+                      audioBase64={currentMainItem.audio_base64}
+                      isDialogue={false}
+                      className="text-lg"
+                    />
+                  )}
+                  {!generatingAudio && (
+                    <span className="text-sm text-gray-500">
+                      Click to hear the audio
+                    </span>
+                  )}
                 </div>
               </div>
               
