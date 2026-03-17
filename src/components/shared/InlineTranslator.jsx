@@ -168,7 +168,7 @@ Word: "${text}"`;
             }}
           />
         </PopoverTrigger>
-        <PopoverContent className="w-auto max-w-xs shadow-xl" side="top" align="center">
+        <PopoverContent className="w-auto max-w-xs shadow-xl" side="top" align="center" onMouseUp={(e) => e.stopPropagation()}>
           <div className="p-2">
             <div className="flex items-center gap-2 mb-2 pb-2 border-b">
               <Languages className="w-4 h-4 text-gray-500" />
