@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"; // Added CardDescription import for consistency with outline
 import { Button } from "@/components/ui/button";
@@ -15,6 +14,7 @@ import { KnowledgeBaseContent } from "@/entities/KnowledgeBaseContent";
 import ExamSummary from './ExamSummary';
 import AudioPlayer from './AudioPlayer';
 import { transcribeAudio } from '@/functions/transcribeAudio';
+import { generateSpeech } from '@/functions/generateSpeech';
 import InlineTranslator from '../shared/InlineTranslator';
 import { toast } from "@/components/ui/use-toast";
 
