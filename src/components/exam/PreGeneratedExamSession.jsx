@@ -115,6 +115,9 @@ export default function PreGeneratedExamSession({ section, exam, useTimer, onCom
   const [showSummary, setShowSummary] = useState(false);
   const [scoreData, setScoreData] = useState(null);
 
+  // State for auto-generating audio for listening clips
+  const [generatingAudio, setGeneratingAudio] = useState(false);
+
   // New state for recording
   const [isRecording, setIsRecording] = useState({}); // {taskIndex: boolean}
   const mediaRecorderRef = useRef(null);
