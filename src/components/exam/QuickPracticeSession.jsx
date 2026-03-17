@@ -1018,7 +1018,7 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
                         <div className="flex items-center justify-between mb-2 md:mb-3">
                             <div className="font-semibold text-base md:text-lg break-words">{index + 1}. <InlineTranslator sourceLanguage={exam.language}>{question.question}</InlineTranslator></div>
                         </div>
-                                {question.question_type === 'multiple_choice' ? (
+                                {(question.question_type === 'multiple_choice' || (question.options && question.options.length > 0)) ? (
                                     <RadioGroup value={answers[index] || ''} onValueChange={(value) => handleAnswerChange(index, value)} disabled={showResults}>
                                         {question.options?.map((option, optionIndex) => {
                                             const optionLetter = String.fromCharCode(65 + optionIndex);
