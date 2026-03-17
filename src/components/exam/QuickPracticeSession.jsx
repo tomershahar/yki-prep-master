@@ -986,7 +986,7 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
                 const userAnswer = answers[index];
                 const correctAnswerFromAI = question.correct_answer;
 
-                if (question.question_type === 'multiple_choice') {
+                if (question.question_type === 'multiple_choice' || (question.options && question.options.length > 0)) {
                     // Case 1: The AI returned a letter (e.g., "B").
                     if (correctAnswerFromAI && correctAnswerFromAI.length === 1 && correctAnswerFromAI.toUpperCase() >= 'A' && correctAnswerFromAI.toUpperCase() <= 'Z') {
                         const correctOptionIndex = correctAnswerFromAI.toUpperCase().charCodeAt(0) - 65;
