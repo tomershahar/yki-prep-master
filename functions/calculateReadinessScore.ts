@@ -46,11 +46,12 @@ Deno.serve(async (req) => {
         const benchmarkAlignment = calculateBenchmarkAlignment(sectionPerformance);
 
         // Final readiness score
-        const readinessScore = Math.round(
+        const rawScore = Math.round(
             (sectionPerformance * 0.60) +
             (practiceQuality * 0.25) +
             (benchmarkAlignment * 0.15)
         );
+        const readinessScore = isNaN(rawScore) ? 0 : rawScore;
 
         // Map to level
         const level = 
