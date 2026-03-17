@@ -194,24 +194,27 @@ export default function PreGeneratedExamSession({ section, exam, useTimer, onCom
           const needsAudio = clips.some(clip => !clip.audio_base64 && clip.audio_script);
           if (needsAudio) {
             setGeneratingAudio(true);
-            const updatedClips = await Promise.all(clips.map(async (clip) => {
-              if (clip.audio_base64 || !clip.audio_script) return clip;
-              try {
-                const { data } = await generateSpeech({
-                  text_to_speak: clip.audio_script,
-                  language: exam.language || 'finnish',
-                  gender: 'female'
-                });
-                if (data?.audio_base64) {
-                  return { ...clip, audio_base64: data.audio_base64 };
+            const generateAudio = async () => {
+              const updatedClips = await Promise.all(clips.map(async (clip) => {
+                if (clip.audio_base64 || !clip.audio_script) return clip;
+                try {
+                  const { data } = await generateSpeech({
+                    text_to_speak: clip.audio_script,
+                    language: exam.language || 'finnish',
+                    gender: 'female'
+                  });
+                  if (data?.audio_base64) {
+                    return { ...clip, audio_base64: data.audio_base64 };
+                  }
+                } catch (e) {
+                  console.error('Failed to generate audio for clip:', e);
                 }
-              } catch (e) {
-                console.error('Failed to generate audio for clip:', e);
-              }
-              return clip;
-            }));
-            setExamContent(prev => ({ ...prev, clips: updatedClips }));
-            setGeneratingAudio(false);
+                return clip;
+              }));
+              setExamContent(prev => ({ ...prev, clips: updatedClips }));
+              setGeneratingAudio(false);
+            };
+            generateAudio();
           }
         }
       } catch (error) {
