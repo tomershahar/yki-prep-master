@@ -16,50 +16,97 @@ export default function ExamSummary({ section, examContent, answers, scoreData, 
     const checkIsCorrect = (question, userAnswer) => {
         if (!userAnswer || userAnswer === 'No answer submitted.') return false;
         const correctAnswer = question.correct_answer;
-        if (question.question_type === 'multiple_choice' && correctAnswer && correctAnswer.length === 1 && correctAnswer.toUpperCase() >= 'A' && correctAnswer.toUpperCase() <= 'Z') {
-            // correct_answer is a letter (e.g. "B") — look up the full option text
-            const correctOptionIndex = correctAnswer.toUpperCase().charCodeAt(0) - 65;
-            const correctOptionText = question.options?.[correctOptionIndex];
-            if (correctOptionText) return normalizeString(userAnswer) === normalizeString(correctOptionText);
-            // Fallback: also accept if user answer starts with the correct letter
-            return normalizeString(userAnswer).startsWith(correctAnswer.toLowerCase());
+        const hasOptions = question.options && question.options.length > 0;
+
+        if (hasOptions) {
+            // Multiple choice: correct_answer is a letter like "A"
+            if (correctAnswer && correctAnswer.length === 1 && correctAnswer.toUpperCase() >= 'A' && correctAnswer.toUpperCase() <= 'Z') {
+                const correctOptionIndex = correctAnswer.toUpperCase().charCodeAt(0) - 65;
+                const correctOptionText = question.options?.[correctOptionIndex];
+                if (correctOptionText) return normalizeString(userAnswer) === normalizeString(correctOptionText);
+                return normalizeString(userAnswer).startsWith(correctAnswer.toLowerCase());
+            }
+            return normalizeString(userAnswer) === normalizeString(correctAnswer);
+        } else {
+            // Short answer / open-ended: keyword overlap matching (>=50%)
+            if (!correctAnswer) return false;
+            const correctWords = normalizeString(correctAnswer).split(' ').filter(w => w.length > 2);
+            const userNorm = normalizeString(userAnswer);
+            if (correctWords.length === 0) return userNorm === normalizeString(correctAnswer);
+            const matchCount = correctWords.filter(w => userNorm.includes(w)).length;
+            return matchCount / correctWords.length >= 0.5;
         }
-        return normalizeString(userAnswer) === normalizeString(correctAnswer);
     };
 
-    const renderReadingListeningSummary = () => (
-        <div className="space-y-6">
-            {(examContent?.questions || []).map((question, index) => {
-                const userAnswer = answers?.[index] || 'No answer submitted.';
-                const isCorrect = checkIsCorrect(question, userAnswer);
-                return (
-                    <Card key={index} className={`bg-white/70 ${isCorrect ? 'border-green-300' : 'border-red-300'}`}>
-                        <CardHeader>
-                            <div className="flex justify-between items-start">
-                                <CardTitle className="text-lg flex-1">
-                                    {index + 1}. <InlineTranslator sourceLanguage={examContent.language}>{question.question}</InlineTranslator>
-                                </CardTitle>
-                                {isCorrect ? (
-                                    <CheckCircle className="w-6 h-6 text-green-600 flex-shrink-0" />
-                                ) : (
-                                    <XCircle className="w-6 h-6 text-red-600 flex-shrink-0" />
-                                )}
-                            </div>
-                        </CardHeader>
-                        <CardContent className="space-y-3">
-                            <p><strong>Your answer:</strong> <span className={isCorrect ? 'text-green-700' : 'text-red-700'}>{userAnswer}</span></p>
-                            {!isCorrect && <p><strong>Correct answer:</strong> <span className="text-green-700">
-                                {question.question_type === 'multiple_choice' && question.correct_answer?.length === 1 && question.correct_answer.toUpperCase() >= 'A' && question.correct_answer.toUpperCase() <= 'Z'
-                                    ? (question.options?.[question.correct_answer.toUpperCase().charCodeAt(0) - 65] || question.correct_answer)
-                                    : question.correct_answer}
-                            </span></p>}
-                            <p className="text-sm text-gray-600"><strong>Explanation:</strong> <InlineTranslator sourceLanguage={examContent.language}>{question.explanation}</InlineTranslator></p>
-                        </CardContent>
-                    </Card>
-                );
-            })}
-        </div>
-    );
+    const renderQuestionCard = (question, userAnswer, isCorrect, idx) => {
+        const hasOptions = question.options && question.options.length > 0;
+        const correctDisplay = hasOptions && question.correct_answer?.length === 1 && question.correct_answer.toUpperCase() >= 'A' && question.correct_answer.toUpperCase() <= 'Z'
+            ? (question.options?.[question.correct_answer.toUpperCase().charCodeAt(0) - 65] || question.correct_answer)
+            : question.correct_answer;
+        return (
+            <Card key={idx} className={`bg-white/70 ${isCorrect ? 'border-green-300' : 'border-red-300'}`}>
+                <CardHeader>
+                    <div className="flex justify-between items-start">
+                        <CardTitle className="text-lg flex-1">
+                            {idx + 1}. <InlineTranslator sourceLanguage={examContent?.language}>{question.question}</InlineTranslator>
+                        </CardTitle>
+                        {isCorrect ? <CheckCircle className="w-6 h-6 text-green-600 flex-shrink-0" /> : <XCircle className="w-6 h-6 text-red-600 flex-shrink-0" />}
+                    </div>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                    <p><strong>Your answer:</strong> <span className={isCorrect ? 'text-green-700' : 'text-red-700'}>{userAnswer}</span></p>
+                    {!isCorrect && <p><strong>Correct answer:</strong> <span className="text-green-700">{correctDisplay}</span></p>}
+                    {question.explanation && <p className="text-sm text-gray-600"><strong>Explanation:</strong> <InlineTranslator sourceLanguage={examContent?.language}>{question.explanation}</InlineTranslator></p>}
+                </CardContent>
+            </Card>
+        );
+    };
+
+    const renderReadingListeningSummary = () => {
+        // New multi-text parts format (reading)
+        if (examContent?.parts) {
+            return (
+                <div className="space-y-8">
+                    {examContent.parts.map((part, pIdx) => (
+                        <div key={pIdx} className="space-y-4">
+                            {part.title && <h4 className="font-semibold text-gray-700 text-base border-b pb-2">{part.title}</h4>}
+                            {(part.questions || []).map((q, qIdx) => {
+                                const key = `${part.title}-${qIdx}`;
+                                const userAnswer = answers?.[key] || 'No answer submitted.';
+                                return renderQuestionCard(q, userAnswer, checkIsCorrect(q, userAnswer), qIdx);
+                            })}
+                        </div>
+                    ))}
+                </div>
+            );
+        }
+        // Clips format (listening)
+        if (examContent?.clips) {
+            return (
+                <div className="space-y-8">
+                    {examContent.clips.map((clip, cIdx) => (
+                        <div key={cIdx} className="space-y-4">
+                            {clip.scenario_description && <h4 className="font-semibold text-gray-700 text-base border-b pb-2">{clip.scenario_description}</h4>}
+                            {(clip.questions || []).map((q, qIdx) => {
+                                const key = `${clip.title !== undefined ? clip.title : ''}-${qIdx}`;
+                                const userAnswer = answers?.[key] || 'No answer submitted.';
+                                return renderQuestionCard(q, userAnswer, checkIsCorrect(q, userAnswer), qIdx);
+                            })}
+                        </div>
+                    ))}
+                </div>
+            );
+        }
+        // Legacy flat format
+        return (
+            <div className="space-y-6">
+                {(examContent?.questions || []).map((q, idx) => {
+                    const userAnswer = answers?.[idx] || 'No answer submitted.';
+                    return renderQuestionCard(q, userAnswer, checkIsCorrect(q, userAnswer), idx);
+                })}
+            </div>
+        );
+    };
 
     const renderWritingSpeakingSummary = () => (
         <div className="space-y-6">

@@ -87,33 +87,92 @@ function getSystemPrompt(section, level, knowledgeContext, situation = null) {
     case 'reading':
       return `${baseInstruction}
 
-TASK: Create a complete reading comprehension exercise for level ${level} in Finnish.
+TASK: Create a multi-text reading comprehension exam for level ${level} in Finnish, with 4 texts of escalating difficulty.
 
-INSTRUCTIONS:
-1. Generate a short reading text ENTIRELY in Finnish.
-   - Topic must be culturally relevant for adult learners in Finland
-   - USE DIVERSE TOPICS: work, daily life, education, culture, nature, technology, food, travel, government, hobbies
-   - AVOID repeating the same topic - vary themes
+STRUCTURE:
+- Teksti 1 (easiest): Simple everyday text. Generate 3 MULTIPLE CHOICE questions only.
+- Teksti 2 (easy): Slightly more complex text. Generate 3 MULTIPLE CHOICE questions only.
+- Teksti 3 (medium): More complex text. Generate 2 multiple choice + 2 short_answer questions (mixed).
+- Teksti 4 (hardest): Most complex text. Generate 1 multiple choice + 3 short_answer questions (mixed).
 
-2. Match CEFR level expectations:
-   - A1: 100–120 words. Very simple vocabulary. Basic sentence structures.
-   - A2: 150–180 words. Simple vocabulary, some thematic terms. Compound sentences.
-   - B1: 180–220 words. Compound and complex sentences. Include reasoning and opinions.
-   - B2: 220–250 words. Complex structures, subordinate clauses, passive voice, abstract vocabulary.
+TEXT LENGTHS for level ${level}:
+- A1: 60-80 / 80-100 / 100-120 / 120-140 words
+- A2: 80-100 / 100-130 / 130-160 / 160-190 words
+- B1: 120-150 / 150-180 / 180-210 / 210-240 words
+- B2: 150-180 / 180-220 / 220-250 / 250-280 words
 
-3. Generate **5 multiple-choice questions** in Finnish.
-   - At least 3 must test inference or interpretation, not just recall.
+RULES:
+- All 4 texts must cover DIFFERENT topics (work, daily life, education, culture, nature, technology, food, travel)
+- All content and questions must be in Finnish
+- multiple_choice questions MUST have 4 options (A, B, C, D format: "A) teksti")
+- multiple_choice correct_answer must be a single letter: "A", "B", "C", or "D"
+- short_answer correct_answer must be a concise 2-5 word phrase in Finnish
 
-4. Return valid JSON:
+Return ONLY valid JSON:
 {
-  "text": "Reading passage in Finnish",
-  "questions": [
+  "parts": [
     {
-      "question_type": "multiple_choice",
-      "question": "Question in Finnish",
-      "options": ["A", "B", "C", "D"],
-      "correct_answer": "Option A",
-      "explanation": "Explanation in Finnish"
+      "title": "Teksti 1",
+      "content": "Reading passage in Finnish...",
+      "questions": [
+        {
+          "question": "Question in Finnish?",
+          "options": ["A) option1", "B) option2", "C) option3", "D) option4"],
+          "correct_answer": "A",
+          "explanation": "Explanation in Finnish"
+        }
+      ]
+    },
+    {
+      "title": "Teksti 2",
+      "content": "Reading passage in Finnish...",
+      "questions": [
+        {
+          "question": "Multiple choice question?",
+          "options": ["A) option1", "B) option2", "C) option3", "D) option4"],
+          "correct_answer": "B",
+          "explanation": "Explanation"
+        }
+      ]
+    },
+    {
+      "title": "Teksti 3",
+      "content": "Reading passage in Finnish...",
+      "questions": [
+        {
+          "question": "Multiple choice question?",
+          "options": ["A) option1", "B) option2", "C) option3", "D) option4"],
+          "correct_answer": "C",
+          "explanation": "Explanation"
+        },
+        {
+          "question": "Short answer question in Finnish?",
+          "correct_answer": "lyhyt vastaus suomeksi",
+          "explanation": "Explanation"
+        }
+      ]
+    },
+    {
+      "title": "Teksti 4",
+      "content": "Reading passage in Finnish...",
+      "questions": [
+        {
+          "question": "Multiple choice question?",
+          "options": ["A) option1", "B) option2", "C) option3", "D) option4"],
+          "correct_answer": "A",
+          "explanation": "Explanation"
+        },
+        {
+          "question": "Short answer question?",
+          "correct_answer": "lyhyt vastaus",
+          "explanation": "Explanation"
+        },
+        {
+          "question": "Short answer question?",
+          "correct_answer": "lyhyt vastaus",
+          "explanation": "Explanation"
+        }
+      ]
     }
   ]
 }`;

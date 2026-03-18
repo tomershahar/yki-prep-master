@@ -556,8 +556,8 @@ Output must be in the following JSON format:
 
                 let isCorrect = false;
 
-                if (userAnswer && correctAnswerFromAI && q.options) {
-                  // Case 1: The AI returned a letter (e.g., "B").
+                if (userAnswer && correctAnswerFromAI && q.options && q.options.length > 0) {
+                  // Multiple choice: correct_answer is a letter (e.g., "B")
                   if (correctAnswerFromAI.length === 1 && correctAnswerFromAI.toUpperCase() >= 'A' && correctAnswerFromAI.toUpperCase() <= 'Z') {
                       const userSelectedIndex = q.options.findIndex(opt => 
                           normalizeString(opt) === normalizeString(userAnswer)
@@ -568,12 +568,20 @@ Output must be in the following JSON format:
                               isCorrect = true;
                           }
                       }
-                  } 
-                  // Case 2: The AI returned the full text of the answer.
-                  else {
+                  } else {
                       if (normalizeString(userAnswer) === normalizeString(correctAnswerFromAI)) {
                           isCorrect = true;
                       }
+                  }
+                } else if (userAnswer && correctAnswerFromAI && (!q.options || q.options.length === 0)) {
+                  // Short answer / open-ended: keyword overlap matching (>=50%)
+                  const correctWords = normalizeString(correctAnswerFromAI).split(' ').filter(w => w.length > 2);
+                  const userNorm = normalizeString(userAnswer);
+                  if (correctWords.length === 0) {
+                      isCorrect = userNorm === normalizeString(correctAnswerFromAI);
+                  } else {
+                      const matchCount = correctWords.filter(w => userNorm.includes(w)).length;
+                      isCorrect = matchCount / correctWords.length >= 0.5;
                   }
                 }
 
