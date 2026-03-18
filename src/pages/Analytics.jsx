@@ -3,7 +3,7 @@ import { User } from "@/entities/User";
 import { getAnalytics } from "@/functions/getAnalytics";
 import { Card, CardContent } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertCircle, Loader2, BarChart3, Users, Clock, Target } from "lucide-react";
+import { AlertCircle, Loader2, BarChart3, Users, Clock, Target, UserPlus, RefreshCw, TrendingUp } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
