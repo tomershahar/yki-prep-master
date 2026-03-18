@@ -197,12 +197,17 @@ Deno.serve(async (req) => {
                     userCache.set(visit.user_id, userData);
                 } catch (_) { userData = null; }
             }
+            // Derive returning status from first-visit data (not the stored flag)
+            const visitDk = getDateKey(new Date(visit.timestamp));
+            const firstDk = userFirstVisitDate[visit.user_id] ? getDateKey(new Date(userFirstVisitDate[visit.user_id])) : null;
+            const isReturning = firstDk !== visitDk;
+
             recentActivity.push({
                 id: visit.id,
                 user_name: userData?.full_name || `User ${visit.user_id?.substring(0, 6)}`,
                 user_email: userData?.email || '',
                 timestamp: visit.timestamp,
-                returning: visit.returning,
+                returning: isReturning,
             });
         }
 
