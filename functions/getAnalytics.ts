@@ -33,52 +33,69 @@ Deno.serve(async (req) => {
             dailyVisits.set(k, { newUsers: new Set(), returningUsers: new Set() });
         }
 
-        // Process UserVisit records
+        // Process UserVisit records — collect ALL visits (not just 30d) to determine
+        // if a user is "new" or "returning" based on their real first-ever visit.
         const dailyActive = new Set();
         const weeklyActive = new Set();
         const monthlyActive = new Set();
         let totalVisitsLast30Days = 0;
-        const visitsByUser = {};
+        const allVisits = []; // collect all visits to sort and classify
         const recentActivityRaw = [];
         const userCache = new Map();
 
+        // First pass: collect ALL visits (no date cutoff) to find each user's first-ever visit
         let visitOffset = 0;
-        let hasMoreVisits = true;
         let processedVisits = 0;
+        const userFirstVisitDate = {}; // user_id -> earliest timestamp string
 
-        while (hasMoreVisits && processedVisits < 10000) {
+        // We need to find the first visit for every user that visited in the last 30 days.
+        // Load all visits sorted ascending (oldest first) — but the SDK only supports list/filter,
+        // so we load newest-first and track per-user minimums.
+        let hasMoreVisits = true;
+        while (hasMoreVisits && processedVisits < 20000) {
             const batch = await base44.asServiceRole.entities.UserVisit.list('-timestamp', 500, visitOffset);
             if (!batch || batch.length === 0) break;
 
             for (const visit of batch) {
                 if (!visit.user_id || !visit.timestamp) continue;
-                const visitDate = new Date(visit.timestamp);
-                if (visitDate < thirtyDaysAgo) { hasMoreVisits = false; break; }
-
                 processedVisits++;
-                totalVisitsLast30Days++;
 
-                monthlyActive.add(visit.user_id);
-                if (visitDate >= sevenDaysAgo) weeklyActive.add(visit.user_id);
-                if (visitDate >= oneDayAgo) dailyActive.add(visit.user_id);
+                // Track earliest visit per user (since we're going newest→oldest, always overwrite)
+                userFirstVisitDate[visit.user_id] = visit.timestamp;
 
-                const dk = getDateKey(visitDate);
-                if (dailyVisits.has(dk)) {
-                    const day = dailyVisits.get(dk);
-                    if (visit.returning) {
-                        day.returningUsers.add(visit.user_id);
-                    } else {
-                        day.newUsers.add(visit.user_id);
-                    }
+                const visitDate = new Date(visit.timestamp);
+                if (visitDate >= thirtyDaysAgo) {
+                    allVisits.push(visit);
+                    totalVisitsLast30Days++;
+                    monthlyActive.add(visit.user_id);
+                    if (visitDate >= sevenDaysAgo) weeklyActive.add(visit.user_id);
+                    if (visitDate >= oneDayAgo) dailyActive.add(visit.user_id);
+                    if (recentActivityRaw.length < 10) recentActivityRaw.push(visit);
                 }
-
-                if (!visitsByUser[visit.user_id]) visitsByUser[visit.user_id] = [];
-                visitsByUser[visit.user_id].push(visit.timestamp);
-
-                if (recentActivityRaw.length < 10) recentActivityRaw.push(visit);
             }
-
             visitOffset += batch.length;
+            // Stop once all batches are processed (no early termination on date)
+            if (batch.length < 500) break;
+        }
+
+        // Now classify each visit: is the user "new" (first-ever visit day) or "returning"?
+        // A user is "new" on a given day if that day is the same as their first-ever visit date.
+        for (const visit of allVisits) {
+            const visitDate = new Date(visit.timestamp);
+            const dk = getDateKey(visitDate);
+            if (!dailyVisits.has(dk)) continue;
+
+            const day = dailyVisits.get(dk);
+            const firstVisitKey = userFirstVisitDate[visit.user_id]
+                ? getDateKey(new Date(userFirstVisitDate[visit.user_id]))
+                : null;
+
+            // If user's first-ever visit is on this day → new user; otherwise → returning
+            if (firstVisitKey === dk) {
+                day.newUsers.add(visit.user_id);
+            } else {
+                day.returningUsers.add(visit.user_id);
+            }
         }
 
         // Build visits chart: last 30 days with dateKey + displayDate + counts
