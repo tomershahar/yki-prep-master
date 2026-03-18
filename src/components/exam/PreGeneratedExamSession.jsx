@@ -168,7 +168,7 @@ export default function PreGeneratedExamSession({ section, exam, useTimer, onCom
         // Shape 2: { text, questions } — single-passage format from practice generators / content pool
         if (section.id === 'reading' && parsedContent.text && !parsedContent.parts) {
             parsedContent.parts = [{
-                title: '',
+                title: 'Text 1',
                 content: parsedContent.text,
                 text: parsedContent.text,
                 questions: parsedContent.questions || []
