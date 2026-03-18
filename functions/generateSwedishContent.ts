@@ -233,7 +233,8 @@ Return ONLY valid JSON in this exact format:
       "assessment": "Assessment criteria..."
     }
   ]
-}`,
+}`;
+  },
 
   listening: (level, wordCount) => `Generate a Swedish listening comprehension scenario for CEFR level ${level}.
 
@@ -350,7 +351,7 @@ Deno.serve(async (req) => {
     let prompt;
     switch (section) {
       case 'reading':
-        prompt = PROMPT_TEMPLATES.reading(level, selectedTopic, wordCount || 300);
+        prompt = PROMPT_TEMPLATES.reading(level, selectedTopic);
         break;
       case 'writing':
         prompt = PROMPT_TEMPLATES.writing(level, taskType || 'email');
@@ -372,9 +373,13 @@ Deno.serve(async (req) => {
     const content = await callOpenAI(prompt);
 
     // Validate the response structure
-    if (section === 'reading' || section === 'listening') {
+    if (section === 'reading') {
+      if (!content.parts || !Array.isArray(content.parts)) {
+        throw new Error(`Invalid reading content: missing parts array`);
+      }
+    } else if (section === 'listening') {
       if (!content.questions || !Array.isArray(content.questions)) {
-        throw new Error(`Invalid ${section} content: missing questions array`);
+        throw new Error(`Invalid listening content: missing questions array`);
       }
     } else if (section === 'writing' || section === 'speaking') {
       if (!content.tasks || !Array.isArray(content.tasks)) {
