@@ -1,174 +1,65 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
-  BarChart, 
-  Bar, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  ResponsiveContainer
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  LineChart, Line, Legend
 } from 'recharts';
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { formatDistanceToNow, format } from 'date-fns';
+import { Badge } from "@/components/ui/badge";
+import { formatDistanceToNow } from 'date-fns';
 import { Loader2 } from 'lucide-react';
 
-// Theme colors - easily customizable
-const CHART_COLORS = {
-  primary: '#3b82f6',    // blue-500
-  secondary: '#10b981',  // green-500
-  tertiary: '#f59e0b',   // amber-500
-  quaternary: '#ef4444'  // red-500
+const COLORS = {
+  primary: '#3b82f6',
+  secondary: '#10b981',
+  amber: '#f59e0b',
+  red: '#ef4444',
+  purple: '#8b5cf6',
 };
 
-const COLORS = [CHART_COLORS.primary, CHART_COLORS.secondary, CHART_COLORS.tertiary, CHART_COLORS.quaternary];
-
-// Utility to convert minutes to hours and minutes
 const formatMinutes = (minutes) => {
-  if (!minutes || minutes < 60) return `${Math.round(minutes)} min`;
+  if (!minutes || minutes < 60) return `${Math.round(minutes || 0)} min`;
   const hours = Math.floor(minutes / 60);
   const mins = Math.round(minutes % 60);
   return mins > 0 ? `${hours}h ${mins}m` : `${hours}h`;
 };
 
-// Utility to fill missing dates with zero values
-const fillMissingDates = (data, days = 7) => {
-  if (!data || data.length === 0) return [];
-  
-  const filledData = [];
-  const today = new Date();
-  
-  for (let i = days - 1; i >= 0; i--) {
-    const date = new Date(today);
-    date.setDate(today.getDate() - i);
-    const dateKey = format(date, 'yyyy-MM-dd');
-    
-    const existingData = data.find(d => d.date === dateKey);
-    filledData.push(existingData || { date: dateKey, new: 0, returning: 0 });
-  }
-  
-  return filledData;
-};
-
-// Safe date formatter to handle invalid dates
-const safeFormatDate = (dateStr, formatStr) => {
-  try {
-    if (!dateStr) return 'N/A';
-    const date = new Date(dateStr);
-    if (isNaN(date.getTime())) return dateStr; // Return original if invalid
-    return format(date, formatStr);
-  } catch (error) {
-    console.warn('Invalid date format:', dateStr);
-    return dateStr;
-  }
-};
-
-export function VisitsChart({ data, isLoading }) {
-  if (isLoading) {
-    return (
-      <Card>
-        <CardHeader><CardTitle>Daily Visits (Last 7 Days)</CardTitle></CardHeader>
-        <CardContent>
-          <div className="h-[300px] flex items-center justify-center">
-            <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  if (!data || data.length === 0) {
-    return (
-      <Card>
-        <CardHeader><CardTitle>Daily Visits (Last 7 Days)</CardTitle></CardHeader>
-        <CardContent>
-          <div className="h-[300px] flex items-center justify-center text-gray-500">
-            No visit data available.
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  // Fill missing dates with zeros
-  const filledData = fillMissingDates(data, 7);
-
+function EmptyState({ title, height = 200 }) {
   return (
-    <Card>
-      <CardHeader><CardTitle>Daily Visits (Last 7 Days)</CardTitle></CardHeader>
-      <CardContent>
-        <ResponsiveContainer width="100%" aspect={2}>
-          <BarChart data={filledData}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis 
-              dataKey="date" 
-              tickFormatter={(str) => safeFormatDate(str, 'dd.MM')}
-            />
-            <YAxis />
-            <Tooltip 
-              labelFormatter={(label) => safeFormatDate(label, 'dd MMM yyyy')}
-            />
-            <Bar dataKey="new" stackId="a" fill={CHART_COLORS.primary} name="New Visits" />
-            <Bar dataKey="returning" stackId="a" fill={CHART_COLORS.secondary} name="Returning Visits" />
-          </BarChart>
-        </ResponsiveContainer>
-      </CardContent>
-    </Card>
+    <div className={`flex items-center justify-center text-gray-400 text-sm`} style={{ height }}>
+      No data available yet
+    </div>
   );
 }
 
-export function EngagementDistributionChart({ data, isLoading }) {
-  if (isLoading) {
-    return (
-      <Card>
-        <CardHeader><CardTitle>Average Daily Engagement</CardTitle></CardHeader>
-        <CardContent>
-          <div className="h-[400px] flex items-center justify-center">
-            <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  if (!data || data.length === 0) {
-    return (
-      <Card>
-        <CardHeader><CardTitle>Average Daily Engagement</CardTitle></CardHeader>
-        <CardContent>
-          <div className="h-[400px] flex items-center justify-center text-gray-500">
-            No engagement data available.
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
+// Daily Visits: new vs returning users per day
+function VisitsChart({ data, range, onRangeChange }) {
+  if (!data || data.length === 0) return <EmptyState title="Daily Visits" />;
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>Average Daily Engagement Time (Last 10 Days)</CardTitle>
-        <p className="text-sm text-gray-600">
-          Average minutes spent practicing per day by active users
-        </p>
+      <CardHeader className="flex flex-row items-center justify-between pb-2">
+        <div>
+          <CardTitle>Daily Users</CardTitle>
+          <p className="text-sm text-gray-500 mt-1">New vs returning users per day</p>
+        </div>
+        <div className="flex gap-1">
+          <button onClick={() => onRangeChange(7)} className={`px-3 py-1 rounded text-sm ${range === 7 ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600'}`}>7d</button>
+          <button onClick={() => onRangeChange(30)} className={`px-3 py-1 rounded text-sm ${range === 30 ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600'}`}>30d</button>
+        </div>
       </CardHeader>
       <CardContent>
-        <ResponsiveContainer width="100%" aspect={2}>
-          <BarChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis 
-              dataKey="date" 
-              label={{ value: 'Date', position: 'insideBottom', offset: -5 }}
-              tickFormatter={(str) => safeFormatDate(str, 'dd.MM')}
+        <ResponsiveContainer width="100%" height={280}>
+          <BarChart data={data} margin={{ top: 5, right: 10, left: -20, bottom: 5 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+            <XAxis dataKey="date" tick={{ fontSize: 11 }} />
+            <YAxis tick={{ fontSize: 11 }} allowDecimals={false} />
+            <Tooltip
+              formatter={(value, name) => [value, name === 'new' ? 'New Users' : 'Returning Users']}
             />
-            <YAxis 
-              label={{ value: 'Average Time', angle: -90, position: 'insideLeft' }}
-            />
-            <Tooltip 
-              formatter={(value) => [formatMinutes(value), 'Avg. Practice Time']}
-              labelFormatter={(label) => safeFormatDate(label, 'dd MMM yyyy')}
-            />
-            <Bar dataKey="averageMinutes" fill={CHART_COLORS.primary} name="averageMinutes" />
+            <Legend formatter={(v) => v === 'new' ? 'New Users' : 'Returning Users'} />
+            <Bar dataKey="new" stackId="a" fill={COLORS.primary} name="new" radius={[0, 0, 0, 0]} />
+            <Bar dataKey="returning" stackId="a" fill={COLORS.secondary} name="returning" radius={[3, 3, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </CardContent>
@@ -176,55 +67,60 @@ export function EngagementDistributionChart({ data, isLoading }) {
   );
 }
 
-export function TimeSpentChart({ data, moduleStats, isLoading }) {
-  if (isLoading) {
-    return (
-      <Card>
-        <CardHeader><CardTitle>Time Analytics</CardTitle></CardHeader>
-        <CardContent>
-          <div className="h-[300px] flex items-center justify-center">
-            <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  if (!data || data.length === 0) {
-    return (
-      <Card>
-        <CardHeader><CardTitle>Time Analytics</CardTitle></CardHeader>
-        <CardContent>
-          <div className="h-[300px] flex items-center justify-center text-gray-500">
-            No time data available.
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
+// Daily active users (practice sessions)
+function DailyActiveUsersChart({ data }) {
+  if (!data || data.length === 0) return <EmptyState title="Daily Active Users" />;
 
   return (
     <Card>
-      <CardHeader><CardTitle>Total Time Spent by Module</CardTitle></CardHeader>
+      <CardHeader className="pb-2">
+        <CardTitle>Daily Active Learners</CardTitle>
+        <p className="text-sm text-gray-500 mt-1">Users completing practice sessions per day</p>
+      </CardHeader>
       <CardContent>
-        <ResponsiveContainer width="100%" aspect={2}>
-          <BarChart data={data || []}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="module" />
-            <YAxis label={{ value: 'Time', angle: -90, position: 'insideLeft' }} />
-            <Tooltip formatter={(value) => [formatMinutes(value), "Total Time"]} />
-            <Bar dataKey="totalMinutes" fill={CHART_COLORS.primary} name="Total Time" />
+        <ResponsiveContainer width="100%" height={280}>
+          <LineChart data={data} margin={{ top: 5, right: 10, left: -20, bottom: 5 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+            <XAxis dataKey="date" tick={{ fontSize: 11 }} />
+            <YAxis tick={{ fontSize: 11 }} allowDecimals={false} />
+            <Tooltip formatter={(v) => [v, 'Active Learners']} />
+            <Line type="monotone" dataKey="activeUsers" stroke={COLORS.purple} strokeWidth={2} dot={{ r: 3 }} name="Active Learners" />
+          </LineChart>
+        </ResponsiveContainer>
+      </CardContent>
+    </Card>
+  );
+}
+
+// Module time breakdown
+function ModuleChart({ data, moduleStats }) {
+  if (!data || data.length === 0) return <EmptyState title="Module Stats" />;
+
+  return (
+    <Card>
+      <CardHeader className="pb-2">
+        <CardTitle>Practice by Module</CardTitle>
+        <p className="text-sm text-gray-500 mt-1">Total time spent in each section</p>
+      </CardHeader>
+      <CardContent>
+        <ResponsiveContainer width="100%" height={200}>
+          <BarChart data={data} margin={{ top: 5, right: 10, left: -20, bottom: 5 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+            <XAxis dataKey="module" tick={{ fontSize: 12 }} />
+            <YAxis tick={{ fontSize: 11 }} />
+            <Tooltip formatter={(v) => [formatMinutes(v), 'Total Time']} />
+            <Bar dataKey="totalMinutes" fill={COLORS.primary} radius={[4, 4, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
-        
+
         {moduleStats && (
-          <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-3">
             {Object.entries(moduleStats).map(([module, stats]) => (
               <div key={module} className="text-center p-3 bg-gray-50 rounded-lg">
-                <h4 className="font-semibold capitalize">{module}</h4>
-                <p className="text-2xl font-bold text-blue-600">{formatMinutes(stats.totalMinutes)}</p>
-                <p className="text-xs text-gray-600">{stats.totalSessions} sessions</p>
-                <p className="text-xs text-gray-500">{formatMinutes(stats.avgPerSession)}/session</p>
+                <h4 className="font-semibold capitalize text-sm">{module}</h4>
+                <p className="text-xl font-bold text-blue-600">{formatMinutes(stats.totalMinutes)}</p>
+                <p className="text-xs text-gray-500">{stats.totalSessions} sessions</p>
+                <p className="text-xs text-gray-400">{formatMinutes(stats.avgPerSession)}/session</p>
               </div>
             ))}
           </div>
@@ -234,96 +130,120 @@ export function TimeSpentChart({ data, moduleStats, isLoading }) {
   );
 }
 
-function RecentActivity({ data, isLoading }) {
-    if (isLoading) {
-        return (
-          <Card>
-            <CardHeader><CardTitle>Recent Activity</CardTitle></CardHeader>
-            <CardContent>
-              <div className="h-[300px] flex items-center justify-center">
-                <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
-              </div>
-            </CardContent>
-          </Card>
-        );
-    }
+// Score / difficulty distribution
+function ScoreDistributionChart({ data }) {
+  if (!data || data.every(d => d.count === 0)) return <EmptyState title="Score Distribution" />;
 
-    if (!data || data.length === 0) {
-        return (
-          <Card>
-            <CardHeader><CardTitle>Recent Activity</CardTitle></CardHeader>
-            <CardContent>
-              <div className="h-[300px] flex items-center justify-center text-gray-500">
-                No recent user activity found.
-              </div>
-            </CardContent>
-          </Card>
-        );
-    }
+  const levelColors = { A1: COLORS.amber, A2: COLORS.secondary, B1: COLORS.primary, B2: COLORS.purple };
 
-    return (
-        <Card>
-            <CardHeader><CardTitle>Recent User Activity</CardTitle></CardHeader>
-            <CardContent>
-                <div className="space-y-4">
-                    {data.map(activity => (
-                        <div key={activity.id} className="flex items-center gap-4">
-                            <Avatar>
-                                <AvatarFallback>{activity.user_name?.[0] || 'U'}</AvatarFallback>
-                            </Avatar>
-                            <div>
-                                <p className="font-medium">{activity.user_name}</p>
-                                <p className="text-sm text-gray-500">
-                                    {activity.returning ? 'Returned to the app' : 'Visited for the first time'}
-                                </p>
-                            </div>
-                            <div className="ml-auto text-sm text-gray-500">
-                                {formatDistanceToNow(new Date(activity.timestamp), { addSuffix: true })}
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </CardContent>
-        </Card>
-    );
+  return (
+    <Card>
+      <CardHeader className="pb-2">
+        <CardTitle>Sessions by Level</CardTitle>
+        <p className="text-sm text-gray-500 mt-1">Distribution of practice difficulty levels</p>
+      </CardHeader>
+      <CardContent>
+        <ResponsiveContainer width="100%" height={200}>
+          <BarChart data={data} margin={{ top: 5, right: 10, left: -20, bottom: 5 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+            <XAxis dataKey="level" tick={{ fontSize: 13 }} />
+            <YAxis tick={{ fontSize: 11 }} allowDecimals={false} />
+            <Tooltip formatter={(v) => [v, 'Sessions']} />
+            <Bar dataKey="count" radius={[4, 4, 0, 0]} name="Sessions"
+              fill={COLORS.primary}
+            />
+          </BarChart>
+        </ResponsiveContainer>
+      </CardContent>
+    </Card>
+  );
 }
 
-export default function AnalyticsCharts({ 
-    chartData, 
-    moduleStats, 
-    recentActivity, 
-    isLoading = false,
-    loadingStates = {}
-}) {
-    // Individual loading states for each chart
-    const {
-        visitsLoading = isLoading,
-        engagementLoading = isLoading,
-        timeSpentLoading = isLoading,
-        activityLoading = isLoading
-    } = loadingStates;
-    
+// Recent activity feed
+function RecentActivity({ data }) {
+  if (!data || data.length === 0) {
     return (
-        <div className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <VisitsChart 
-                    data={chartData?.visitsChart || []} 
-                    isLoading={visitsLoading}
-                />
-                <EngagementDistributionChart 
-                    data={chartData?.engagementDistribution || []} 
-                    isLoading={engagementLoading}
-                />
-            </div>
-            <TimeSpentChart 
-                data={chartData?.timeSpent || []} 
-                moduleStats={moduleStats} 
-                isLoading={timeSpentLoading}
-            />
-            <RecentActivity 
-                data={recentActivity || []} 
-                isLoading={activityLoading}
-            />
-        </div>
+      <Card>
+        <CardHeader><CardTitle>Recent Activity</CardTitle></CardHeader>
+        <CardContent><EmptyState title="" height={120} /></CardContent>
+      </Card>
     );
+  }
+
+  return (
+    <Card>
+      <CardHeader><CardTitle>Recent Visits</CardTitle></CardHeader>
+      <CardContent>
+        <div className="space-y-3">
+          {data.map((activity, i) => (
+            <div key={activity.id || i} className="flex items-center gap-3">
+              <Avatar className="w-8 h-8">
+                <AvatarFallback className="text-xs">{activity.user_name?.[0] || 'U'}</AvatarFallback>
+              </Avatar>
+              <div className="flex-1 min-w-0">
+                <p className="font-medium text-sm truncate">{activity.user_name}</p>
+                <p className="text-xs text-gray-500 truncate">{activity.user_email}</p>
+              </div>
+              <div className="text-right shrink-0">
+                <Badge variant={activity.returning ? "secondary" : "default"} className="text-xs mb-1">
+                  {activity.returning ? 'Returning' : 'New'}
+                </Badge>
+                <p className="text-xs text-gray-400">
+                  {formatDistanceToNow(new Date(activity.timestamp), { addSuffix: true })}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+export default function AnalyticsCharts({ chartData, moduleStats, recentActivity, topUsers }) {
+  const [visitRange, setVisitRange] = useState(7);
+
+  const visitsData = visitRange === 7
+    ? (chartData?.visitsChart7Days || chartData?.visitsChart?.slice(-7) || [])
+    : (chartData?.visitsChart || []);
+
+  return (
+    <div className="space-y-6">
+      {/* Row 1: Visits + Daily Active Learners */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <VisitsChart data={visitsData} range={visitRange} onRangeChange={setVisitRange} />
+        <DailyActiveUsersChart data={chartData?.engagementDistribution || []} />
+      </div>
+
+      {/* Row 2: Module breakdown + Score distribution */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <ModuleChart data={chartData?.timeSpent || []} moduleStats={moduleStats} />
+        <ScoreDistributionChart data={chartData?.scoreDistribution || []} />
+      </div>
+
+      {/* Row 3: Recent activity + Top users */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <RecentActivity data={recentActivity || []} />
+        {topUsers && topUsers.length > 0 && (
+          <Card>
+            <CardHeader><CardTitle>Most Active Users</CardTitle></CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {topUsers.map((u, i) => (
+                  <div key={u.email} className="flex items-center gap-3">
+                    <span className="text-sm font-bold text-gray-400 w-5">{i + 1}</span>
+                    <Avatar className="w-8 h-8">
+                      <AvatarFallback className="text-xs">{u.email?.[0]?.toUpperCase()}</AvatarFallback>
+                    </Avatar>
+                    <p className="flex-1 text-sm truncate">{u.email}</p>
+                    <Badge variant="outline">{u.sessions} sessions</Badge>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+      </div>
+    </div>
+  );
 }
