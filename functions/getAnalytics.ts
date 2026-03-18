@@ -1,333 +1,239 @@
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.20';
 
-import { createClientFromRequest } from 'npm:@base44/sdk@0.7.0';
-
-// Helper function to normalize dates to UTC for consistent daily buckets
-function normalizeToUTCDay(date) {
-    const utcDate = new Date(date);
-    return new Date(Date.UTC(utcDate.getUTCFullYear(), utcDate.getUTCMonth(), utcDate.getUTCDate()));
+function getDateKey(date) {
+    const d = new Date(date);
+    return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(d.getUTCDate()).padStart(2, '0')}`;
 }
 
-// Helper function to get date string for grouping
-function getDateKey(date) {
-    const normalized = normalizeToUTCDay(date);
-    return normalized.toISOString().split('T')[0];
+function formatDisplayDate(isoDateKey) {
+    const [year, month, day] = isoDateKey.split('-').map(Number);
+    const date = new Date(Date.UTC(year, month - 1, day));
+    return date.toLocaleDateString('en-GB', { month: 'short', day: 'numeric', timeZone: 'UTC' });
 }
 
 Deno.serve(async (req) => {
     try {
         const base44 = createClientFromRequest(req);
-        
         const user = await base44.auth.me();
         if (!user || user.role !== 'admin') {
             return new Response(JSON.stringify({ error: 'Access denied' }), { status: 403, headers: { "Content-Type": "application/json" } });
         }
 
-        console.log('Starting optimized analytics calculation...');
-
-        // Setup normalized date ranges in UTC
         const now = new Date();
+        const todayKey = getDateKey(now);
         const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
         const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-        const oneDayAgo = new Date(now.getTime() - 1 * 24 * 60 * 60 * 1000);
-        const tenDaysAgo = new Date(now.getTime() - 10 * 24 * 60 * 60 * 1000);
+        const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
 
-        // Create a user cache to avoid repeated lookups
-        const userCache = new Map();
-        const getUserData = async (userId) => {
-            if (userCache.has(userId)) {
-                return userCache.get(userId);
-            }
-            
-            try {
-                const users = await base44.asServiceRole.entities.User.filter({ id: userId }, '-created_date', 1);
-                const userData = users?.[0] || null;
-                userCache.set(userId, userData);
-                return userData;
-            } catch (error) {
-                console.warn(`Failed to fetch user ${userId}:`, error.message);
-                userCache.set(userId, null);
-                return null;
-            }
-        };
+        // Build daily buckets for last 30 days (visits) and last 7 days (display)
+        const dailyVisits = new Map(); // dateKey -> { new: Set, returning: Set }
+        for (let i = 29; i >= 0; i--) {
+            const d = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
+            const k = getDateKey(d);
+            dailyVisits.set(k, { newUsers: new Set(), returningUsers: new Set() });
+        }
 
-        // Initialize tracking variables
-        const allActiveUserEmails = new Set();
-        const allActiveUserIds = new Set();
-        let totalVisitsLast30Days = 0;
+        // Process UserVisit records
         const dailyActive = new Set();
         const weeklyActive = new Set();
         const monthlyActive = new Set();
+        let totalVisitsLast30Days = 0;
+        const visitsByUser = {};
         const recentActivityRaw = [];
+        const userCache = new Map();
 
-        // Setup for Daily Visits Chart (last 7 days) - FIXED FOR MONDAY START
-        const visitsChartDataMap = new Map();
-        for (let i = 6; i >= 0; i--) {
-            const date = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
-            const dateKey = getDateKey(date);
-            visitsChartDataMap.set(dateKey, {
-                // FIXED: Use Finnish locale with Monday as first day of week for display
-                date: date.toLocaleDateString('fi-FI', { month: 'short', day: 'numeric' }),
-                newUsers: new Set(),
-                returningUsers: new Set(),
-                new: 0,
-                returning: 0
-            });
-        }
-
-        // Process Visits with proper date filtering
-        console.log('Processing user visits...');
         let visitOffset = 0;
-        const visitBatchSize = 500;
         let hasMoreVisits = true;
         let processedVisits = 0;
-        const visitsByUser = {};
 
-        while (hasMoreVisits && processedVisits < 8000) {
-            const batch = await base44.asServiceRole.entities.UserVisit.list('-timestamp', visitBatchSize, visitOffset);
-            if (!batch || batch.length === 0) {
-                hasMoreVisits = false;
-                break;
-            }
+        while (hasMoreVisits && processedVisits < 10000) {
+            const batch = await base44.asServiceRole.entities.UserVisit.list('-timestamp', 500, visitOffset);
+            if (!batch || batch.length === 0) break;
 
             for (const visit of batch) {
                 if (!visit.user_id || !visit.timestamp) continue;
-                
                 const visitDate = new Date(visit.timestamp);
-                
-                // Early termination if too old (more than 30 days)
-                if (visitDate < thirtyDaysAgo) {
-                    hasMoreVisits = false;
-                    break;
-                }
-                
+                if (visitDate < thirtyDaysAgo) { hasMoreVisits = false; break; }
+
                 processedVisits++;
-                
-                // Track user activity by date ranges
+                totalVisitsLast30Days++;
+
                 monthlyActive.add(visit.user_id);
                 if (visitDate >= sevenDaysAgo) weeklyActive.add(visit.user_id);
                 if (visitDate >= oneDayAgo) dailyActive.add(visit.user_id);
-                
-                // Daily visits chart data (last 7 days only)
-                const visitDateKey = getDateKey(visitDate);
-                if (visitsChartDataMap.has(visitDateKey)) {
-                    const dayData = visitsChartDataMap.get(visitDateKey);
-                    
-                    // Add user to the appropriate set based on their returning status
-                    if (visit.returning) { 
-                        dayData.returningUsers.add(visit.user_id);
+
+                const dk = getDateKey(visitDate);
+                if (dailyVisits.has(dk)) {
+                    const day = dailyVisits.get(dk);
+                    if (visit.returning) {
+                        day.returningUsers.add(visit.user_id);
                     } else {
-                        dayData.newUsers.add(visit.user_id);
+                        day.newUsers.add(visit.user_id);
                     }
                 }
-                
-                totalVisitsLast30Days++;
-                
-                // Track visits per user for statistics
+
                 if (!visitsByUser[visit.user_id]) visitsByUser[visit.user_id] = [];
                 visitsByUser[visit.user_id].push(visit.timestamp);
-                
-                // Collect recent activity with real user data (limit to 15 most recent)
-                if (recentActivityRaw.length < 15) {
-                    recentActivityRaw.push(visit);
-                }
+
+                if (recentActivityRaw.length < 10) recentActivityRaw.push(visit);
             }
-            
+
             visitOffset += batch.length;
         }
 
-        console.log(`Processed ${processedVisits} visits from ${monthlyActive.size} unique users`);
-
-        // Calculate visit statistics
-        let newVisits = 0;
-        let returningVisits = 0;
-        Object.keys(visitsByUser).forEach(userId => {
-            const userVisits = visitsByUser[userId];
-            newVisits++;
-            if (userVisits.length > 1) {
-                returningVisits += userVisits.length - 1;
-            }
-        });
-
-        // Convert Sets to counts for the chart
-        // visitsChartDataMap is populated chronologically, so Array.from will maintain order.
-        const visitsChartArray = Array.from(visitsChartDataMap.values()).map(dayData => ({
-            date: dayData.date,
-            new: dayData.newUsers.size,
-            returning: dayData.returningUsers.size
+        // Build visits chart: last 30 days with dateKey + displayDate + counts
+        const visitsChart30Days = Array.from(dailyVisits.entries()).map(([dateKey, day]) => ({
+            dateKey,
+            date: formatDisplayDate(dateKey),
+            new: day.newUsers.size,
+            returning: day.returningUsers.size,
+            total: day.newUsers.size + day.returningUsers.size,
         }));
 
+        // Today's stats
+        const todayData = dailyVisits.get(todayKey) || { newUsers: new Set(), returningUsers: new Set() };
+        const todayNewUsers = todayData.newUsers.size;
+        const todayReturningUsers = todayData.returningUsers.size;
 
-        // Process Practice Sessions with date filtering and daily tracking
-        console.log('Processing practice sessions...');
+        // Process Practice Sessions
+        const tenDaysAgo = new Date(now.getTime() - 10 * 24 * 60 * 60 * 1000);
         let totalPracticeSessions = 0;
+        const allActiveUserEmails = new Set();
         const sessionCountByEmail = {};
         const dailyEngagementData = new Map();
-        const userSessionDates = {};
         const modules = ['reading', 'listening', 'speaking', 'writing'];
         const moduleStats = Object.fromEntries(modules.map(m => [m, { totalMinutes: 0, totalSessions: 0 }]));
 
-        // Initialize daily engagement map for last 10 days
         for (let i = 9; i >= 0; i--) {
-            const date = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
-            const dateKey = getDateKey(date);
-            dailyEngagementData.set(dateKey, {
-                date: date.toLocaleDateString('fi-FI', { month: 'short', day: 'numeric' }),
-                dateKey: dateKey,
-                totalMinutes: 0,
-                activeUsers: new Set(),
-                averageMinutes: 0
-            });
+            const d = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
+            const k = getDateKey(d);
+            dailyEngagementData.set(k, { dateKey: k, date: formatDisplayDate(k), totalMinutes: 0, activeUsers: new Set(), averageMinutes: 0 });
         }
 
+        // Score distribution
+        const scoreDistribution = { 'A1': 0, 'A2': 0, 'B1': 0, 'B2': 0 };
+
         let sessionOffset = 0;
-        const sessionBatchSize = 500;
         let hasMoreSessions = true;
         let processedSessions = 0;
 
         while (hasMoreSessions && processedSessions < 6000) {
-            const batch = await base44.asServiceRole.entities.PracticeSession.list('-created_date', sessionBatchSize, sessionOffset);
-            if (!batch || batch.length === 0) {
-                hasMoreSessions = false;
-                break;
-            }
-            
+            const batch = await base44.asServiceRole.entities.PracticeSession.list('-created_date', 500, sessionOffset);
+            if (!batch || batch.length === 0) break;
+
             for (const session of batch) {
                 if (!session.created_by || !session.created_date) continue;
-                
                 const sessionDate = new Date(session.created_date);
-                
-                // Early termination if older than 30 days
-                if (sessionDate < thirtyDaysAgo) {
-                    hasMoreSessions = false;
-                    break;
-                }
-                
+                if (sessionDate < thirtyDaysAgo) { hasMoreSessions = false; break; }
+
                 processedSessions++;
                 totalPracticeSessions++;
-                
+
                 const email = session.created_by.toLowerCase();
                 allActiveUserEmails.add(email);
                 sessionCountByEmail[email] = (sessionCountByEmail[email] || 0) + 1;
-                
+
                 const durationMinutes = session.duration_minutes || 0;
-                
-                // Track daily engagement data (last 10 days only)
+
                 if (sessionDate >= tenDaysAgo) {
-                    const sessionDateKey = getDateKey(sessionDate);
-                    if (dailyEngagementData.has(sessionDateKey)) {
-                        const dayData = dailyEngagementData.get(sessionDateKey);
-                        dayData.totalMinutes += durationMinutes;
-                        dayData.activeUsers.add(email);
+                    const dk = getDateKey(sessionDate);
+                    if (dailyEngagementData.has(dk)) {
+                        const day = dailyEngagementData.get(dk);
+                        day.totalMinutes += durationMinutes;
+                        day.activeUsers.add(email);
                     }
                 }
-                
-                // Track active dates per user
-                const userSessionDateKey = getDateKey(sessionDate);
-                if (!userSessionDates[email]) userSessionDates[email] = new Set();
-                userSessionDates[email].add(userSessionDateKey);
-                
-                // Module statistics
+
                 if (session.exam_section && moduleStats[session.exam_section]) {
                     moduleStats[session.exam_section].totalMinutes += durationMinutes;
                     moduleStats[session.exam_section].totalSessions++;
                 }
+
+                // Score distribution by difficulty level
+                if (session.difficulty_level && scoreDistribution.hasOwnProperty(session.difficulty_level)) {
+                    scoreDistribution[session.difficulty_level]++;
+                }
             }
-            
+
             sessionOffset += batch.length;
         }
 
-        console.log(`Processed ${processedSessions} practice sessions`);
+        const dailyEngagementArray = Array.from(dailyEngagementData.values()).map(day => {
+            const count = day.activeUsers.size;
+            return {
+                dateKey: day.dateKey,
+                date: day.date,
+                totalMinutes: Math.round(day.totalMinutes),
+                activeUsers: count,
+                averageMinutes: count > 0 ? Math.round(day.totalMinutes / count) : 0,
+            };
+        });
 
-        // Calculate daily averages for the engagement time series chart
-        const dailyEngagementArray = [];
-        const sortedEngagementDateKeys = Array.from(dailyEngagementData.keys()).sort();
-        for (const dateKey of sortedEngagementDateKeys) {
-            const dayData = dailyEngagementData.get(dateKey);
-            const activeUserCount = dayData.activeUsers.size;
-            dayData.averageMinutes = activeUserCount > 0 ? Math.round(dayData.totalMinutes / activeUserCount) : 0;
-            
-            dailyEngagementArray.push({
-                // FIXED: Use Finnish locale for consistency
-                date: new Date(dateKey).toLocaleDateString('fi-FI', { month: 'short', day: 'numeric' }),
-                dateKey: dateKey,
-                totalMinutes: dayData.totalMinutes,
-                activeUsers: activeUserCount,
-                averageMinutes: dayData.averageMinutes
-            });
-        }
-
-        dailyEngagementArray.sort((a, b) => a.dateKey.localeCompare(b.dateKey));
-
-        const totalUniqueUsers = allActiveUserEmails.size;
-
-        // KPI calculations
-        const kpis = {
-            totalVisits: totalVisitsLast30Days,
-            uniqueUsers: totalUniqueUsers,
-            returningVisits,
-            newVisits,
-            avgSessionsPerUser: totalUniqueUsers > 0 ? (totalPracticeSessions / totalUniqueUsers).toFixed(1) : 0,
-            totalPracticeSessions: totalPracticeSessions,
-            dailyActiveUsers: dailyActive.size,
-            weeklyActiveUsers: weeklyActive.size,
-            monthlyActiveUsers: monthlyActive.size
-        };
-
-        // Chart data preparation
-        const chartData = {
-            visitsChart: visitsChartArray,
-            engagementDistribution: dailyEngagementArray,
-            timeSpent: modules.map(m => ({ 
-                module: m.charAt(0).toUpperCase() + m.slice(1), 
-                totalMinutes: Math.round(moduleStats[m].totalMinutes) 
-            }))
-        };
-
-        // Recent activity with real user data
+        // Resolve recent activity user names
         const recentActivity = [];
-        for (const visit of recentActivityRaw.slice(0, 10)) {
-            const userData = await getUserData(visit.user_id);
+        for (const visit of recentActivityRaw) {
+            let userData = userCache.get(visit.user_id);
+            if (!userData) {
+                try {
+                    const users = await base44.asServiceRole.entities.User.filter({ id: visit.user_id }, '-created_date', 1);
+                    userData = users?.[0] || null;
+                    userCache.set(visit.user_id, userData);
+                } catch (_) { userData = null; }
+            }
             recentActivity.push({
-                id: visit.id || `activity-${visit.user_id}`,
-                user_name: userData?.full_name || `User ${visit.user_id?.substring(0, 8)}`,
-                user_email: userData?.email || 'anonymous@example.com',
-                user_id: visit.user_id,
+                id: visit.id,
+                user_name: userData?.full_name || `User ${visit.user_id?.substring(0, 6)}`,
+                user_email: userData?.email || '',
                 timestamp: visit.timestamp,
-                returning: visitsByUser[visit.user_id] && visitsByUser[visit.user_id].length > 1
+                returning: visit.returning,
             });
         }
 
-        // Calculate module averages
         Object.values(moduleStats).forEach(stats => {
             stats.avgPerSession = stats.totalSessions > 0 ? parseFloat((stats.totalMinutes / stats.totalSessions).toFixed(1)) : 0;
             stats.totalMinutes = Math.round(stats.totalMinutes);
         });
 
-        console.log(`Analytics completed successfully: ${totalUniqueUsers} unique users, ${totalVisitsLast30Days} visits, ${totalPracticeSessions} sessions`);
+        const totalUniqueUsers = allActiveUserEmails.size;
 
-        return new Response(JSON.stringify({ 
-            kpis, 
-            moduleStats, 
-            chartData, 
+        // Top users by sessions
+        const topUsers = Object.entries(sessionCountByEmail)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 5)
+            .map(([email, count]) => ({ email, sessions: count }));
+
+        return new Response(JSON.stringify({
+            kpis: {
+                uniqueUsers: totalUniqueUsers,
+                totalPracticeSessions,
+                dailyActiveUsers: dailyActive.size,
+                weeklyActiveUsers: weeklyActive.size,
+                monthlyActiveUsers: monthlyActive.size,
+                todayNewUsers,
+                todayReturningUsers,
+                totalVisitsLast30Days,
+                avgSessionsPerUser: totalUniqueUsers > 0 ? parseFloat((totalPracticeSessions / totalUniqueUsers).toFixed(1)) : 0,
+            },
+            moduleStats,
+            chartData: {
+                visitsChart: visitsChart30Days,
+                visitsChart7Days: visitsChart30Days.slice(-7),
+                engagementDistribution: dailyEngagementArray,
+                timeSpent: modules.map(m => ({
+                    module: m.charAt(0).toUpperCase() + m.slice(1),
+                    totalMinutes: Math.round(moduleStats[m].totalMinutes),
+                })),
+                scoreDistribution: Object.entries(scoreDistribution).map(([level, count]) => ({ level, count })),
+            },
             recentActivity,
-            meta: {
-                processedVisits,
-                processedSessions,
-                cachedUsers: userCache.size
-            }
-        }), {
-            status: 200, 
-            headers: { "Content-Type": "application/json" }
-        });
+            topUsers,
+            meta: { processedVisits, processedSessions }
+        }), { status: 200, headers: { "Content-Type": "application/json" } });
 
     } catch (error) {
         console.error("Analytics error:", error);
-        return new Response(JSON.stringify({ 
-            error: error.message,
-            stack: error.stack
-        }), {
-            status: 500, 
-            headers: { "Content-Type": "application/json" }
+        return new Response(JSON.stringify({ error: error.message, stack: error.stack }), {
+            status: 500, headers: { "Content-Type": "application/json" }
         });
     }
 });
