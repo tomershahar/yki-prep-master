@@ -788,7 +788,7 @@ Output must be in the following JSON format:
                     <InlineTranslator sourceLanguage={exam.language}>{question.question}</InlineTranslator>
                   </p>
                 </div>
-                {question.type === 'multiple_choice' ? (
+                {question.options && question.options.length > 0 ? (
                   <RadioGroup value={userAnswer || ''} onValueChange={(value) => handleAnswerChange(answerKey, value)}>
                     {question.options?.map((option, optionIndex) => (
                       <div key={optionIndex} className="flex items-center space-x-2 p-2 rounded">
