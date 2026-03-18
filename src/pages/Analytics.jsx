@@ -115,32 +115,57 @@ export default function AnalyticsPage() {
           {/* KPI Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <KpiCard
-              title="Total Users"
-              value={analyticsData.kpis?.uniqueUsers || 0}
-              subtitle="Unique active users"
-              icon={Users}
+              title="New Users Today"
+              value={analyticsData.kpis?.todayNewUsers ?? 0}
+              subtitle="First-time visitors today"
+              icon={UserPlus}
               color="blue"
             />
             <KpiCard
-              title="Daily Active"
-              value={analyticsData.kpis?.dailyActiveUsers || 0}
-              subtitle="Users active today"
-              icon={Target}
+              title="Returning Today"
+              value={analyticsData.kpis?.todayReturningUsers ?? 0}
+              subtitle="Returning visitors today"
+              icon={RefreshCw}
               color="green"
             />
             <KpiCard
               title="Weekly Active"
               value={analyticsData.kpis?.weeklyActiveUsers || 0}
-              subtitle="Users active this week"
+              subtitle="Unique visitors this week"
               icon={Clock}
               color="amber"
             />
             <KpiCard
               title="Total Sessions"
               value={analyticsData.kpis?.totalPracticeSessions || 0}
-              subtitle="Practice sessions completed"
+              subtitle="Practice sessions (30d)"
               icon={BarChart3}
               color="purple"
+            />
+          </div>
+
+          {/* Secondary KPIs */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <KpiCard
+              title="Monthly Active Users"
+              value={analyticsData.kpis?.monthlyActiveUsers || 0}
+              subtitle="Unique visitors last 30 days"
+              icon={Users}
+              color="blue"
+            />
+            <KpiCard
+              title="Avg Sessions / User"
+              value={analyticsData.kpis?.avgSessionsPerUser || 0}
+              subtitle="Average practice sessions"
+              icon={TrendingUp}
+              color="green"
+            />
+            <KpiCard
+              title="Total Visits (30d)"
+              value={analyticsData.kpis?.totalVisitsLast30Days || 0}
+              subtitle="All visits in last 30 days"
+              icon={Target}
+              color="amber"
             />
           </div>
 
@@ -149,6 +174,7 @@ export default function AnalyticsPage() {
             chartData={analyticsData.chartData}
             moduleStats={analyticsData.moduleStats}
             recentActivity={analyticsData.recentActivity}
+            topUsers={analyticsData.topUsers}
           />
         </>
       ) : (
