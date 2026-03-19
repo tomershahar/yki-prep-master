@@ -280,7 +280,9 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'OpenAI API key not configured' }, { status: 500, headers: corsHeaders });
     }
 
-    const { section, level, topic, wordCount, taskType, situation } = await req.json();
+    const { section, level: rawLevel, topic, wordCount, taskType, situation } = await req.json();
+    const ykiToCefr = { '1': 'A1', '2': 'A2', '3': 'B1', '4': 'B2', '5': 'C1', '6': 'C2' };
+    const level = ykiToCefr[rawLevel] || rawLevel;
     
     // Parse situation if provided
     let parsedSituation = null;

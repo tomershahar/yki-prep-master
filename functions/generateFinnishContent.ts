@@ -23,7 +23,9 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Unauthorized' }, { status: 401, headers: corsHeaders });
     }
 
-    const { section, level, language, situation } = await req.json();
+    const { section, level: rawLevel, language, situation } = await req.json();
+    const ykiToCefr = { '1': 'A1', '2': 'A2', '3': 'B1', '4': 'B2', '5': 'C1', '6': 'C2' };
+    const level = ykiToCefr[rawLevel] || rawLevel;
 
     if (!section || !level || !language) {
       return Response.json(

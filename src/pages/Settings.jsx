@@ -335,9 +335,11 @@ export default function Settings() {
                       <Select value={formData[`${section.id}_level`]} onValueChange={(value) => handleChange(`${section.id}_level`, value)}>
                         <SelectTrigger id={`${section.id}_level`}><SelectValue placeholder="Select level" /></SelectTrigger>
                         <SelectContent>
-                          {testConfig?.levels?.map(level => (
-                            <SelectItem key={level} value={level}>{level}</SelectItem>
-                          ))}
+                          {testConfig?.levels?.map(level => {
+                            const ykiToCefr = { '1': 'A1', '2': 'A2', '3': 'B1', '4': 'B2', '5': 'C1', '6': 'C2' };
+                            const cefrLabel = ykiToCefr[level];
+                            return <SelectItem key={level} value={level}>{cefrLabel ? `${level} (${cefrLabel})` : level}</SelectItem>;
+                          })}
                         </SelectContent>
                       </Select>
                     </div>
