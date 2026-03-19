@@ -311,11 +311,31 @@ Deno.serve(async (req) => {
     // Get random topic if not provided
     const selectedTopic = topic || SWEDISH_TOPICS[Math.floor(Math.random() * SWEDISH_TOPICS.length)];
 
+    // For reading, make 2 parallel calls (2 texts each) and merge to get 4 texts
+    if (section === 'reading') {
+      const [content1, content2] = await Promise.all([
+        callOpenAI(PROMPT_TEMPLATES.reading(level, selectedTopic, 1)),
+        callOpenAI(PROMPT_TEMPLATES.reading(level, selectedTopic, 2)),
+      ]);
+
+      const parts2 = (content2.parts || []).map((p, i) => ({
+        ...p,
+        title: `Text ${(content1.parts || []).length + i + 1}`
+      }));
+
+      return Response.json({
+        parts: [...(content1.parts || []), ...parts2],
+        language: 'swedish',
+        difficulty: level,
+        topic: selectedTopic
+      }, { headers: corsHeaders });
+    }
+
     // Generate prompt based on section
     let prompt;
     switch (section) {
       case 'reading':
-        prompt = PROMPT_TEMPLATES.reading(level, selectedTopic);
+        prompt = PROMPT_TEMPLATES.reading(level, selectedTopic, 1);
         break;
       case 'writing':
         prompt = PROMPT_TEMPLATES.writing(level, taskType || 'email');
