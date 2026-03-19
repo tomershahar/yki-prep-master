@@ -56,6 +56,35 @@ Deno.serve(async (req) => {
       }
     }
 
+    // For reading, make 2 parallel calls (2 texts each) and merge to get 4 texts total
+    if (section === 'reading') {
+      const [batch1, batch2] = await Promise.all([
+        openai.chat.completions.create({
+          model: "gpt-4o",
+          messages: [{ role: "system", content: getReadingPrompt(level, knowledgeContext, 1) }],
+          response_format: { type: "json_object" },
+          temperature: 0.7,
+        }),
+        openai.chat.completions.create({
+          model: "gpt-4o",
+          messages: [{ role: "system", content: getReadingPrompt(level, knowledgeContext, 2) }],
+          response_format: { type: "json_object" },
+          temperature: 0.7,
+        }),
+      ]);
+
+      const content1 = JSON.parse(batch1.choices[0].message.content);
+      const content2 = JSON.parse(batch2.choices[0].message.content);
+
+      // Rename parts from batch2 to avoid title conflicts, then merge
+      const parts2 = (content2.parts || []).map((p, i) => ({
+        ...p,
+        title: `Teksti ${(content1.parts || []).length + i + 1}`
+      }));
+
+      return Response.json({ parts: [...(content1.parts || []), ...parts2] }, { headers: corsHeaders });
+    }
+
     const systemPrompt = getSystemPrompt(section, level, knowledgeContext, parsedSituation);
 
     const completion = await openai.chat.completions.create({
