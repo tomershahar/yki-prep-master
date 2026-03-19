@@ -87,26 +87,23 @@ function getSystemPrompt(section, level, knowledgeContext, situation = null) {
     case 'reading':
       return `${baseInstruction}
 
-TASK: Create a multi-text reading comprehension exam for level ${level} in Finnish, with 4 texts of escalating difficulty.
+TASK: Create a reading comprehension exercise for level ${level} in Finnish with 2 texts.
 
 STRUCTURE:
-- Teksti 1 (easiest): Simple everyday text. Generate 3 MULTIPLE CHOICE questions only.
-- Teksti 2 (easy): Slightly more complex text. Generate 3 MULTIPLE CHOICE questions only.
-- Teksti 3 (medium): More complex text. Generate 2 multiple choice + 2 short_answer questions (mixed).
-- Teksti 4 (hardest): Most complex text. Generate 1 multiple choice + 3 short_answer questions (mixed).
+- Teksti 1: Easier text on one topic. Generate 3 MULTIPLE CHOICE questions.
+- Teksti 2: Harder text on a DIFFERENT topic. Generate 2 multiple choice + 2 short answer questions.
 
 TEXT LENGTHS for level ${level}:
-- A1: 60-80 / 80-100 / 100-120 / 120-140 words
-- A2: 80-100 / 100-130 / 130-160 / 160-190 words
-- B1: 120-150 / 150-180 / 180-210 / 210-240 words
-- B2: 150-180 / 180-220 / 220-250 / 250-280 words
+- A1: 80-100 / 100-120 words
+- A2: 100-130 / 130-160 words
+- B1: 140-170 / 170-200 words
+- B2: 170-200 / 200-230 words
 
 RULES:
-- All 4 texts must cover DIFFERENT topics (work, daily life, education, culture, nature, technology, food, travel)
+- The 2 texts must cover DIFFERENT topics (work, daily life, education, culture, nature, technology, food, travel)
 - All content and questions must be in Finnish
-- multiple_choice questions MUST have 4 options (A, B, C, D format: "A) teksti")
-- multiple_choice correct_answer must be a single letter: "A", "B", "C", or "D"
-- short_answer correct_answer must be a concise 2-5 word phrase in Finnish
+- multiple_choice: 4 options (e.g. "A) teksti"), correct_answer is a single letter: "A", "B", "C", or "D"
+- short_answer: correct_answer is a concise 2-5 word phrase in Finnish (no options field)
 
 Return ONLY valid JSON:
 {
@@ -116,8 +113,8 @@ Return ONLY valid JSON:
       "content": "Reading passage in Finnish...",
       "questions": [
         {
-          "question": "Question in Finnish?",
-          "options": ["A) option1", "B) option2", "C) option3", "D) option4"],
+          "question": "Question?",
+          "options": ["A) opt1", "B) opt2", "C) opt3", "D) opt4"],
           "correct_answer": "A",
           "explanation": "Explanation in Finnish"
         }
@@ -129,42 +126,8 @@ Return ONLY valid JSON:
       "questions": [
         {
           "question": "Multiple choice question?",
-          "options": ["A) option1", "B) option2", "C) option3", "D) option4"],
+          "options": ["A) opt1", "B) opt2", "C) opt3", "D) opt4"],
           "correct_answer": "B",
-          "explanation": "Explanation"
-        }
-      ]
-    },
-    {
-      "title": "Teksti 3",
-      "content": "Reading passage in Finnish...",
-      "questions": [
-        {
-          "question": "Multiple choice question?",
-          "options": ["A) option1", "B) option2", "C) option3", "D) option4"],
-          "correct_answer": "C",
-          "explanation": "Explanation"
-        },
-        {
-          "question": "Short answer question in Finnish?",
-          "correct_answer": "lyhyt vastaus suomeksi",
-          "explanation": "Explanation"
-        }
-      ]
-    },
-    {
-      "title": "Teksti 4",
-      "content": "Reading passage in Finnish...",
-      "questions": [
-        {
-          "question": "Multiple choice question?",
-          "options": ["A) option1", "B) option2", "C) option3", "D) option4"],
-          "correct_answer": "A",
-          "explanation": "Explanation"
-        },
-        {
-          "question": "Short answer question?",
-          "correct_answer": "lyhyt vastaus",
           "explanation": "Explanation"
         },
         {

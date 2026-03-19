@@ -25,23 +25,21 @@ const PROMPT_TEMPLATES = {
 Topic inspiration: ${topic}
 Cultural context: Include authentic Swedish cultural references where appropriate.
 
-STRUCTURE: Generate 4 reading texts with escalating difficulty:
-- Text 1 (easiest): Simple everyday text. Generate 3 MULTIPLE CHOICE questions only.
-- Text 2 (easy): Slightly more complex. Generate 3 MULTIPLE CHOICE questions only.
-- Text 3 (medium): More complex. Generate 2 multiple choice + 2 short_answer questions (mixed).
-- Text 4 (hardest): Most complex. Generate 1 multiple choice + 3 short_answer questions (mixed).
+STRUCTURE: Generate 2 reading texts:
+- Text 1: Easier text on one topic. Generate 3 MULTIPLE CHOICE questions.
+- Text 2: Harder text on a DIFFERENT topic. Generate 2 multiple choice + 2 short answer questions.
 
 TEXT LENGTHS for level ${level}:
-- A1: 60-80 / 80-100 / 100-120 / 120-140 words
-- A2: 80-100 / 100-130 / 130-160 / 160-190 words
-- B1: 120-150 / 150-180 / 180-210 / 210-240 words
-- B2: 150-180 / 180-220 / 220-250 / 250-280 words
+- A1: 80-100 / 100-120 words
+- A2: 100-130 / 130-160 words
+- B1: 140-170 / 170-200 words
+- B2: 170-200 / 200-230 words
 
 RULES:
-- All 4 texts must cover DIFFERENT topics (work, daily life, education, culture, nature, technology, food, travel)
+- The 2 texts must cover DIFFERENT topics (work, daily life, education, culture, nature, technology, food, travel)
 - All content and questions in Swedish
-- multiple_choice correct_answer must be a single letter: "A", "B", "C", or "D"
-- short_answer correct_answer must be a concise 2-5 word phrase in Swedish
+- multiple_choice: 4 options, correct_answer is a single letter: "A", "B", "C", or "D"
+- short_answer: correct_answer is a concise 2-5 word phrase in Swedish (no options field)
 
 Return ONLY valid JSON:
 {
@@ -63,47 +61,13 @@ Return ONLY valid JSON:
       "content": "Swedish reading passage...",
       "questions": [
         {
-          "question": "Question?",
-          "options": ["A) option1", "B) option2", "C) option3", "D) option4"],
-          "correct_answer": "B",
-          "explanation": "Explanation"
-        }
-      ]
-    },
-    {
-      "title": "Text 3",
-      "content": "Swedish reading passage...",
-      "questions": [
-        {
           "question": "Multiple choice question?",
           "options": ["A) option1", "B) option2", "C) option3", "D) option4"],
-          "correct_answer": "C",
+          "correct_answer": "B",
           "explanation": "Explanation"
         },
         {
           "question": "Short answer question in Swedish?",
-          "correct_answer": "kort svar på svenska",
-          "explanation": "Explanation"
-        }
-      ]
-    },
-    {
-      "title": "Text 4",
-      "content": "Swedish reading passage...",
-      "questions": [
-        {
-          "question": "Multiple choice question?",
-          "options": ["A) option1", "B) option2", "C) option3", "D) option4"],
-          "correct_answer": "A",
-          "explanation": "Explanation"
-        },
-        {
-          "question": "Short answer question?",
-          "correct_answer": "kort svar",
-          "explanation": "Explanation"
-        },
-        {
-          "question": "Short answer question?",
           "correct_answer": "kort svar",
           "explanation": "Explanation"
         }
