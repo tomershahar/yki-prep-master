@@ -20,61 +20,49 @@ const SWEDISH_TOPICS = [
 ];
 
 const PROMPT_TEMPLATES = {
-  reading: (level, topic) => `Generate a multi-text reading comprehension exam for CEFR level ${level} in Swedish.
+  reading: (level, topic, batch = 1) => {
+    const topicSets = {
+      1: ['work', 'daily life', 'nature', 'food'],
+      2: ['education', 'culture', 'technology', 'travel']
+    };
+    const topics = topicSets[batch] || topicSets[1];
+    const textLengths = { A1: ['60-80', '80-100'], A2: ['80-100', '100-130'], B1: ['120-150', '150-180'], B2: ['150-180', '180-220'] };
+    const [len1, len2] = textLengths[level] || ['80-100', '100-130'];
+    const titleOffset = batch === 1 ? 1 : 3;
 
-Topic inspiration: ${topic}
-Cultural context: Include authentic Swedish cultural references where appropriate.
+    return `Generate 2 Swedish reading comprehension texts for CEFR level ${level}.
 
-STRUCTURE: Generate 2 reading texts:
-- Text 1: Easier text on one topic. Generate 3 MULTIPLE CHOICE questions.
-- Text 2: Harder text on a DIFFERENT topic. Generate 2 multiple choice + 2 short answer questions.
+Topic inspiration: ${topic}. Cover topics from: ${topics.join(', ')}. Each text must be on a DIFFERENT topic.
 
-TEXT LENGTHS for level ${level}:
-- A1: 80-100 / 100-120 words
-- A2: 100-130 / 130-160 words
-- B1: 140-170 / 170-200 words
-- B2: 170-200 / 200-230 words
+- Text ${titleOffset} (easier): ${len1} words. Generate 3 MULTIPLE CHOICE questions only.
+- Text ${titleOffset + 1} (harder): ${len2} words. Generate 2 multiple choice + 2 short_answer questions.
 
 RULES:
-- The 2 texts must cover DIFFERENT topics (work, daily life, education, culture, nature, technology, food, travel)
 - All content and questions in Swedish
-- multiple_choice: 4 options, correct_answer is a single letter: "A", "B", "C", or "D"
-- short_answer: correct_answer is a concise 2-5 word phrase in Swedish (no options field)
+- multiple_choice: 4 options (e.g. "A) text"), correct_answer is a SINGLE letter: "A", "B", "C", or "D"
+- short_answer: correct_answer is a concise 2-5 word Swedish phrase, NO options field
 
 Return ONLY valid JSON:
 {
   "parts": [
     {
-      "title": "Text 1",
-      "content": "Swedish reading passage...",
+      "title": "Text ${titleOffset}",
+      "content": "Swedish passage...",
       "questions": [
-        {
-          "question": "Question in Swedish?",
-          "options": ["A) option1", "B) option2", "C) option3", "D) option4"],
-          "correct_answer": "A",
-          "explanation": "Why this is correct"
-        }
+        { "question": "...", "options": ["A) ...", "B) ...", "C) ...", "D) ..."], "correct_answer": "A", "explanation": "..." }
       ]
     },
     {
-      "title": "Text 2",
-      "content": "Swedish reading passage...",
+      "title": "Text ${titleOffset + 1}",
+      "content": "Swedish passage...",
       "questions": [
-        {
-          "question": "Multiple choice question?",
-          "options": ["A) option1", "B) option2", "C) option3", "D) option4"],
-          "correct_answer": "B",
-          "explanation": "Explanation"
-        },
-        {
-          "question": "Short answer question in Swedish?",
-          "correct_answer": "kort svar",
-          "explanation": "Explanation"
-        }
+        { "question": "...", "options": ["A) ...", "B) ...", "C) ...", "D) ..."], "correct_answer": "B", "explanation": "..." },
+        { "question": "...", "correct_answer": "kort svar", "explanation": "..." }
       ]
     }
   ]
-}`,
+}`;
+  },
 
   writing: (level, taskType) => `Generate TWO Swedish writing tasks for CEFR level ${level}.
 
