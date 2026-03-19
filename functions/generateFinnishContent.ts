@@ -109,65 +109,65 @@ Deno.serve(async (req) => {
   }
 });
 
-function getSystemPrompt(section, level, knowledgeContext, situation = null) {
+function getReadingPrompt(level, knowledgeContext, batch) {
   const baseInstruction = `You are a YKI (Finnish National Certificate of Language Proficiency) Practice Generator. Your task is to generate high-quality practice content for CEFR level ${level} in Finnish. Ensure all content is culturally relevant, natural, and grammatically correct. Respond ONLY with valid JSON.${knowledgeContext}`;
+  
+  const topicSets = {
+    1: ['work', 'daily life', 'nature', 'food'],
+    2: ['education', 'culture', 'technology', 'travel']
+  };
+  const topics = topicSets[batch] || topicSets[1];
 
-  switch (section) {
-    case 'reading':
-      return `${baseInstruction}
+  const textLengths = {
+    A1: ['60-80', '80-100'],
+    A2: ['80-100', '100-130'],
+    B1: ['120-150', '150-180'],
+    B2: ['150-180', '180-220'],
+  };
+  const [len1, len2] = textLengths[level] || ['80-100', '100-130'];
 
-TASK: Create a reading comprehension exercise for level ${level} in Finnish with 2 texts.
+  const titleOffset = batch === 1 ? 1 : 3;
 
-STRUCTURE:
-- Teksti 1: Easier text on one topic. Generate 3 MULTIPLE CHOICE questions.
-- Teksti 2: Harder text on a DIFFERENT topic. Generate 2 multiple choice + 2 short answer questions.
+  return `${baseInstruction}
 
-TEXT LENGTHS for level ${level}:
-- A1: 80-100 / 100-120 words
-- A2: 100-130 / 130-160 words
-- B1: 140-170 / 170-200 words
-- B2: 170-200 / 200-230 words
+TASK: Create 2 Finnish reading texts on topics from: ${topics.join(', ')}. Each text must cover a DIFFERENT topic.
+
+- Teksti ${titleOffset} (easier): ${len1} words. Generate 3 MULTIPLE CHOICE questions only.
+- Teksti ${titleOffset + 1} (harder): ${len2} words. Generate 2 multiple choice + 2 short_answer questions.
 
 RULES:
-- The 2 texts must cover DIFFERENT topics (work, daily life, education, culture, nature, technology, food, travel)
-- All content and questions must be in Finnish
-- multiple_choice: 4 options (e.g. "A) teksti"), correct_answer is a single letter: "A", "B", "C", or "D"
-- short_answer: correct_answer is a concise 2-5 word phrase in Finnish (no options field)
+- All content and questions in Finnish
+- multiple_choice: 4 options (e.g. "A) teksti"), correct_answer is a SINGLE letter: "A", "B", "C", or "D"
+- short_answer: correct_answer is a concise 2-5 word phrase in Finnish, NO options field
 
 Return ONLY valid JSON:
 {
   "parts": [
     {
-      "title": "Teksti 1",
-      "content": "Reading passage in Finnish...",
+      "title": "Teksti ${titleOffset}",
+      "content": "Finnish passage...",
       "questions": [
-        {
-          "question": "Question?",
-          "options": ["A) opt1", "B) opt2", "C) opt3", "D) opt4"],
-          "correct_answer": "A",
-          "explanation": "Explanation in Finnish"
-        }
+        { "question": "...", "options": ["A) ...", "B) ...", "C) ...", "D) ..."], "correct_answer": "A", "explanation": "..." }
       ]
     },
     {
-      "title": "Teksti 2",
-      "content": "Reading passage in Finnish...",
+      "title": "Teksti ${titleOffset + 1}",
+      "content": "Finnish passage...",
       "questions": [
-        {
-          "question": "Multiple choice question?",
-          "options": ["A) opt1", "B) opt2", "C) opt3", "D) opt4"],
-          "correct_answer": "B",
-          "explanation": "Explanation"
-        },
-        {
-          "question": "Short answer question?",
-          "correct_answer": "lyhyt vastaus",
-          "explanation": "Explanation"
-        }
+        { "question": "...", "options": ["A) ...", "B) ...", "C) ...", "D) ..."], "correct_answer": "B", "explanation": "..." },
+        { "question": "...", "correct_answer": "lyhyt vastaus", "explanation": "..." }
       ]
     }
   ]
 }`;
+}
+
+function getSystemPrompt(section, level, knowledgeContext, situation = null) {
+  const baseInstruction = `You are a YKI (Finnish National Certificate of Language Proficiency) Practice Generator. Your task is to generate high-quality practice content for CEFR level ${level} in Finnish. Ensure all content is culturally relevant, natural, and grammatically correct. Respond ONLY with valid JSON.${knowledgeContext}`;
+
+  switch (section) {
+    case 'reading':
+      return getReadingPrompt(level, knowledgeContext, 1);
 
     case 'listening':
       return `${baseInstruction}
