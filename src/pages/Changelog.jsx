@@ -28,6 +28,20 @@ export default function ChangelogPage() {
     const recentImprovements = [
         {
             date: 'March 20, 2026',
+            type: 'feature',
+            title: 'Listening Level Assessment',
+            description: 'The Level Assessment now includes a fully functional Listening module! The adaptive MCQ flow tests your listening comprehension across A1–B2 levels using real AI-generated audio clips in Finnish, Swedish, and Danish. Your assessed listening level is saved to your profile and used to personalize practice content.',
+            icon: Sparkles
+        },
+        {
+            date: 'March 20, 2026',
+            type: 'fix',
+            title: 'Assessment Result Labels Fixed',
+            description: 'Fixed a bug where the Listening assessment incorrectly described results as "reading comprehension" instead of "listening comprehension". Results now correctly reflect the module being assessed.',
+            icon: Bug
+        },
+        {
+            date: 'March 20, 2026',
             type: 'fix',
             title: 'Fixed User Level Data Migration',
             description: 'Resolved a data inconsistency where some users retained legacy CEFR level values (e.g. "A1") from an older system. All user profiles have now been migrated to the current numeric scale, ensuring practice content and difficulty settings correctly reflect your chosen level.',
