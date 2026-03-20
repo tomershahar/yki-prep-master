@@ -153,6 +153,16 @@ export default function MCQFlow({ module, language, onComplete, onCancel }) {
     onComplete({ level, reasoning, session });
   };
 
+  if (phase === 'no_questions') {
+    return (
+      <div className="flex flex-col items-center justify-center py-16 gap-4 text-center">
+        <p className="text-gray-700 font-medium">No questions available yet</p>
+        <p className="text-sm text-gray-500">Assessment questions for <strong>{language} {module}</strong> haven't been added yet. Please check back later or contact an admin.</p>
+        <Button variant="outline" onClick={onCancel}>Go Back</Button>
+      </div>
+    );
+  }
+
   if (phase === 'loading') {
     return (
       <div className="flex flex-col items-center justify-center py-16 gap-3">
