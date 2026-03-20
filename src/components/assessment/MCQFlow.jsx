@@ -13,6 +13,11 @@ function shuffle(arr) {
   return [...arr].sort(() => Math.random() - 0.5);
 }
 
+function normalizeAnswer(str) {
+  if (typeof str !== 'string') return '';
+  return str.trim().replace(/[.!?;,]+$/, '').replace(/\s+/g, ' ').toLowerCase();
+}
+
 function buildReasoning(level, module, rounds, scores) {
   const scoreStr = scores.map((s, i) => `Round ${i + 1}: ${s}/${QUESTIONS_PER_ROUND}`).join(', ');
   const levelLabels = { A1: 'beginner', A2: 'elementary', B1: 'intermediate', B2: 'upper-intermediate' };
