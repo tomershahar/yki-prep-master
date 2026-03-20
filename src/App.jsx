@@ -60,6 +60,7 @@ const AuthenticatedApp = () => {
         />
       ))}
       <Route path="/LevelAssessment" element={<LayoutWrapper currentPageName="LevelAssessment"><LevelAssessment /></LayoutWrapper>} />
+      <Route path="/AssessmentQuestionsAdmin" element={<LayoutWrapper currentPageName="AssessmentQuestionsAdmin"><AssessmentQuestionsAdmin /></LayoutWrapper>} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
