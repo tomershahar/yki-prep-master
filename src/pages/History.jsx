@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { User } from "@/entities/User";
 import { PracticeSession } from "@/entities/PracticeSession";
 import { Card, CardContent } from "@/components/ui/card";
@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { History as HistoryIcon, BookOpen, Headphones, Mic, PenTool, Clock, CheckCircle, XCircle, MessageSquare, Calendar } from "lucide-react";
+import { History as HistoryIcon, BookOpen, Headphones, Mic, PenTool, Clock, MessageSquare, Calendar, Trash2 } from "lucide-react";
 import { Loader2 } from "lucide-react";
 import YKIScoreBadge from "../components/exam/YKIScoreBadge";
 
