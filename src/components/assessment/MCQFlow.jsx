@@ -20,7 +20,7 @@ function buildReasoning(level, rounds, scores) {
 }
 
 export default function MCQFlow({ module, language, onComplete, onCancel }) {
-  const [phase, setPhase] = useState('loading'); // loading | question | done
+  const [phase, setPhase] = useState('loading'); // loading | question | done | no_questions
   const [questions, setQuestions] = useState([]);
   const [currentQ, setCurrentQ] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
