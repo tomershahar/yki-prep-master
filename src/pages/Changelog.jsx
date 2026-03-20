@@ -27,6 +27,20 @@ export default function ChangelogPage() {
     // Recent improvements from the last 2 weeks
     const recentImprovements = [
         {
+            date: 'March 20, 2026',
+            type: 'fix',
+            title: 'Fixed User Level Data Migration',
+            description: 'Resolved a data inconsistency where some users retained legacy CEFR level values (e.g. "A1") from an older system. All user profiles have now been migrated to the current numeric scale, ensuring practice content and difficulty settings correctly reflect your chosen level.',
+            icon: Bug
+        },
+        {
+            date: 'March 20, 2026',
+            type: 'improvement',
+            title: 'Settings Page Level Normalization',
+            description: 'The Settings page now automatically detects and normalizes legacy CEFR level values when you open it, preventing mismatches between your displayed level and the content you receive. No action needed — it happens seamlessly.',
+            icon: Zap
+        },
+        {
             date: 'February 3, 2026',
             type: 'feature',
             title: 'Expanded Nordic Language Support',
