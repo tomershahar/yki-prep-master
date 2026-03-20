@@ -240,7 +240,7 @@ export default function MCQFlow({ module, language, onComplete, onCancel }) {
             return (
               <button key={i} className={cls} onClick={() => handleSelect(opt)} disabled={confirmed}>
                 {opt}
-                {confirmed && opt === q.correct_answer && (
+                {confirmed && normalizeAnswer(opt) === normalizeAnswer(q.correct_answer) && (
                   <CheckCircle2 className="inline ml-2 w-4 h-4 text-green-600" />
                 )}
               </button>
