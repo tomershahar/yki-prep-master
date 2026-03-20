@@ -90,7 +90,7 @@ export default function MCQFlow({ module, language, onComplete, onCancel }) {
       // End of round — tally score (all answers already in sessionAnswers via handleConfirm)
       const finalAnswers = { ...sessionAnswers, [questions[currentQ].id]: selectedAnswer };
       const score = questions.reduce((acc, q) => {
-        return acc + (finalAnswers[q.id] === q.correct_answer ? 1 : 0);
+        return acc + (normalizeAnswer(finalAnswers[q.id]) === normalizeAnswer(q.correct_answer) ? 1 : 0);
       }, 0);
       runAlgorithm(score);
     }
