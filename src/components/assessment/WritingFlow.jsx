@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
-import { entry as gradeAssessmentWriting } from '@/functions/gradeAssessmentWriting/entry';
+import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Loader2, AlertCircle } from 'lucide-react';
@@ -37,7 +37,7 @@ export default function WritingFlow({ language, onComplete, onCancel }) {
     setIsSubmitting(true);
     setError(null);
     try {
-      const res = await gradeAssessmentWriting({
+      const res = await base44.functions.invoke('gradeAssessmentWriting/entry', {
         user_text: text,
         language,
         prompt_given: prompt,
