@@ -24,11 +24,91 @@ const sectionColors = {
   writing: "text-purple-600 bg-purple-50"
 };
 
+function SwipeableCard({ session, onDelete, children }) {
+  const [offsetX, setOffsetX] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const startX = useRef(null);
+  const longPressTimer = useRef(null);
+  const DELETE_THRESHOLD = -80;
+
+  const handleTouchStart = (e) => {
+    startX.current = e.touches[0].clientX;
+    longPressTimer.current = setTimeout(() => {
+      setIsDeleting(true);
+    }, 600);
+  };
+
+  const handleTouchMove = (e) => {
+    if (startX.current === null) return;
+    clearTimeout(longPressTimer.current);
+    const diff = e.touches[0].clientX - startX.current;
+    if (diff < 0) {
+      setIsDragging(true);
+      setOffsetX(Math.max(diff, -120));
+    }
+  };
+
+  const handleTouchEnd = () => {
+    clearTimeout(longPressTimer.current);
+    if (offsetX < DELETE_THRESHOLD) {
+      setIsDeleting(true);
+    } else {
+      setOffsetX(0);
+    }
+    setIsDragging(false);
+    startX.current = null;
+  };
+
+  const confirmDelete = async () => {
+    await onDelete(session.id);
+  };
+
+  const cancelDelete = () => {
+    setIsDeleting(false);
+    setOffsetX(0);
+  };
+
+  if (isDeleting) {
+    return (
+      <div className="relative rounded-xl overflow-hidden border border-red-200 bg-red-50">
+        <div className="p-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Trash2 className="w-5 h-5 text-red-500" />
+            <span className="text-red-700 font-medium">Delete this session?</span>
+          </div>
+          <div className="flex gap-2">
+            <Button size="sm" variant="outline" onClick={cancelDelete}>Cancel</Button>
+            <Button size="sm" className="bg-red-500 hover:bg-red-600 text-white" onClick={confirmDelete}>Delete</Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative overflow-hidden rounded-xl">
+      {/* Delete background */}
+      <div className="absolute inset-y-0 right-0 flex items-center justify-end px-6 bg-red-500 rounded-xl">
+        <Trash2 className="w-6 h-6 text-white" />
+      </div>
+      {/* Card */}
+      <div
+        style={{ transform: `translateX(${offsetX}px)`, transition: isDragging ? 'none' : 'transform 0.3s ease' }}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+      >
+        {children}
+      </div>
+    </div>
+  );
+}
+
 export default function HistoryPage() {
   const [user, setUser] = useState(null);
   const [sessions, setSessions] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedSession, setSelectedSession] = useState(null);
 
   useEffect(() => {
     loadHistoryData();
