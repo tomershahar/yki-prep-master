@@ -684,6 +684,12 @@ Would you like to advance to level ${newLevel}?`)) {
           }
         }
 
+        // Update speaking_cefr_level from session data if this is a speaking session
+        if (sessionData.section === 'speaking' && sessionData.cefr_level && sessionData.cefr_level !== 'UNGRADABLE') {
+          await User.updateMyUserData({ speaking_cefr_level: sessionData.cefr_level });
+          currentUser = await User.me();
+        }
+
         // Update training hours
         const currentSectionHours = currentUser[`${sessionData.section}_hours_trained`] || 0;
         const currentTotalHours = currentUser.total_hours_trained || 0;
