@@ -616,6 +616,24 @@ export default function Dashboard() {
                 />
             </div>
 
+            {/* Level Assessment CTA */}
+            <div className="bg-gradient-to-r from-violet-50 to-indigo-50 border border-violet-200 rounded-xl p-5 flex items-center justify-between gap-4">
+              <div className="flex items-center gap-4">
+                <div className="p-3 bg-violet-500 rounded-xl">
+                  <Target className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-violet-900">Level Assessment</h3>
+                  <p className="text-sm text-violet-700">Find out your current CEFR level across all four skills.</p>
+                </div>
+              </div>
+              <Link to="/LevelAssessment">
+                <Button className="bg-violet-600 hover:bg-violet-700 text-white whitespace-nowrap">
+                  Take Assessment
+                </Button>
+              </Link>
+            </div>
+
             {/* Enhanced KPI Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
               <ErrorBoundary>
