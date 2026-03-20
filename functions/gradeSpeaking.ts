@@ -163,11 +163,26 @@ Provide comprehensive, detailed evaluation in the following JSON format:
 
     } catch (error) {
         console.error("Speaking grading error:", error);
+        // Return 200 with UNGRADABLE so the frontend can still complete the session
         return new Response(JSON.stringify({ 
             error: error.message,
-            details: 'Backend speaking grading failed'
+            cefr_level: 'UNGRADABLE',
+            total_score: 0,
+            scores: { communicative_ability: 0, coherence: 0, vocabulary: 0, grammar: 0 },
+            feedback: {
+                strengths: 'Grading unavailable.',
+                weaknesses: 'Grading unavailable.',
+                fluency_analysis: '',
+                pronunciation_notes: '',
+                grammar_speaking: '',
+                vocabulary_range: '',
+                structure_organization: '',
+                examples: '',
+                focus_areas: [],
+                practice_suggestions: ''
+            }
         }), {
-            status: 500,
+            status: 200,
             headers: { "Content-Type": "application/json", ...corsHeaders },
         });
     }

@@ -44,7 +44,9 @@ Deno.serve(async (req) => {
 
     const languageName = LANGUAGE_NAMES[language] || language;
 
-    const systemPrompt = `You are an expert CEFR language examiner specializing in ${languageName}. Your task is to assess the CEFR level (A1, A2, B1, or B2) of a short writing sample.
+    const systemPrompt = `You are an expert CEFR language examiner specializing in ${languageName}. Your task is to assess the CEFR level (A1, A2, B1, or B2) of a short writing sample written in ${languageName}.
+
+IMPORTANT: First check that the writing sample is actually written in ${languageName}. If it is written in a different language (e.g. English, another language), set recommended_level to "ERROR" and explain in reasoning that the response must be written in ${languageName}.
 
 The user was given an open-ended prompt requiring no minimum language difficulty, so any level of response is valid. An A1 user might write 2-3 simple sentences; a B2 user might write a complex, nuanced paragraph.
 
@@ -56,8 +58,8 @@ Assess based on:
 
 Output ONLY valid JSON with exactly these fields:
 {
-  "recommended_level": "A1" | "A2" | "B1" | "B2",
-  "reasoning": "1-2 sentences in English explaining the level, referencing vocabulary, sentence structure, and grammatical accuracy"
+  "recommended_level": "A1" | "A2" | "B1" | "B2" | "ERROR",
+  "reasoning": "1-2 sentences in English explaining the level, referencing vocabulary, sentence structure, and grammatical accuracy. If ERROR, explain that the response must be written in ${languageName}."
 }`;
 
     const userMessage = `Language: ${languageName}
