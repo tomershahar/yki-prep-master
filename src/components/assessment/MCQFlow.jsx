@@ -53,6 +53,10 @@ export default function MCQFlow({ module, language, onComplete, onCancel }) {
       language,
     });
     const picked = shuffle(pool).slice(0, QUESTIONS_PER_ROUND);
+    if (picked.length === 0) {
+      setPhase('no_questions');
+      return;
+    }
     setQuestions(picked);
     setPhase('question');
   };
