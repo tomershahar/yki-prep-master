@@ -76,12 +76,11 @@ export default function MCQFlow({ module, language, onComplete, onCancel }) {
       setSelectedAnswer(null);
       setConfirmed(false);
     } else {
-      // End of round — tally score
+      // End of round — tally score (all answers already in sessionAnswers via handleConfirm)
+      const finalAnswers = { ...sessionAnswers, [questions[currentQ].id]: selectedAnswer };
       const score = questions.reduce((acc, q) => {
-        return acc + (sessionAnswers[q.id] === q.correct_answer ? 1 : 0);
-      }, 0) + (selectedAnswer === questions[currentQ].correct_answer ? 1 : 0);
-
-      // Dedup the last answer (already added via handleConfirm above)
+        return acc + (finalAnswers[q.id] === q.correct_answer ? 1 : 0);
+      }, 0);
       runAlgorithm(score);
     }
   };
