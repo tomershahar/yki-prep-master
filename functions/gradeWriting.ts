@@ -1,4 +1,4 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.6';
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.21';
 
 const callOpenAI = async (prompt, timeout = 60000) => {
     const apiKey = Deno.env.get("OPENAI_API_KEY");
