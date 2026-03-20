@@ -233,7 +233,7 @@ export default function MCQFlow({ module, language, onComplete, onCancel }) {
                 ? 'border-blue-500 bg-blue-50 text-blue-800'
                 : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50';
             } else {
-              if (opt === q.correct_answer) cls += 'border-green-500 bg-green-50 text-green-800';
+              if (normalizeAnswer(opt) === normalizeAnswer(q.correct_answer)) cls += 'border-green-500 bg-green-50 text-green-800';
               else if (opt === selectedAnswer) cls += 'border-red-400 bg-red-50 text-red-700';
               else cls += 'border-gray-200 text-gray-400';
             }
