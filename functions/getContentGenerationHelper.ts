@@ -1,4 +1,4 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.6';
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.21';
 
 /**
  * Helper function to route content generation to the appropriate test-specific function.
@@ -53,7 +53,7 @@ Deno.serve(async (req) => {
         is_active: true
       });
 
-      const seenIds: string[] = user.used_content_pool_ids || [];
+      const seenIds = user.used_content_pool_ids || [];
 
       // 2. Filter out already-seen items
       let availableItems = (poolItems || []).filter((item) => !seenIds.includes(item.id));
