@@ -527,9 +527,8 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
 
                 let isCorrect = false;
 
-                if (question.question_type === 'multiple_choice') {
+                if (question.question_type === 'multiple_choice' || (question.options && question.options.length > 0)) {
                     // Case 1: The AI returned a letter (e.g., "B").
-                    // We need to compare the user's selected option text with the option corresponding to the correct letter.
                     if (correctAnswerFromAI && correctAnswerFromAI.length === 1 && correctAnswerFromAI.toUpperCase() >= 'A' && correctAnswerFromAI.toUpperCase() <= 'Z') {
                         const correctOptionIndex = correctAnswerFromAI.toUpperCase().charCodeAt(0) - 65;
                         if (question.options && question.options[correctOptionIndex]) {
@@ -540,7 +539,6 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
                         }
                     }
                     // Case 2: The AI returned the full text of the answer.
-                    // We directly compare the user's selected option text with the AI's provided correct answer text.
                     else {
                         if (normalizeString(userAnswer) === normalizeString(correctAnswerFromAI)) {
                             isCorrect = true;
