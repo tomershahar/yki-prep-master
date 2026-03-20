@@ -1,13 +1,12 @@
 import { Toaster } from "@/components/ui/toaster"
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
-import NavigationTracker from '@/lib/NavigationTracker'
 import { pagesConfig } from './pages.config'
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
-import ErrorBoundary from '@/components/shared/ErrorBoundary';
+import LevelAssessment from '@/pages/LevelAssessment';
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
@@ -40,9 +39,6 @@ const AuthenticatedApp = () => {
     }
   }
 
-  // Pages that need error boundaries (critical paths with AI/complex operations)
-  const criticalPages = ['Practice', 'FullExam', 'ExamReadiness'];
-
   // Render the main app
   return (
     <Routes>
@@ -57,17 +53,12 @@ const AuthenticatedApp = () => {
           path={`/${path}`}
           element={
             <LayoutWrapper currentPageName={path}>
-              {criticalPages.includes(path) ? (
-                <ErrorBoundary>
-                  <Page />
-                </ErrorBoundary>
-              ) : (
-                <Page />
-              )}
+              <Page />
             </LayoutWrapper>
           }
         />
       ))}
+      <Route path="/LevelAssessment" element={<LayoutWrapper currentPageName="LevelAssessment"><LevelAssessment /></LayoutWrapper>} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
@@ -80,7 +71,6 @@ function App() {
     <AuthProvider>
       <QueryClientProvider client={queryClientInstance}>
         <Router>
-          <NavigationTracker />
           <AuthenticatedApp />
         </Router>
         <Toaster />
