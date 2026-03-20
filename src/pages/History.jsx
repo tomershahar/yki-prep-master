@@ -154,6 +154,11 @@ export default function HistoryPage() {
     });
   };
 
+  const handleDelete = async (sessionId) => {
+    await PracticeSession.delete(sessionId);
+    setSessions(prev => prev.filter(s => s.id !== sessionId));
+  };
+
   const getPassingStatus = (score) => {
     return score >= 75;
   };
