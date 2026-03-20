@@ -1,31 +1,20 @@
-import { createClient } from 'npm:@base44/sdk@0.1.0';
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.21';
 import { createHash } from 'node:crypto';
 
 const base64encode = (buffer) => {
     const bytes = new Uint8Array(buffer);
     let binary = '';
-    const chunkSize = 0x8000; // 32KB chunks to avoid stack overflow
-    
+    const chunkSize = 0x8000;
     for (let i = 0; i < bytes.length; i += chunkSize) {
         const chunk = bytes.subarray(i, i + chunkSize);
         binary += String.fromCharCode.apply(null, Array.from(chunk));
     }
-    
     return btoa(binary);
 };
 
-const base44 = createClient({
-    appId: Deno.env.get('BASE44_APP_ID'),
-});
-
 Deno.serve(async (req) => {
     try {
-        const authHeader = req.headers.get('Authorization');
-        if (!authHeader) {
-            return new Response('Unauthorized', { status: 401 });
-        }
-        const token = authHeader.split(' ')[1];
-        base44.auth.setToken(token);
+        const base44 = createClientFromRequest(req);
         
         const user = await base44.auth.me();
         if (!user) {
