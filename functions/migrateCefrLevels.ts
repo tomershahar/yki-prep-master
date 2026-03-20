@@ -12,11 +12,14 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    const users = await base44.asServiceRole.entities.User.list();
+    const { skip = 0 } = await req.json().catch(() => ({}));
+
+    // Fetch a batch of 100 users
+    const users = await base44.asServiceRole.entities.User.list('email', 100, skip);
     let migrated = 0;
 
     for (const u of users) {
-      // Only migrate YKI users (numeric_1_6 scale)
+      // Only migrate YKI users (numeric_1_6 scale) that still have CEFR values
       if (u.target_test && u.target_test !== 'YKI') continue;
 
       const updates = {};
@@ -30,12 +33,18 @@ Deno.serve(async (req) => {
         await base44.asServiceRole.entities.User.update(u.id, updates);
         migrated++;
         console.log(`Migrated ${u.email}: ${JSON.stringify(updates)}`);
-        // Small delay to avoid rate limiting
-        await new Promise(r => setTimeout(r, 300));
+        await new Promise(r => setTimeout(r, 200));
       }
     }
 
-    return Response.json({ success: true, migrated, total: users.length });
+    return Response.json({ 
+      success: true, 
+      migrated, 
+      processed: users.length,
+      skip,
+      next_skip: skip + users.length,
+      done: users.length < 100
+    });
   } catch (error) {
     return Response.json({ error: error.message }, { status: 500 });
   }
