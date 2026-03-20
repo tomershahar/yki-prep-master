@@ -101,14 +101,14 @@ export default function LevelAssessment() {
             {(activeModule === 'reading' || activeModule === 'listening') && (
               <MCQFlow
                 module={activeModule}
-                language={user?.target_language || 'finnish'}
+                language={user?.test_language || 'finnish'}
                 onComplete={(r) => handleComplete(activeModule, r)}
                 onCancel={handleCancel}
               />
             )}
             {activeModule === 'writing' && (
               <WritingFlow
-                language={user?.target_language || 'finnish'}
+                language={user?.test_language || 'finnish'}
                 onComplete={(r) => handleComplete(activeModule, r)}
                 onCancel={handleCancel}
               />

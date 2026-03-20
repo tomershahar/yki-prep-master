@@ -17,18 +17,13 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Rate limit check: max 10 AI calls per hour per user
-    const oneHourAgo = new Date(Date.now() - 3600000).toISOString();
-    const recentLogs = await base44.asServiceRole.entities.AIUsageLog.filter({
-      user_email: user.email,
-      function_name: 'gradeAssessmentWriting',
+    // Rate limit check via shared function
+    const rateLimitCheck = await base44.functions.invoke('checkAIRateLimit', {
+      functionName: 'gradeAssessmentWriting',
     });
-    const recentCount = recentLogs.filter(
-      (l) => l.timestamp && l.timestamp > oneHourAgo
-    ).length;
-    if (recentCount >= 10) {
+    if (rateLimitCheck.allowed === false) {
       return Response.json(
-        { error: 'Rate limit exceeded. Please try again later.' },
+        { error: rateLimitCheck.message || 'Rate limit exceeded. Please try again later.' },
         { status: 429 }
       );
     }

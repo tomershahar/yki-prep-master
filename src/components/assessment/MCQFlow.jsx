@@ -13,10 +13,12 @@ function shuffle(arr) {
   return [...arr].sort(() => Math.random() - 0.5);
 }
 
-function buildReasoning(level, rounds, scores) {
+function buildReasoning(level, module, rounds, scores) {
   const scoreStr = scores.map((s, i) => `Round ${i + 1}: ${s}/${QUESTIONS_PER_ROUND}`).join(', ');
   const levelLabels = { A1: 'beginner', A2: 'elementary', B1: 'intermediate', B2: 'upper-intermediate' };
-  return `Based on your answers (${scoreStr}), your reading comprehension aligns with the ${level} ${levelLabels[level] || ''} level. The adaptive algorithm confirmed this by testing you across multiple difficulty rounds.`;
+  const moduleLabels = { reading: 'reading comprehension', listening: 'listening comprehension' };
+  const moduleLabel = moduleLabels[module] || module;
+  return `Based on your answers (${scoreStr}), your ${moduleLabel} aligns with the ${level} ${levelLabels[level] || ''} level. The adaptive algorithm confirmed this by testing you across multiple difficulty rounds.`;
 }
 
 export default function MCQFlow({ module, language, onComplete, onCancel }) {
