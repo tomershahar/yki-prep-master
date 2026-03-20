@@ -404,6 +404,9 @@ export default function Settings() {
                 <Save className="w-4 h-4 mr-2" />
                 {isSaving ? 'Saving...' : 'Save Settings'}
               </Button>
+              <Button variant="outline" className="w-full" onClick={() => window.location.href = '/LevelAssessment'}>
+                Take Level Assessment
+              </Button>
               <Button onClick={handleLogout} variant="outline" className="w-full" aria-label="Log out of your account">
                 <LogOut className="w-4 h-4 mr-2" />
                 Log Out

@@ -141,7 +141,7 @@ export default function MCQFlow({ module, language, onComplete, onCancel }) {
   const saveSession = async (level, qIds, answers, scores) => {
     setIsSaving(true);
     setPhase('done');
-    const reasoning = buildReasoning(level, rounds + 1, scores);
+    const reasoning = buildReasoning(level, module, rounds + 1, scores);
     const session = await base44.entities.AssessmentSession.create({
       module,
       recommended_level: level,
