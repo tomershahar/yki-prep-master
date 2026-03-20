@@ -30,6 +30,8 @@ Deno.serve(async (req) => {
         await base44.asServiceRole.entities.User.update(u.id, updates);
         migrated++;
         console.log(`Migrated ${u.email}: ${JSON.stringify(updates)}`);
+        // Small delay to avoid rate limiting
+        await new Promise(r => setTimeout(r, 300));
       }
     }
 
