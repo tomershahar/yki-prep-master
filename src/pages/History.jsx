@@ -380,47 +380,57 @@ export default function HistoryPage() {
         <div className="space-y-4">
           {sessions.map((session) => {
             const SectionIcon = sectionIcons[session.exam_section];
-            const isPassing = getPassingStatus(session.score);
             
             return (
-              <Card key={session.id} className="hover:shadow-lg transition-shadow">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <div className={`p-3 rounded-lg ${sectionColors[session.exam_section]}`}>
-                        <SectionIcon className="w-6 h-6" />
-                      </div>
-                      <div>
-                        <h3 className="text-lg font-semibold capitalize">
-                          {session.exam_section} {session.session_type === 'practice' ? 'Practice' : 'Full Exam'}
-                        </h3>
-                        <div className="flex items-center gap-4 text-sm text-gray-600 mt-1">
-                          <div className="flex items-center gap-1">
-                            <Calendar className="w-4 h-4" />
-                            {formatDate(session.created_date)}
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <Clock className="w-4 h-4" />
-                            {session.duration_minutes} min
-                          </div>
-                          <Badge variant="outline">{session.difficulty_level}</Badge>
+              <SwipeableCard key={session.id} session={session} onDelete={handleDelete}>
+                <Card className="hover:shadow-lg transition-shadow">
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        <div className={`p-3 rounded-lg ${sectionColors[session.exam_section]}`}>
+                          <SectionIcon className="w-6 h-6" />
                         </div>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center gap-4">
-                      <div className="text-right">
-                        <YKIScoreBadge score={session.score} />
-                        <div className="text-xs text-gray-500 mt-2">
-                          {session.questions_correct}/{session.questions_attempted} correct
+                        <div>
+                          <h3 className="text-lg font-semibold capitalize">
+                            {session.exam_section} {session.session_type === 'practice' ? 'Practice' : 'Full Exam'}
+                          </h3>
+                          <div className="flex items-center gap-4 text-sm text-gray-600 mt-1">
+                            <div className="flex items-center gap-1">
+                              <Calendar className="w-4 h-4" />
+                              {formatDate(session.created_date)}
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <Clock className="w-4 h-4" />
+                              {session.duration_minutes} min
+                            </div>
+                            <Badge variant="outline">{session.difficulty_level}</Badge>
+                          </div>
                         </div>
                       </div>
                       
-                      <FeedbackDialog session={session} />
+                      <div className="flex items-center gap-4">
+                        <div className="text-right">
+                          <YKIScoreBadge score={session.score} />
+                          <div className="text-xs text-gray-500 mt-2">
+                            {session.questions_correct}/{session.questions_attempted} correct
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <FeedbackDialog session={session} />
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-red-400 hover:text-red-600 hover:bg-red-50 hidden md:flex"
+                            onClick={() => handleDelete(session.id)}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
+              </SwipeableCard>
             );
           })}
         </div>
