@@ -65,16 +65,26 @@ export default function Settings() {
       // Get default level from config
       const defaultLevel = config?.levels?.[0] || '3';
       
+      // Normalize: if test uses numeric scale but user has old CEFR value stored, convert it
+      const cefrToNumeric = { 'A1': '1', 'A2': '2', 'B1': '3', 'B2': '4', 'C1': '5', 'C2': '6' };
+      const normalizeLevel = (level) => {
+        if (!level) return defaultLevel;
+        if (config?.scoring_rules?.scale_type === 'numeric_1_6' && cefrToNumeric[level]) {
+          return cefrToNumeric[level];
+        }
+        return level;
+      };
+      
       setFormData({
         target_country: currentUser.target_country || 'FI',
         target_test: currentUser.target_test || 'YKI',
         test_language: currentUser.test_language || 'finnish',
         interface_language: currentUser.interface_language || 'en',
-        target_level: currentUser.target_level || defaultLevel,
-        reading_level: currentUser.reading_level || defaultLevel,
-        listening_level: currentUser.listening_level || defaultLevel,
-        speaking_level: currentUser.speaking_level || defaultLevel,
-        writing_level: currentUser.writing_level || defaultLevel,
+        target_level: normalizeLevel(currentUser.target_level),
+        reading_level: normalizeLevel(currentUser.reading_level),
+        listening_level: normalizeLevel(currentUser.listening_level),
+        speaking_level: normalizeLevel(currentUser.speaking_level),
+        writing_level: normalizeLevel(currentUser.writing_level),
         daily_goal_minutes: currentUser.daily_goal_minutes || 30,
         test_date: currentUser.test_date || '',
         profile_picture_url: currentUser.profile_picture_url || '',
