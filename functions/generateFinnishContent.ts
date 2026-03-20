@@ -1,4 +1,4 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.6';
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.21';
 import OpenAI from 'npm:openai@4.73.1';
 
 const openai = new OpenAI({
