@@ -89,8 +89,8 @@ Return JSON: { "questions": [ { "passage": "...", "question": "...", "options": 
             input: q.passage,
           });
           const audioBuffer = await ttsRes.arrayBuffer();
-          const audioBlob = new Blob([audioBuffer], { type: 'audio/mpeg' });
-          const uploadResult = await base44.asServiceRole.integrations.Core.UploadFile({ file: audioBlob });
+          const audioFile = new File([audioBuffer], 'audio.mp3', { type: 'audio/mpeg' });
+          const uploadResult = await base44.asServiceRole.integrations.Core.UploadFile({ file: audioFile });
           audio_url = uploadResult?.file_url || null;
         } catch (ttsErr) {
           console.error('TTS failed:', ttsErr.message);
