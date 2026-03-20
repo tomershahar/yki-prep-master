@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
-import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Loader2, AlertCircle } from 'lucide-react';
