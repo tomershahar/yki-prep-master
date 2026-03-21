@@ -31,8 +31,9 @@ import {
   SidebarFooter,
   SidebarProvider,
   SidebarTrigger,
+  useSidebar,
 } from "@/components/ui/sidebar";
-import FeedbackButton from "@/components/shared/FeedbackButton"; // Import the new component
+import FeedbackButton from "@/components/shared/FeedbackButton";
 
 export default function Layout({ children, currentPageName }) {
   const location = useLocation();
