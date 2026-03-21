@@ -35,6 +35,43 @@ import {
 } from "@/components/ui/sidebar";
 import FeedbackButton from "@/components/shared/FeedbackButton";
 
+function NavItems({ items, location }) {
+  const { setOpenMobile, isMobile } = useSidebar();
+
+  const handleNavClick = () => {
+    if (isMobile) setOpenMobile(false);
+  };
+
+  return (
+    <SidebarMenu>
+      {items.map((item) => (
+        <SidebarMenuItem key={item.title}>
+          <SidebarMenuButton
+            asChild
+            className={`mx-2 rounded-xl transition-all duration-200 ${
+              !item.external && location.pathname === item.url
+                ? 'bg-blue-500/30 text-white shadow-md border border-blue-400/20'
+                : 'text-blue-100/80 hover:bg-white/10 hover:text-white'
+            }`}
+          >
+            {item.external ? (
+              <a href={item.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 px-4 py-3" onClick={handleNavClick}>
+                <item.icon className="w-5 h-5 shrink-0" />
+                <span className="font-medium">{item.title}</span>
+              </a>
+            ) : (
+              <Link to={item.url} className="flex items-center gap-3 px-4 py-3" onClick={handleNavClick}>
+                <item.icon className="w-5 h-5 shrink-0" />
+                <span className="font-medium">{item.title}</span>
+              </Link>
+            )}
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+      ))}
+    </SidebarMenu>
+  );
+}
+
 export default function Layout({ children, currentPageName }) {
   const location = useLocation();
   const [user, setUser] = useState(null);
