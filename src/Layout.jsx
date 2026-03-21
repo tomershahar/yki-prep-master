@@ -314,32 +314,7 @@ export default function Layout({ children, currentPageName }) {
                 Navigation
               </SidebarGroupLabel>
               <SidebarGroupContent>
-                <SidebarMenu>
-                  {adminNavigationItems.map((item) => (
-                    <SidebarMenuItem key={item.title}>
-                      <SidebarMenuButton
-                        asChild
-                        className={`mx-2 rounded-xl transition-all duration-200 ${
-                          !item.external && location.pathname === item.url
-                            ? 'bg-blue-500/30 text-white shadow-md border border-blue-400/20'
-                            : 'text-blue-100/80 hover:bg-white/10 hover:text-white'
-                        }`}
-                      >
-                        {item.external ? (
-                          <a href={item.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 px-4 py-3" aria-label={`Navigate to ${item.title}`}>
-                            <item.icon className="w-5 h-5" />
-                            <span className="font-medium">{item.title}</span>
-                          </a>
-                        ) : (
-                          <Link to={item.url} className="flex items-center gap-3 px-4 py-3" aria-label={`Navigate to ${item.title}`}>
-                            <item.icon className="w-5 h-5" />
-                            <span className="font-medium">{item.title}</span>
-                          </Link>
-                        )}
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  ))}
-                </SidebarMenu>
+                <NavItems items={adminNavigationItems} location={location} />
               </SidebarGroupContent>
             </SidebarGroup>
           </SidebarContent>
