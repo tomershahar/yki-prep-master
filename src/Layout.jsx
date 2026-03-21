@@ -339,10 +339,15 @@ export default function Layout({ children, currentPageName }) {
         </Sidebar>
 
         <main className="flex-1 flex flex-col">
-          <header className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm border-b border-slate-200/60 dark:border-slate-700 px-6 py-4 md:hidden">
-            <div className="flex items-center gap-4">
-              <SidebarTrigger className="hover:bg-gray-100 dark:hover:bg-gray-800 p-2 rounded-lg transition-colors duration-200" aria-label="Toggle sidebar" />
-              <h1 className="text-xl font-bold text-gray-900 dark:text-white">Nordic Test Prep</h1>
+          <header className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm border-b border-slate-200/60 dark:border-slate-700 px-4 py-3 md:hidden sticky top-0 z-10">
+            <div className="flex items-center gap-3">
+              <SidebarTrigger className="hover:bg-gray-100 dark:hover:bg-gray-800 p-2 rounded-lg transition-colors duration-200 shrink-0" aria-label="Toggle sidebar" />
+              <div className="flex items-center gap-2 min-w-0">
+                <div className="w-7 h-7 bg-gradient-to-br from-sky-400 to-blue-600 rounded-lg flex items-center justify-center shrink-0">
+                  <Languages className="w-4 h-4 text-white" />
+                </div>
+                <h1 className="text-base font-bold text-gray-900 dark:text-white truncate">Nordic Test Prep</h1>
+              </div>
             </div>
           </header>
 
