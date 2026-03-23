@@ -185,14 +185,14 @@ const SpeakingTask = ({ task, taskIndex, onAnswerSubmit, isSubmitting, language,
     };
 
     return (
-        <Card key={taskIndex} className="bg-white shadow-sm border">
-            <CardHeader>
-                <div className="flex justify-between items-start">
-                    <div>
-                        <CardTitle className="text-lg font-bold flex items-center gap-2">
+        <Card key={taskIndex} className="bg-white shadow-sm border overflow-hidden">
+            <CardHeader className="p-3 md:p-6">
+                <div className="flex justify-between items-start gap-2">
+                    <div className="min-w-0">
+                        <CardTitle className="text-base md:text-lg font-bold flex items-center gap-2 flex-wrap">
                             <Badge variant="secondary"><InlineTranslator sourceLanguage={language}>{task.task_type || 'Speaking Task'}</InlineTranslator></Badge>
                         </CardTitle>
-                        <CardDescription className="mt-1 text-gray-600">
+                        <CardDescription className="mt-1 text-gray-600 break-words">
                             <span className="font-medium">Prompt:</span> <InlineTranslator sourceLanguage={language}>{task.prompt}</InlineTranslator>
                         </CardDescription>
                         {task.time_limit && (
