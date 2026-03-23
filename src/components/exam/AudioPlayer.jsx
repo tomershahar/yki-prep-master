@@ -171,7 +171,7 @@ export default function AudioPlayer({
   };
 
   return (
-    <div className={`bg-white rounded-lg border p-4 ${className}`}>
+    <div className={`bg-white rounded-lg border p-3 w-full overflow-hidden ${className}`}>
       <audio ref={audioRef} preload="metadata" />
       
       {error && (
@@ -180,22 +180,22 @@ export default function AudioPlayer({
         </div>
       )}
       
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="flex items-center gap-2">
           <Button
             onClick={handlePlayPause}
             disabled={!audioBase64 || !!error}
-            size="lg"
-            className="flex items-center gap-2 min-w-[120px]"
+            size="default"
+            className="flex items-center gap-2"
           >
             {isPlaying ? (
               <>
-                <Pause className="w-5 h-5" />
+                <Pause className="w-4 h-4" />
                 Pause
               </>
             ) : (
               <>
-                <Play className="w-5 h-5" />
+                <Play className="w-4 h-4" />
                 Play
               </>
             )}
@@ -205,7 +205,7 @@ export default function AudioPlayer({
             onClick={handleRestart}
             disabled={!audioBase64 || !!error}
             variant="outline"
-            size="lg"
+            size="default"
             className="flex items-center gap-2"
           >
             <RotateCcw className="w-4 h-4" />
@@ -213,13 +213,11 @@ export default function AudioPlayer({
           </Button>
         </div>
         
-        <div className="flex items-center gap-3 text-gray-600">
-          <div className="flex items-center gap-2">
-            <Volume2 className="w-4 h-4" />
-            <span className="font-mono text-lg">
-              {formatTime(currentTime)} / {formatTime(duration)}
-            </span>
-          </div>
+        <div className="flex items-center gap-1 text-gray-600 shrink-0">
+          <Volume2 className="w-4 h-4" />
+          <span className="font-mono text-sm">
+            {formatTime(currentTime)} / {formatTime(duration)}
+          </span>
         </div>
       </div>
       
