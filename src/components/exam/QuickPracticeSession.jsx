@@ -1337,9 +1337,9 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
                             </CardHeader>
                             <CardContent>
                                 <InlineTranslator sourceLanguage={exam.language}>
-                                    <div className="prose max-w-none text-lg leading-relaxed text-gray-700">
+                                    <div className="prose max-w-none text-base md:text-lg leading-relaxed text-gray-700 break-words overflow-wrap-anywhere">
                                         {examContent.text.split('\n').map((paragraph, index) => (
-                                            <p key={index}>{paragraph}</p>
+                                            <p key={index} className="break-words">{paragraph}</p>
                                         ))}
                                     </div>
                                 </InlineTranslator>
