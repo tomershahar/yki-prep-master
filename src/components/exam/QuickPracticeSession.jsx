@@ -1411,22 +1411,23 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
                         </Card>
                     </div>
                 ) : section.id === 'speaking' ? ( // NEW BRANCH for speaking
-                    <div className="space-y-6">
+                    <div className="space-y-4">
                         <Card className="border-0 shadow-lg">
-                            <CardHeader>
-                                <div className="flex justify-between items-center">
-                                    <div>
+                            <CardHeader className="p-3 md:p-6">
+                                <div className="flex flex-col sm:flex-row justify-between items-start gap-3">
+                                    <div className="min-w-0">
                                         <Badge variant="secondary" className="mb-2 flex items-center gap-1">
                                             <Sparkles className="w-3 h-3" />
                                             Quick Practice
                                         </Badge>
-                                        <CardTitle className="text-2xl font-bold">
+                                        <CardTitle className="text-lg md:text-2xl font-bold break-words">
                                             Speaking Tasks
                                         </CardTitle>
                                         <Badge variant="secondary" className="mt-2">
                                             {exam.language === 'finnish' ? 'Finnish' : 'Swedish'} - {exam.difficulty}
                                         </Badge>
                                     </div>
+                                    <Button variant="outline" onClick={onCancel} size="sm" className="w-full sm:w-auto shrink-0">Exit Practice</Button>
                                 </div>
                                 <Progress value={
                                     (Object.keys(answers).length / items.length) * 100
