@@ -1323,9 +1323,9 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
                 </DialogContent>
             </Dialog>
 
-            <div className="max-w-7xl mx-auto p-4">
+            <div className="max-w-7xl mx-auto p-2 sm:p-4 w-full overflow-hidden">
                 {section.id === 'reading' && examContent.text ? (
-                    <div className="flex flex-col gap-6">
+                    <div className="flex flex-col gap-4 md:gap-6">
                         <Card className="border-0 shadow-lg">
                             <CardHeader>
                                 <div className="flex items-center justify-between">
