@@ -1433,7 +1433,7 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
                                     (Object.keys(answers).length / items.length) * 100
                                 } className="mt-4" />
                             </CardHeader>
-                            <CardContent className="space-y-6">
+                            <CardContent className="space-y-4 p-3 md:p-6">
                                 <AIRateLimitBanner error={rateLimitError} />
                                 <ChaosControl />
                                 {items.map((task, index) => (
