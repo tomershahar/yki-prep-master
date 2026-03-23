@@ -216,12 +216,12 @@ export default function ExamSession({ section, useTimer, onComplete, onCancel })
   const progress = ((currentQuestion + 1) / questions.length) * 100;
 
   return (
-    <div className="max-w-4xl mx-auto p-4 space-y-6">
+    <div className="max-w-4xl mx-auto p-2 sm:p-4 space-y-4 w-full overflow-hidden">
       <Card className="border-0 shadow-lg">
         <CardHeader>
-          <div className="flex justify-between items-center">
-            <div>
-              <CardTitle className="text-2xl font-bold">
+          <div className="flex justify-between items-start gap-2">
+            <div className="min-w-0">
+              <CardTitle className="text-lg sm:text-2xl font-bold break-words">
                 {section.title} - Question {currentQuestion + 1} of {questions.length}
               </CardTitle>
               <Badge variant="secondary" className="mt-2">
