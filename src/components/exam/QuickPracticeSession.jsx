@@ -1200,24 +1200,25 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
 
     const QuestionCardContent = (
         <Card className="border-0 shadow-lg">
-            <CardHeader>
-                <div className="flex justify-between items-center">
-                    <div>
+            <CardHeader className="p-3 md:p-6">
+                <div className="flex flex-col sm:flex-row justify-between items-start gap-3">
+                    <div className="min-w-0">
                         <Badge variant="secondary" className="mb-2 flex items-center gap-1">
                             <Sparkles className="w-3 h-3" />
                             Quick Practice
                         </Badge>
-                        <CardTitle className="text-2xl font-bold">
+                        <CardTitle className="text-lg md:text-2xl font-bold break-words">
                             {section.id === 'writing' ? 'Task' : 'Question'} {currentQuestion + 1} of {items.length}
                         </CardTitle>
                         <Badge variant="secondary" className="mt-2">
                             {exam.language === 'finnish' ? 'Finnish' : 'Swedish'} - {exam.difficulty}
                         </Badge>
                     </div>
+                    <Button variant="outline" onClick={onCancel} size="sm" className="w-full sm:w-auto shrink-0" disabled={isGrading || isSubmitting}>Exit Practice</Button>
                 </div>
                 <Progress value={progress} className="mt-4" />
             </CardHeader>
-            <CardContent className="space-y-6">
+            <CardContent className="space-y-4 p-3 md:p-6">
                 <AIRateLimitBanner error={rateLimitError} />
                 {renderQuestion(items[currentQuestion], currentQuestion)}
                 <div className="flex justify-between items-center pt-6">
