@@ -1350,23 +1350,23 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
                 ) : section.id === 'listening' && examContent.audio_script ? (
                     <div className="space-y-4 md:space-y-6">
                         <Card className="border-0 shadow-lg">
-                            <CardHeader className="p-4 md:p-6">
-                                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                                    <div>
-                                        <CardTitle className="text-xl md:text-2xl font-bold flex items-center gap-2">
+                            <CardHeader className="p-3 md:p-6">
+                                <div className="flex flex-col sm:flex-row justify-between items-start gap-3">
+                                    <div className="min-w-0">
+                                        <CardTitle className="text-lg md:text-2xl font-bold break-words">
                                             Listening Comprehension
                                         </CardTitle>
                                         <Badge variant="secondary" className="mt-2">
                                             {exam.language === 'finnish' ? 'Finnish' : 'Swedish'} - {exam.difficulty}
                                         </Badge>
                                     </div>
-                                    <Button variant="outline" onClick={onCancel} size="sm" className="w-full sm:w-auto">Exit Practice</Button>
+                                    <Button variant="outline" onClick={onCancel} size="sm" className="w-full sm:w-auto shrink-0">Exit Practice</Button>
                                 </div>
                             </CardHeader>
-                            <CardContent className="p-4 md:p-6">
-                                <div className="p-3 md:p-4 bg-blue-50 rounded-lg mb-4 md:mb-6">
+                            <CardContent className="p-3 md:p-6">
+                                <div className="p-3 md:p-4 bg-blue-50 rounded-lg mb-4 md:mb-6 overflow-hidden">
                                     <h3 className="font-semibold mb-2 text-sm md:text-base">Listening Scenario:</h3>
-                                    <div className="text-xs md:text-sm text-gray-600 mb-3"><InlineTranslator sourceLanguage={exam.language}>{examContent.scenario_description}</InlineTranslator></div>
+                                    <div className="text-xs md:text-sm text-gray-600 mb-3 break-words"><InlineTranslator sourceLanguage={exam.language}>{examContent.scenario_description}</InlineTranslator></div>
                                     <ChaosControl />
                                     <div className="flex flex-col gap-3">
                                         <AudioPlayer
