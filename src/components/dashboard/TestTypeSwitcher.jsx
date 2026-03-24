@@ -58,7 +58,13 @@ export default function TestTypeSwitcher({ currentUser, onTestChange }) {
   };
 
   const getCurrentConfig = () => {
+    const userLangCode = currentUser.test_language === 'finnish' ? 'fi' : currentUser.test_language === 'swedish' ? 'sv' : 'da';
     return testConfigs.find(
+      config => 
+        config.country_code === currentUser.target_country &&
+        config.test_name === currentUser.target_test &&
+        config.language_code === userLangCode
+    ) || testConfigs.find(
       config => 
         config.country_code === currentUser.target_country &&
         config.test_name === currentUser.target_test
