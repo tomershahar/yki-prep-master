@@ -1038,27 +1038,30 @@ Output must be in the following JSON format:
   
   const QuestionCardContent = (
     <Card className="border-0 shadow-lg">
-      <CardHeader>
-        <div className="flex justify-between items-center">
-          <div>
+      <CardHeader className="p-3 md:p-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start gap-3">
+          <div className="min-w-0">
             <Badge variant="secondary" className="mb-2">Full Exam</Badge>
-            <CardTitle className="text-2xl font-bold">
+            <CardTitle className="text-lg md:text-2xl font-bold break-words">
               {section.title} - {section.id === 'writing' || section.id === 'speaking' ? 'Task' : 'Question'} {currentQuestionDisplay} of {totalQuestionsDisplayed} {subQuestionOfSubtotal}
             </CardTitle>
             <Badge variant="secondary" className="mt-2">{exam.language === 'finnish' ? 'Finnish' : 'Swedish'} - {exam.difficulty}</Badge>
           </div>
-          {useTimer && !showSummary && (
-            <div className="flex items-center gap-2">
-              <Clock className="w-5 h-5" />
-              <span className={`font-mono text-lg ${timeLeft < 300 ? 'text-red-600' : 'text-gray-700'}`}>
-                {formatTime(timeLeft)}
-              </span>
-            </div>
-          )}
+          <div className="flex items-center gap-2 shrink-0">
+            {useTimer && !showSummary && (
+              <div className="flex items-center gap-2">
+                <Clock className="w-5 h-5" />
+                <span className={`font-mono text-lg ${timeLeft < 300 ? 'text-red-600' : 'text-gray-700'}`}>
+                  {formatTime(timeLeft)}
+                </span>
+              </div>
+            )}
+            <Button variant="outline" size="sm" onClick={onCancel} className="hidden sm:flex">Exit Exam</Button>
+          </div>
         </div>
         <Progress value={progress} className="mt-4" />
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-4 p-3 md:p-6">
         {renderQuestion(currentMainItem, currentQuestion, currentSubQuestionIndex)}
         <div className="flex justify-between items-center pt-6">
           <Button 
