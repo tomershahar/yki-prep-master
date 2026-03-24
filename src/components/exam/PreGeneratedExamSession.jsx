@@ -1063,17 +1063,18 @@ Output must be in the following JSON format:
       </CardHeader>
       <CardContent className="space-y-4 p-3 md:p-6">
         {renderQuestion(currentMainItem, currentQuestion, currentSubQuestionIndex)}
-        <div className="flex justify-between items-center pt-6">
-          <Button 
-            variant="outline" 
-            onClick={handlePrevious} 
-            disabled={currentQuestion === 0 && currentSubQuestionIndex === 0}
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Previous
-          </Button>
-          <div className="flex gap-3">
-            <Button variant="outline" onClick={onCancel}>Exit Exam</Button>
+        <div className="flex justify-between items-center pt-4 md:pt-6">
+        <Button 
+          variant="outline" 
+          onClick={handlePrevious} 
+          disabled={currentQuestion === 0 && currentSubQuestionIndex === 0}
+        >
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Previous
+        </Button>
+        <div className="flex gap-2 md:gap-3">
+          <Button variant="outline" onClick={onCancel} className="sm:hidden">Exit</Button>
+          <Button variant="outline" onClick={onCancel} className="hidden sm:flex">Exit Exam</Button>
             {isLastOverallQuestion ? (
               <Button 
                 onClick={handleFinishExam} 
