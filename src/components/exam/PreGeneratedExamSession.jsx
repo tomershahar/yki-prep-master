@@ -1102,21 +1102,21 @@ Output must be in the following JSON format:
   );
 
   return (
-    <div className="max-w-7xl mx-auto p-4">
-      {section.id === 'reading' && examContent.parts ? ( // Changed from examContent.texts
-        <div className="flex flex-col gap-6">
+    <div className="max-w-7xl mx-auto p-2 sm:p-4 w-full overflow-hidden">
+      {section.id === 'reading' && examContent.parts ? (
+        <div className="flex flex-col gap-4 md:gap-6">
           <Card className="border-0 shadow-lg">
-            <CardHeader>
+            <CardHeader className="p-3 md:p-6">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-lg font-bold flex items-center gap-2">
+                <CardTitle className="text-base md:text-lg font-bold flex items-center gap-2 flex-wrap min-w-0">
                   <Badge variant="outline">{exam.difficulty}</Badge>
-                  <InlineTranslator sourceLanguage={exam.language}>Read the text</InlineTranslator> - {currentQuestion + 1} of {examContent.parts.length} {/* Changed from examContent.texts.length */}
+                  <span className="break-words"><InlineTranslator sourceLanguage={exam.language}>Read the text</InlineTranslator> - {currentQuestion + 1} of {examContent.parts.length}</span>
                 </CardTitle>
               </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-3 md:p-6">
               <InlineTranslator sourceLanguage={exam.language}>
-                <div className="prose max-w-none text-gray-700">
+                <div className="prose max-w-none text-gray-700 break-words overflow-wrap-anywhere text-sm md:text-base">
                   <ReactMarkdown>{currentMainItem.content}</ReactMarkdown>
                 </div>
               </InlineTranslator>
@@ -1125,16 +1125,16 @@ Output must be in the following JSON format:
           {QuestionCardContent}
         </div>
       ) : section.id === 'listening' && examContent.clips ? (
-        <div className="space-y-6">
+        <div className="space-y-4 md:space-y-6">
           <Card className="border-0 shadow-lg">
-            <CardHeader>
-              <CardTitle className="text-lg font-bold flex items-center gap-2">
+            <CardHeader className="p-3 md:p-6">
+              <CardTitle className="text-base md:text-lg font-bold flex items-center gap-2 flex-wrap min-w-0 break-words">
                 <Badge variant="outline">{exam.difficulty}</Badge>
-                <InlineTranslator sourceLanguage={exam.language}>Listen to the audio</InlineTranslator> - {currentQuestion + 1} of {examContent.clips.length}
+                <span><InlineTranslator sourceLanguage={exam.language}>Listen to the audio</InlineTranslator> - {currentQuestion + 1} of {examContent.clips.length}</span>
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="p-4 bg-blue-50 rounded-lg mb-4">
+            <CardContent className="p-3 md:p-6">
+              <div className="p-3 md:p-4 bg-blue-50 rounded-lg mb-4 overflow-hidden">
                 <h3 className="font-semibold mb-2"><InlineTranslator sourceLanguage={exam.language}>Listening Scenario:</InlineTranslator></h3>
                 <p className="text-sm text-gray-600 mb-3"><InlineTranslator sourceLanguage={exam.language}>{currentMainItem.scenario_description}</InlineTranslator></p>
                 <div className="flex items-center gap-4">
