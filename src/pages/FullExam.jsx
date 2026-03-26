@@ -677,13 +677,18 @@ INSTRUCTIONS:
       });
 
       // Full progression logic for full exams
+      // Use the exam's difficulty level as the baseline, NOT the user's stored level.
+      // This prevents downgrading a user who tests at a higher level than their current stored level.
       if (sessionData.score >= 75) {
-        const currentLevel = currentUser[`${sessionData.section}_level`] || 'A1';
-        const currentIndex = difficultyLevels.indexOf(currentLevel);
+        const examDifficulty = sessionData.difficulty_level || currentUser[`${sessionData.section}_level`] || 'A1';
+        const currentStoredLevel = currentUser[`${sessionData.section}_level`] || 'A1';
+        const examIndex = difficultyLevels.indexOf(examDifficulty);
+        const storedIndex = difficultyLevels.indexOf(currentStoredLevel);
 
-        if (currentIndex < difficultyLevels.length - 1) {
-          const newLevel = difficultyLevels[currentIndex + 1];
-          if (confirm(`Congratulations! You passed with ${sessionData.score}%.\n\nWould you like to advance to level ${newLevel} for ${sessionData.section}?`)) {
+        // Only offer advancement if the exam was taken at or above the user's current stored level
+        if (examIndex >= storedIndex && examIndex < difficultyLevels.length - 1) {
+          const newLevel = difficultyLevels[examIndex + 1];
+          if (confirm(`Congratulations! You passed the ${examDifficulty} exam with ${sessionData.score}%.\n\nWould you like to advance to level ${newLevel} for ${sessionData.section}?`)) {
             await User.updateMyUserData({
               [`${sessionData.section}_level`]: newLevel
             });
@@ -695,14 +700,21 @@ INSTRUCTIONS:
           } else {
             toast({
               title: "Exam Passed!",
-              description: `You've chosen to stay at level ${currentLevel}.`,
+              description: `You've chosen to stay at level ${examDifficulty}.`,
               duration: 5000,
             });
           }
-        } else {
+        } else if (examIndex >= difficultyLevels.length - 1) {
           toast({
             title: "Highest Level Achieved!",
-            description: `Amazing! You passed with ${sessionData.score}%! You are at the highest level (${currentLevel}) for this section!`,
+            description: `Amazing! You passed with ${sessionData.score}%! You are at the highest level (${examDifficulty}) for this section!`,
+            duration: 5000,
+          });
+        } else {
+          // Exam was below current level — just congratulate, no level change
+          toast({
+            title: "Exam Passed!",
+            description: `You passed with ${sessionData.score}%! Your level remains at ${currentStoredLevel}.`,
             duration: 5000,
           });
         }

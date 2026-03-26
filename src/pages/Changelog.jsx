@@ -27,6 +27,27 @@ export default function ChangelogPage() {
     // Recent improvements from the last 2 weeks
     const recentImprovements = [
         {
+            date: 'March 26, 2026',
+            type: 'fix',
+            title: 'Fixed Exam Level Promotion Bug',
+            description: 'Fixed a critical bug where completing a full exam (e.g. at B1 level) could incorrectly promote you to a lower level (e.g. A2) instead of the correct next level. Level advancement is now based on the difficulty of the exam you actually took, not your stored profile level.',
+            icon: Bug
+        },
+        {
+            date: 'March 26, 2026',
+            type: 'fix',
+            title: 'Fixed Dashboard "Preparing for" Language Mismatch',
+            description: 'Fixed a bug where the dashboard showed the wrong test name (e.g. "YKI - Swedish Language Test") even when the user had Finnish selected in their settings. The correct test configuration is now matched by language.',
+            icon: Bug
+        },
+        {
+            date: 'March 26, 2026',
+            type: 'improvement',
+            title: 'Full Mobile Responsiveness Overhaul',
+            description: 'Completed a comprehensive mobile-responsiveness audit across the practice and exam interface. Fixed horizontal overflow issues, improved padding and text wrapping on small screens, and standardized layouts in Quick Practice and Full Exam session components. All session modes are now fully usable on mobile devices.',
+            icon: Zap
+        },
+        {
             date: 'March 20, 2026',
             type: 'feature',
             title: 'Listening Level Assessment',
