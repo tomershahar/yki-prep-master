@@ -43,39 +43,40 @@ Deno.serve(async (req) => {
         const recentActivityRaw = [];
         const userCache = new Map();
 
-        // First pass: collect ALL visits (no date cutoff) to find each user's first-ever visit
+        // Load only the last 30 days of visits (newest first), stop early once we go past 30 days.
+        // To determine new vs returning, we use the `returning` flag stored on the visit record itself.
         let visitOffset = 0;
         let processedVisits = 0;
-        const userFirstVisitDate = {}; // user_id -> earliest timestamp string
-
-        // We need to find the first visit for every user that visited in the last 30 days.
-        // Load all visits sorted ascending (oldest first) — but the SDK only supports list/filter,
-        // so we load newest-first and track per-user minimums.
+        const userFirstVisitDate = {};
         let hasMoreVisits = true;
-        while (hasMoreVisits && processedVisits < 20000) {
-            const batch = await base44.asServiceRole.entities.UserVisit.list('-timestamp', 500, visitOffset);
+
+        while (hasMoreVisits && processedVisits < 5000) {
+            const batch = await base44.asServiceRole.entities.UserVisit.list('-timestamp', 200, visitOffset);
             if (!batch || batch.length === 0) break;
 
+            let reachedCutoff = false;
             for (const visit of batch) {
                 if (!visit.user_id || !visit.timestamp) continue;
-                processedVisits++;
-
-                // Track earliest visit per user (since we're going newest→oldest, always overwrite)
-                userFirstVisitDate[visit.user_id] = visit.timestamp;
 
                 const visitDate = new Date(visit.timestamp);
-                if (visitDate >= thirtyDaysAgo) {
-                    allVisits.push(visit);
-                    totalVisitsLast30Days++;
-                    monthlyActive.add(visit.user_id);
-                    if (visitDate >= sevenDaysAgo) weeklyActive.add(visit.user_id);
-                    if (visitDate >= oneDayAgo) dailyActive.add(visit.user_id);
-                    if (recentActivityRaw.length < 10) recentActivityRaw.push(visit);
+                if (visitDate < thirtyDaysAgo) { reachedCutoff = true; break; }
+
+                processedVisits++;
+                // Track earliest seen visit per user within this window
+                if (!userFirstVisitDate[visit.user_id] || visitDate < new Date(userFirstVisitDate[visit.user_id])) {
+                    userFirstVisitDate[visit.user_id] = visit.timestamp;
                 }
+
+                allVisits.push(visit);
+                totalVisitsLast30Days++;
+                monthlyActive.add(visit.user_id);
+                if (visitDate >= sevenDaysAgo) weeklyActive.add(visit.user_id);
+                if (visitDate >= oneDayAgo) dailyActive.add(visit.user_id);
+                if (recentActivityRaw.length < 10) recentActivityRaw.push(visit);
             }
+
             visitOffset += batch.length;
-            // Stop once all batches are processed (no early termination on date)
-            if (batch.length < 500) break;
+            if (reachedCutoff || batch.length < 200) break;
         }
 
         // Now classify each visit: is the user "new" (first-ever visit day) or "returning"?
@@ -134,8 +135,8 @@ Deno.serve(async (req) => {
         let hasMoreSessions = true;
         let processedSessions = 0;
 
-        while (hasMoreSessions && processedSessions < 6000) {
-            const batch = await base44.asServiceRole.entities.PracticeSession.list('-created_date', 500, sessionOffset);
+        while (hasMoreSessions && processedSessions < 3000) {
+            const batch = await base44.asServiceRole.entities.PracticeSession.list('-created_date', 200, sessionOffset);
             if (!batch || batch.length === 0) break;
 
             for (const session of batch) {
