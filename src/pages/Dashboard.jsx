@@ -292,6 +292,11 @@ export default function Dashboard() {
     } catch (err) {
       console.error("Error loading dashboard data:", err);
       if (isInitialLoad) {
+        // If unauthenticated, redirect to login instead of showing error
+        if (err.status === 401 || err.status === 403 || err.message?.toLowerCase().includes('auth') || err.message?.toLowerCase().includes('login')) {
+          import('@/api/base44Client').then(({ base44 }) => base44.auth.redirectToLogin(window.location.href));
+          return;
+        }
         setError('Failed to load dashboard data: ' + err.message);
       }
     } finally {
