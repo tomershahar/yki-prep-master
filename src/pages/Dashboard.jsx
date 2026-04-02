@@ -242,6 +242,7 @@ export default function Dashboard() {
 
   const fetchDashboardData = useCallback(async (isInitialLoad = false) => {
     try {
+      // Always re-fetch user to get latest practice_completion_counts and levels
       const currentUser = await User.me();
       
       if (!currentUser) {
@@ -333,17 +334,28 @@ export default function Dashboard() {
     return () => clearTimeout(trackVisitDelayed);
   }, [user, trackUserVisit]); // trackUserVisit is now stable due to useCallback
 
+  // Fix: check localStorage directly on mount (storage event doesn't fire in same tab)
   useEffect(() => {
-    const handleStorageChange = () => {
-      if (localStorage.getItem('dashboard_refresh_needed')) {
-        localStorage.removeItem('dashboard_refresh_needed');
-        refreshDashboard();
+    if (localStorage.getItem('dashboard_refresh_needed')) {
+      localStorage.removeItem('dashboard_refresh_needed');
+      refreshDashboard();
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Fix: also refresh when tab becomes visible again (user navigates back from practice)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        if (localStorage.getItem('dashboard_refresh_needed')) {
+          localStorage.removeItem('dashboard_refresh_needed');
+          refreshDashboard();
+        }
       }
     };
 
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
-  }, [refreshDashboard]); // refreshDashboard is now stable due to useCallback
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [refreshDashboard]);
 
   // ALL USEMEMO HOOKS MUST BE BEFORE EARLY RETURNS
   // Get recent achievements (only earned ones) - Memoized
