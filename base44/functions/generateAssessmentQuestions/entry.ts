@@ -12,7 +12,11 @@ const LEVEL_DESCRIPTIONS = {
 
 const LANGUAGE_NAMES = { finnish: 'Finnish', swedish: 'Swedish', danish: 'Danish' };
 
-const TTS_VOICES = ['alloy', 'echo', 'fable', 'nova', 'shimmer', 'onyx'];
+const TTS_VOICE_MAP = {
+  finnish: 'nova',
+  swedish: 'shimmer',
+  danish: 'shimmer',
+};
 
 Deno.serve(async (req) => {
   try {
@@ -82,7 +86,7 @@ Return JSON: { "questions": [ { "passage": "...", "question": "...", "options": 
 
       if (module === 'listening' && q.passage) {
         try {
-          const voice = TTS_VOICES[Math.floor(Math.random() * TTS_VOICES.length)];
+          const voice = TTS_VOICE_MAP[language] || 'nova';
           const ttsRes = await openai.audio.speech.create({
             model: 'tts-1',
             voice,

@@ -377,13 +377,11 @@ INSTRUCTIONS:
       });
 
       console.log('Starting AI generation for:', section.id, language, difficulty);
-      console.log('Using file URLs:', fileUrls.length > 0 ? fileUrls.length + ' files' : 'no files');
 
 
       const generationPromise = InvokeLLM({
         prompt: prompt,
         response_json_schema: responseSchema,
-        file_urls: fileUrls.length > 0 ? fileUrls : undefined,
         model: "gpt-4o"
       });
 
