@@ -1,0 +1,74 @@
+{
+  "name": "AssessmentQuestion",
+  "type": "object",
+  "properties": {
+    "module": {
+      "type": "string",
+      "enum": [
+        "reading",
+        "listening"
+      ],
+      "description": "Which skill module this question belongs to"
+    },
+    "level": {
+      "type": "string",
+      "enum": [
+        "A1",
+        "A2",
+        "B1",
+        "B2",
+        "C1",
+        "C2"
+      ],
+      "description": "CEFR level this question targets"
+    },
+    "language": {
+      "type": "string",
+      "enum": [
+        "finnish",
+        "swedish",
+        "danish"
+      ],
+      "description": "Language of the question content"
+    },
+    "passage": {
+      "type": "string",
+      "description": "For reading: passage shown to user. For listening: audio script (admin reference only, never shown to user)."
+    },
+    "audio_url": {
+      "type": "string",
+      "description": "Pre-generated audio URL (listening questions only). Store file path/ID if storage is private \u2014 request signed URL at runtime."
+    },
+    "question": {
+      "type": "string",
+      "description": "The question text shown to the user"
+    },
+    "options": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Exactly 4 answer options"
+    },
+    "correct_answer": {
+      "type": "string",
+      "description": "Must match one of the options exactly"
+    }
+  },
+  "required": [
+    "module",
+    "level",
+    "language",
+    "question",
+    "options",
+    "correct_answer"
+  ],
+  "rls": {
+    "read": {},
+    "write": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

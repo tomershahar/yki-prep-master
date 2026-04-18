@@ -26,7 +26,7 @@ const PROMPT_TEMPLATES = {
       2: ['education', 'culture', 'technology', 'travel']
     };
     const topics = topicSets[batch] || topicSets[1];
-    const textLengths = { A1: ['60-80', '80-100'], A2: ['80-100', '100-130'], B1: ['120-150', '150-180'], B2: ['150-180', '180-220'] };
+    const textLengths = { A1: ['60-80', '80-100'], A2: ['80-100', '100-130'], B1: ['120-150', '150-180'], B2: ['150-180', '180-220'], C1: ['220-270', '270-320'], C2: ['300-360', '360-420'] };
     const [len1, len2] = textLengths[level] || ['80-100', '100-130'];
     const titleOffset = batch === 1 ? 1 : 3;
 
@@ -69,11 +69,16 @@ Return ONLY valid JSON:
 Task type: ${taskType}
 Cultural context: Swedish society
 
+CEFR word count requirements:
+- A1: 30-50 words | A2: 40-60 words | B1: 60-100 words | B2: 80-120 words
+- C1: 120-180 words (sophisticated register, nuanced arguments)
+- C2: 180-250 words (near-native precision, academic/professional register)
+
 Create two writing prompts that:
 - Are appropriate for ${level} level
 - Reflect Swedish cultural contexts (work, education, daily life)
 - Include clear instructions in Swedish
-- Specify word count requirements
+- Specify word count requirements matching the CEFR level above
 - Provide context and scenario
 
 Return ONLY valid JSON in this exact format:
@@ -82,7 +87,7 @@ Return ONLY valid JSON in this exact format:
     {
       "task_type": "Informal Message",
       "prompt": "The task instructions in Swedish...",
-      "word_count": "150-200 words",
+      "word_count": "word count appropriate for ${level}",
       "sample_answer": "Example response...",
       "assessment_criteria": {
         "task_fulfillment": "...",
@@ -105,6 +110,12 @@ Return ONLY valid JSON in this exact format:
 }`,
 
   speaking: (level) => `Generate TWO Swedish speaking tasks for CEFR level ${level}.
+
+CEFR expectations:
+- A1: Simple personal questions | A2: Basic descriptions and opinions
+- B1: Narrating experiences with reasoning | B2: Discussing abstract topics with detail
+- C1: Nuanced arguments, sophisticated vocabulary, complex reasoning structures
+- C2: Near-native fluency, highly abstract/academic topics, critical analytical discussion
 
 Create speaking prompts that:
 - Are appropriate for ${level} level

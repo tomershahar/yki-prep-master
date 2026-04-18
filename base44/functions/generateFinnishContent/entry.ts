@@ -125,6 +125,8 @@ function getReadingPrompt(level, knowledgeContext, batch) {
     A2: ['80-100', '100-130'],
     B1: ['120-150', '150-180'],
     B2: ['150-180', '180-220'],
+    C1: ['220-270', '270-320'],
+    C2: ['300-360', '360-420'],
   };
   const [len1, len2] = textLengths[level] || ['80-100', '100-130'];
 
@@ -177,10 +179,13 @@ function getSystemPrompt(section, level, knowledgeContext, situation = null) {
 TASK: Create a complete listening comprehension exercise for level ${level} in Finnish.
 
 INSTRUCTIONS:
-1. Generate a short audio script (150-200 words) for a single speaker ENTIRELY in Finnish.
+1. Generate an audio script for a single speaker ENTIRELY in Finnish.
+   - Word count by level: A1: 80-120 | A2: 120-160 | B1: 160-200 | B2: 200-240 | C1: 250-300 | C2: 320-380
    - USE VARIED REALISTIC SCENARIOS: news reports, personal stories, announcements, phone messages, podcasts, instructions, interviews, advertisements
 
-2. Match CEFR level expectations for spoken language.
+ 2. Match CEFR level expectations for spoken language.
+    - C1: Complex, nuanced speech with sophisticated vocabulary and idiomatic expressions
+    - C2: Near-native natural speech, complex argumentation, abstract or academic content
 
 3. Generate **4-6 multiple-choice questions** in Finnish.
 
@@ -216,6 +221,8 @@ INSTRUCTIONS:
    - A2: 40-60 words per task
    - B1: 60-100 words per task
    - B2: 100-150 words per task
+   - C1: 150-220 words per task. Sophisticated register, nuanced arguments, complex cohesive devices.
+   - C2: 220-300 words per task. Near-native precision, academic or professional register, critical analysis.
 
 3. Return valid JSON:
 {
@@ -331,6 +338,8 @@ INSTRUCTIONS:
    - A2: Basic descriptions and opinions
    - B1: Narrating experiences with reasoning
    - B2: Discussing abstract topics with detail
+   - C1: Nuanced arguments with advanced vocabulary, sophisticated reasoning, and complex structures
+   - C2: Near-native fluency, highly abstract or academic topics, critical and analytical discussion
 
 3. Return valid JSON:
 {

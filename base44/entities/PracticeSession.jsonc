@@ -1,0 +1,97 @@
+{
+  "name": "PracticeSession",
+  "type": "object",
+  "properties": {
+    "exam_section": {
+      "type": "string",
+      "enum": [
+        "reading",
+        "listening",
+        "speaking",
+        "writing"
+      ],
+      "description": "Which exam section was practiced"
+    },
+    "session_type": {
+      "type": "string",
+      "enum": [
+        "practice",
+        "full_exam"
+      ],
+      "description": "Whether the session was a quick practice or a full exam simulation"
+    },
+    "duration_minutes": {
+      "type": "number",
+      "description": "How long the session lasted"
+    },
+    "score": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100,
+      "description": "Score achieved in the session"
+    },
+    "questions_attempted": {
+      "type": "number",
+      "description": "Number of questions answered"
+    },
+    "questions_correct": {
+      "type": "number",
+      "description": "Number of correct answers"
+    },
+    "difficulty_level": {
+      "type": "string",
+      "enum": [
+        "A1",
+        "A2",
+        "B1",
+        "B2",
+        "C1",
+        "C2"
+      ],
+      "description": "Difficulty level of the practice"
+    },
+    "feedback": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "AI-generated feedback for the session"
+    },
+    "cefr_level": {
+      "type": "string",
+      "description": "Estimated CEFR level from the session"
+    },
+    "answers": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "User's answers for the session"
+    },
+    "detailed_feedback": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "Detailed task-by-task feedback for writing/speaking"
+    }
+  },
+  "required": [
+    "exam_section",
+    "session_type",
+    "duration_minutes",
+    "score"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "write": {
+      "created_by": "{{user.email}}"
+    }
+  },
+  "description": "Tracks a user's practice session details."
+}

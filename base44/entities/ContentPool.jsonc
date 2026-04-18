@@ -1,0 +1,72 @@
+{
+  "name": "ContentPool",
+  "type": "object",
+  "properties": {
+    "language": {
+      "type": "string",
+      "enum": [
+        "finnish",
+        "swedish",
+        "danish"
+      ],
+      "description": "Language of the content"
+    },
+    "section": {
+      "type": "string",
+      "enum": [
+        "reading",
+        "listening",
+        "speaking",
+        "writing"
+      ],
+      "description": "Exam section this content belongs to"
+    },
+    "level": {
+      "type": "string",
+      "enum": [
+        "A1",
+        "A2",
+        "B1",
+        "B2",
+        "C1",
+        "C2"
+      ],
+      "description": "CEFR difficulty level"
+    },
+    "content": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "The full generated exam/practice content as JSON"
+    },
+    "used_count": {
+      "type": "number",
+      "default": 0,
+      "description": "How many times this content has been served to users"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether this content is available for serving"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When this content was created"
+    }
+  },
+  "required": [
+    "language",
+    "section",
+    "level",
+    "content"
+  ],
+  "rls": {
+    "read": {},
+    "write": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  },
+  "description": "Pool of pre-generated practice content that can be served to users"
+}

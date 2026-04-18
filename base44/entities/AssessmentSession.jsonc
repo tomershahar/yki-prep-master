@@ -1,0 +1,96 @@
+{
+  "name": "AssessmentSession",
+  "type": "object",
+  "properties": {
+    "module": {
+      "type": "string",
+      "enum": [
+        "reading",
+        "listening",
+        "writing",
+        "speaking"
+      ],
+      "description": "Which skill module was assessed"
+    },
+    "recommended_level": {
+      "type": "string",
+      "enum": [
+        "A1",
+        "A2",
+        "B1",
+        "B2",
+        "C1",
+        "C2"
+      ],
+      "description": "The CEFR level recommended by this assessment"
+    },
+    "questions_asked": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Question IDs used in the session (reading/listening only)"
+    },
+    "answers": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "User's answers keyed by question ID (reading/listening only)"
+    },
+    "reasoning": {
+      "type": "string",
+      "description": "1-2 sentence explanation of the recommended level"
+    },
+    "raw_ai_response": {
+      "type": "string",
+      "description": "Full raw GPT-4o JSON string before parsing (writing module only, for QA)"
+    },
+    "prompt_given": {
+      "type": "string",
+      "description": "The writing prompt shown to the user (writing module only)"
+    },
+    "user_text": {
+      "type": "string",
+      "description": "The user's submitted writing sample (writing module only)"
+    },
+    "language": {
+      "type": "string",
+      "enum": [
+        "finnish",
+        "swedish",
+        "danish"
+      ],
+      "description": "Language of the assessment (for QA filtering without joining User)"
+    }
+  },
+  "required": [
+    "module",
+    "recommended_level"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "write": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  },
+  "description": "Records a completed level assessment session for a user"
+}

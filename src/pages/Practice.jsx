@@ -24,7 +24,7 @@ import { toast } from "@/components/ui/use-toast";
 import SituationPickerModal from '../components/practice/SituationPickerModal';
 import SituationBanner from '../components/practice/SituationBanner';
 
-const difficultyLevels = ["A1", "A2", "B1", "B2"];
+const difficultyLevels = ["A1", "A2", "B1", "B2", "C1", "C2"];
 
 export default function Practice() {
   const [user, setUser] = useState(null);
@@ -140,6 +140,8 @@ INSTRUCTIONS:
    - A2: 150–180 words. Simple vocabulary, some thematic terms. Compound sentences with basic connectors.
    - B1: 180–220 words. Compound and complex sentences. Include reasoning, descriptive expressions, and opinions.
    - B2: 220–250 words. Complex structures, subordinate clauses, passive voice, conditional sentences, and abstract vocabulary.
+   - C1: 280–320 words. Sophisticated vocabulary, nuanced argument, idiomatic expressions, varied sentence structure.
+   - C2: 340–400 words. Near-native complexity, highly abstract topics, critical analysis, precise register control.
 
 3. Generate **5 multiple-choice questions** in ${languageName}.
    - At least 3 must test inference or interpretation, not just recall.
@@ -218,12 +220,14 @@ INSTRUCTIONS:
    - SELECT DIFFERENT THEMES: work, education, health, environment, culture, technology, community
 
 2. Match the CEFR level expectations **exactly** for prompts and word counts:
-   - A1: 30-50 words per task.
-   - A2: 40-60 words per task.
-   - B1: 60-100 words per task.
-   - B2: 80-120 words per task.
+    - A1: 30-50 words per task.
+    - A2: 40-60 words per task.
+    - B1: 60-100 words per task.
+    - B2: 80-120 words per task.
+    - C1: 120-180 words per task. Sophisticated register, nuanced arguments, complex cohesive devices.
+    - C2: 180-250 words per task. Near-native precision, highly academic or professional register.
 
-3. For each task, provide a sample answer and clear assessment criteria.
+ 3. For each task, provide a sample answer and clear assessment criteria.
 
 4. Return a valid JSON object with this exact structure:
 {
@@ -271,6 +275,8 @@ INSTRUCTIONS:
    - A2: Basic descriptions and opinions.
    - B1: Narrating experiences with reasoning.
    - B2: Discussing abstract topics with detail.
+   - C1: Nuanced arguments with advanced vocabulary and sophisticated reasoning.
+   - C2: Near-native critical discussion, highly abstract or academic topics.
 
 3. For each task, provide a sample answer and assessment criteria.
 

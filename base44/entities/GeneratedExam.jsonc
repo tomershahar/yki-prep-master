@@ -1,0 +1,84 @@
+{
+  "name": "GeneratedExam",
+  "type": "object",
+  "properties": {
+    "section": {
+      "type": "string",
+      "enum": [
+        "reading",
+        "listening",
+        "speaking",
+        "writing"
+      ],
+      "description": "The exam section this content relates to."
+    },
+    "language": {
+      "type": "string",
+      "enum": [
+        "finnish",
+        "swedish"
+      ],
+      "description": "The language this content is for."
+    },
+    "difficulty": {
+      "type": "string",
+      "enum": [
+        "A1",
+        "A2",
+        "B1",
+        "B2",
+        "C1",
+        "C2"
+      ],
+      "description": "The difficulty level of this exam."
+    },
+    "content": {
+      "type": "string",
+      "description": "The full JSON content of the generated exam, stored as a string."
+    },
+    "is_taken": {
+      "type": "boolean",
+      "default": false,
+      "description": "Flag to check if this exam has been taken by a user."
+    },
+    "taken_by": {
+      "type": "string",
+      "description": "Email of the user who took this exam."
+    }
+  },
+  "required": [
+    "section",
+    "language",
+    "difficulty",
+    "content"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "is_taken": false
+        },
+        {
+          "taken_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "write": {
+      "$or": [
+        {
+          "taken_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}
