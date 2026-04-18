@@ -27,6 +27,13 @@ export default function ChangelogPage() {
     // Recent improvements from the last 2 weeks
     const recentImprovements = [
         {
+            date: 'April 18, 2026',
+            type: 'feature',
+            title: 'C1 & C2 Advanced Level Support',
+            description: 'You can now practice and take full exams at C1 (Advanced) and C2 (Mastery) CEFR levels across all four skills — reading, listening, writing, and speaking. AI-generated content is fully calibrated for advanced complexity, including sophisticated vocabulary, nuanced arguments, and near-native register. C1/C2 levels are also available in Onboarding and Settings for profile configuration.',
+            icon: Sparkles
+        },
+        {
             date: 'March 26, 2026',
             type: 'fix',
             title: 'Fixed Exam Level Promotion Bug',
