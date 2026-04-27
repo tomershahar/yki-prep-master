@@ -186,6 +186,16 @@ export default function Layout({ children, currentPageName }) {
       icon: MessageSquare,
       external: true,
     },
+    {
+      title: "About",
+      url: "/About",
+      icon: Languages,
+    },
+    {
+      title: "Contact",
+      url: "/Contact",
+      icon: MessageSquare,
+    },
   ];
 
   // Add admin pages for admin users only

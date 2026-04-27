@@ -1,0 +1,151 @@
+{
+  "name": "TestConfiguration",
+  "type": "object",
+  "properties": {
+    "country_code": {
+      "type": "string",
+      "enum": [
+        "FI",
+        "SE",
+        "DK"
+      ],
+      "description": "Country code for the test (Finland, Sweden, Denmark)"
+    },
+    "test_name": {
+      "type": "string",
+      "enum": [
+        "YKI",
+        "Swedex",
+        "TISUS",
+        "SFI",
+        "PD3",
+        "PD2"
+      ],
+      "description": "Official test name"
+    },
+    "language_code": {
+      "type": "string",
+      "enum": [
+        "fi",
+        "sv",
+        "da"
+      ],
+      "description": "Language of the test content"
+    },
+    "display_name": {
+      "type": "string",
+      "description": "Human-readable test name (e.g., 'YKI - Finnish Citizenship Test')"
+    },
+    "levels": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Available difficulty levels (e.g., ['A1', 'A2', 'B1', 'B2'] or ['1', '2', '3', '4', '5', '6'])"
+    },
+    "sections": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Section name (e.g., 'reading', 'writing', 'speaking', 'listening')"
+          },
+          "display_name": {
+            "type": "string",
+            "description": "Localized section name (e.g., 'L\u00e4sf\u00f6rst\u00e5else' for Swedish reading)"
+          },
+          "duration_minutes": {
+            "type": "number",
+            "description": "Time allocated for this section in minutes"
+          },
+          "parts": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            },
+            "description": "Sub-parts within this section"
+          }
+        }
+      },
+      "description": "Test sections structure"
+    },
+    "scoring_rules": {
+      "type": "object",
+      "properties": {
+        "scale_type": {
+          "type": "string",
+          "enum": [
+            "numeric_1_6",
+            "cefr",
+            "danish_7_point"
+          ],
+          "description": "Grading scale used"
+        },
+        "passing_criteria": {
+          "type": "object",
+          "additionalProperties": true,
+          "description": "Rules for passing the test"
+        },
+        "weighted_sections": {
+          "type": "object",
+          "additionalProperties": true,
+          "description": "Section weights for overall score calculation"
+        }
+      },
+      "description": "Scoring and grading rules for this test"
+    },
+    "content_prompts": {
+      "type": "object",
+      "properties": {
+        "reading_prompt_template": {
+          "type": "string",
+          "description": "AI prompt template for generating reading comprehension content"
+        },
+        "writing_prompt_template": {
+          "type": "string",
+          "description": "AI prompt template for generating writing tasks"
+        },
+        "speaking_prompt_template": {
+          "type": "string",
+          "description": "AI prompt template for generating speaking tasks"
+        },
+        "listening_prompt_template": {
+          "type": "string",
+          "description": "AI prompt template for generating listening content"
+        }
+      },
+      "description": "AI generation prompt templates"
+    },
+    "cultural_topics": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Culture-specific topics for authentic content (e.g., 'Fika culture', 'Hygge', 'Sauna traditions')"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether this test configuration is currently active"
+    }
+  },
+  "required": [
+    "country_code",
+    "test_name",
+    "language_code",
+    "display_name",
+    "levels",
+    "sections"
+  ],
+  "rls": {
+    "read": {},
+    "write": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  },
+  "description": "Configuration for different language proficiency tests (YKI, Swedex, PD3, etc.)"
+}

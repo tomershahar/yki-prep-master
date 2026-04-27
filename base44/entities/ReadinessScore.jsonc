@@ -1,0 +1,103 @@
+{
+  "name": "ReadinessScore",
+  "type": "object",
+  "properties": {
+    "user_email": {
+      "type": "string",
+      "description": "Email of the user this readiness score belongs to"
+    },
+    "score": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100,
+      "description": "Overall readiness score (0-100%)"
+    },
+    "level": {
+      "type": "string",
+      "enum": [
+        "YKI Beginner",
+        "YKI Learner",
+        "YKI Candidate",
+        "YKI Ready"
+      ],
+      "description": "Current readiness level"
+    },
+    "section_scores": {
+      "type": "object",
+      "properties": {
+        "reading": {
+          "type": "number"
+        },
+        "listening": {
+          "type": "number"
+        },
+        "writing": {
+          "type": "number"
+        },
+        "speaking": {
+          "type": "number"
+        }
+      },
+      "description": "Individual section readiness scores"
+    },
+    "section_performance": {
+      "type": "number",
+      "description": "Section performance score (60% weight)"
+    },
+    "practice_quality": {
+      "type": "number",
+      "description": "Practice quality score (25% weight)"
+    },
+    "benchmark_alignment": {
+      "type": "number",
+      "description": "Exam benchmark alignment score (15% weight)"
+    },
+    "target_level": {
+      "type": "string",
+      "enum": [
+        "A1",
+        "A2",
+        "B1",
+        "B2"
+      ],
+      "description": "User's target exam level"
+    },
+    "sufficient_data": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether user has enough practice data for accurate score"
+    },
+    "last_calculated": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When this score was last calculated"
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 1000,
+      "description": "Optional notes or summary about this readiness score entry"
+    }
+  },
+  "required": [
+    "user_email",
+    "score",
+    "level"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "user_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "write": {
+      "created_by": "{{user.email}}"
+    }
+  }
+}

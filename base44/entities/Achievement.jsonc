@@ -1,0 +1,58 @@
+{
+  "name": "Achievement",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Achievement title"
+    },
+    "description": {
+      "type": "string",
+      "description": "Achievement description"
+    },
+    "icon": {
+      "type": "string",
+      "description": "Icon identifier for the achievement"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "hours",
+        "streak",
+        "score",
+        "completion",
+        "milestone",
+        "reading",
+        "listening",
+        "speaking",
+        "writing",
+        "feedback"
+      ],
+      "description": "Type of achievement"
+    },
+    "requirement": {
+      "type": "number",
+      "description": "Numeric requirement to unlock (e.g., 10 hours, 7 days streak)"
+    },
+    "points": {
+      "type": "number",
+      "description": "Points awarded for this achievement"
+    }
+  },
+  "required": [
+    "title",
+    "description",
+    "icon",
+    "category",
+    "requirement",
+    "points"
+  ],
+  "rls": {
+    "read": {},
+    "write": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

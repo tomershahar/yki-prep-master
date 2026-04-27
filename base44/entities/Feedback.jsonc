@@ -1,0 +1,62 @@
+{
+  "name": "Feedback",
+  "type": "object",
+  "properties": {
+    "feedback_text": {
+      "type": "string",
+      "description": "The user's written feedback."
+    },
+    "screenshot_url": {
+      "type": "string",
+      "format": "uri",
+      "description": "Optional URL of a screenshot uploaded by the user."
+    },
+    "page_context": {
+      "type": "string",
+      "description": "The URL of the page the user was on when submitting feedback."
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "new",
+        "seen",
+        "in-progress",
+        "resolved"
+      ],
+      "default": "new",
+      "description": "The current status of the feedback item."
+    }
+  },
+  "required": [
+    "feedback_text"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "status": "resolved"
+        },
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "write": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

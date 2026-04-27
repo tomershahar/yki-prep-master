@@ -1,0 +1,46 @@
+{
+  "name": "UserVisit",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string",
+      "description": "Base44 user ID of the visitor"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the visit occurred"
+    },
+    "returning": {
+      "type": "boolean",
+      "description": "Whether this was a returning user visit (true) or first visit (false)"
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 1000,
+      "description": "Optional notes or context about this visit"
+    }
+  },
+  "required": [
+    "user_id",
+    "timestamp",
+    "returning"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "user_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "write": {
+      "created_by": "{{user.email}}"
+    }
+  }
+}

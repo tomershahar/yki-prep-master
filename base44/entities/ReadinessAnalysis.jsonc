@@ -1,0 +1,120 @@
+{
+  "name": "ReadinessAnalysis",
+  "type": "object",
+  "properties": {
+    "user_email": {
+      "type": "string",
+      "description": "Email of the user this analysis belongs to"
+    },
+    "readiness_score_id": {
+      "type": "string",
+      "description": "ID of the associated ReadinessScore record"
+    },
+    "level_assessment": {
+      "type": "string",
+      "description": "AI-generated explanation of current level (2-3 sentences)"
+    },
+    "recommendations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "priority": {
+            "type": "number"
+          },
+          "action": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "specific_focus": {
+            "type": "string"
+          },
+          "practice_type": {
+            "type": "string",
+            "enum": [
+              "reading",
+              "listening",
+              "writing",
+              "speaking"
+            ]
+          },
+          "difficulty": {
+            "type": "string",
+            "enum": [
+              "A1",
+              "A2",
+              "B1",
+              "B2"
+            ]
+          }
+        }
+      },
+      "description": "3-5 prioritized recommendations from AI"
+    },
+    "next_milestone": {
+      "type": "object",
+      "properties": {
+        "target_level": {
+          "type": "string"
+        },
+        "criteria": {
+          "type": "string"
+        },
+        "estimated_sessions": {
+          "type": "number"
+        },
+        "estimated_weeks": {
+          "type": "number"
+        }
+      },
+      "description": "What user needs to reach next level"
+    },
+    "timeline_assessment": {
+      "type": "string",
+      "description": "Assessment of readiness by exam date (if provided)"
+    },
+    "motivational_message": {
+      "type": "string",
+      "description": "Personalized motivational message"
+    },
+    "analysis_date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When this analysis was generated"
+    },
+    "is_stale": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether this analysis is >24 hours old"
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 1000,
+      "description": "Optional short description or summary of this readiness analysis"
+    }
+  },
+  "required": [
+    "user_email",
+    "level_assessment",
+    "recommendations"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "user_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "write": {
+      "created_by": "{{user.email}}"
+    }
+  }
+}

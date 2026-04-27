@@ -1,0 +1,92 @@
+{
+  "name": "EvaluationReport",
+  "type": "object",
+  "properties": {
+    "model_type": {
+      "type": "string",
+      "enum": [
+        "reading",
+        "listening",
+        "speaking",
+        "writing"
+      ],
+      "description": "The type of AI model that was evaluated."
+    },
+    "difficulty_level": {
+      "type": "string",
+      "enum": [
+        "A1",
+        "A2",
+        "B1",
+        "B2"
+      ],
+      "description": "The difficulty level targeted during the evaluation."
+    },
+    "language": {
+      "type": "string",
+      "enum": [
+        "finnish",
+        "swedish"
+      ],
+      "description": "The language of the evaluated content."
+    },
+    "score": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100,
+      "description": "The overall performance score from 0 to 100."
+    },
+    "report_summary": {
+      "type": "object",
+      "properties": {
+        "strengths": {
+          "type": "string"
+        },
+        "weaknesses": {
+          "type": "string"
+        },
+        "final_verdict": {
+          "type": "string"
+        }
+      },
+      "description": "A summary of the model's performance."
+    },
+    "detailed_breakdown": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "A detailed breakdown of the evaluation criteria (e.g., level_accuracy, grammar, question_quality)."
+    },
+    "recommendations": {
+      "type": "string",
+      "description": "Actionable recommendations for improving the model."
+    },
+    "improved_prompt": {
+      "type": "string",
+      "description": "A complete, ready-to-use improved version of the original generation prompt that addresses the identified issues."
+    },
+    "generated_content": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "The actual AI-generated content that was evaluated."
+    }
+  },
+  "required": [
+    "model_type",
+    "difficulty_level",
+    "language",
+    "score",
+    "report_summary"
+  ],
+  "rls": {
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "write": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

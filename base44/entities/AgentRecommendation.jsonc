@@ -1,0 +1,105 @@
+{
+  "name": "AgentRecommendation",
+  "type": "object",
+  "properties": {
+    "agent_type": {
+      "type": "string",
+      "enum": [
+        "adaptive_learning",
+        "study_coach"
+      ],
+      "description": "Type of agent that generated this recommendation"
+    },
+    "recommendation_type": {
+      "type": "string",
+      "enum": [
+        "practice_section",
+        "difficulty_adjustment",
+        "motivation",
+        "streak_recovery",
+        "goal_suggestion"
+      ],
+      "description": "Type of recommendation"
+    },
+    "language": {
+      "type": "string",
+      "enum": [
+        "finnish",
+        "swedish"
+      ],
+      "description": "Target language for this recommendation"
+    },
+    "title": {
+      "type": "string",
+      "description": "Title of the recommendation"
+    },
+    "message": {
+      "type": "string",
+      "description": "Detailed recommendation message"
+    },
+    "action_url": {
+      "type": "string",
+      "format": "uri",
+      "description": "URL for the recommended action"
+    },
+    "action_text": {
+      "type": "string",
+      "description": "Text for the action button"
+    },
+    "priority": {
+      "type": "number",
+      "minimum": 1,
+      "maximum": 10,
+      "default": 5,
+      "description": "Priority level: 1-3 (info), 4-7 (warning), 8-10 (critical)"
+    },
+    "priority_category": {
+      "type": "string",
+      "enum": [
+        "info",
+        "warning",
+        "critical"
+      ],
+      "description": "Auto-categorized based on priority for UI theming"
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "Additional data like weak areas, performance metrics, grammar rules, vocabulary lists, etc."
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether this recommendation is still active"
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When this recommendation expires"
+    },
+    "schema_version": {
+      "type": "number",
+      "default": 1,
+      "description": "Schema version for backwards compatibility"
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 1000,
+      "description": "Optional plain-language description summarising this recommendation"
+    }
+  },
+  "required": [
+    "agent_type",
+    "recommendation_type",
+    "title",
+    "message"
+  ],
+  "rls": {
+    "read": {
+      "created_by": "{{user.email}}"
+    },
+    "write": {
+      "created_by": "{{user.email}}"
+    }
+  }
+}

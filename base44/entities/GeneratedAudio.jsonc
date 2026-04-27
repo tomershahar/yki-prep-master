@@ -1,0 +1,52 @@
+{
+  "name": "GeneratedAudio",
+  "type": "object",
+  "properties": {
+    "text_hash": {
+      "type": "string",
+      "description": "Hash of the text + language + gender for quick lookup"
+    },
+    "text_content": {
+      "type": "string",
+      "description": "Original text that was converted to speech"
+    },
+    "language": {
+      "type": "string",
+      "enum": [
+        "finnish",
+        "swedish"
+      ],
+      "description": "Language of the audio"
+    },
+    "gender": {
+      "type": "string",
+      "enum": [
+        "male",
+        "female"
+      ],
+      "description": "Gender of the voice"
+    },
+    "audio_base64": {
+      "type": "string",
+      "description": "Base64 encoded audio data"
+    },
+    "openai_voice": {
+      "type": "string",
+      "description": "OpenAI voice used (nova, shimmer, onyx, etc.)"
+    }
+  },
+  "required": [
+    "text_hash",
+    "text_content",
+    "language",
+    "gender",
+    "audio_base64",
+    "openai_voice"
+  ],
+  "rls": {
+    "read": {},
+    "write": {
+      "created_by": "{{user.email}}"
+    }
+  }
+}

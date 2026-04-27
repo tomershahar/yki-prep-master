@@ -1,0 +1,124 @@
+{
+  "name": "SpeakingSituation",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "object",
+      "properties": {
+        "finnish": {
+          "type": "string"
+        },
+        "swedish": {
+          "type": "string"
+        }
+      },
+      "description": "Situation title in different languages"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "Healthcare",
+        "Work",
+        "Daily Life",
+        "Social",
+        "Services"
+      ],
+      "description": "Situation category"
+    },
+    "difficulty": {
+      "type": "string",
+      "enum": [
+        "A1",
+        "A2",
+        "B1",
+        "B2"
+      ],
+      "description": "CEFR difficulty level"
+    },
+    "context": {
+      "type": "object",
+      "properties": {
+        "finnish": {
+          "type": "string"
+        },
+        "swedish": {
+          "type": "string"
+        }
+      },
+      "description": "2-3 sentence context description in different languages"
+    },
+    "key_phrases": {
+      "type": "object",
+      "properties": {
+        "finnish": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "swedish": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "5-8 key phrases/vocabulary words in different languages"
+    },
+    "expected_elements": {
+      "type": "object",
+      "properties": {
+        "finnish": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "swedish": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "3-5 elements the student should cover in different languages"
+    },
+    "languages": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "finnish",
+          "swedish"
+        ]
+      },
+      "description": "Languages this situation is available for"
+    },
+    "icon": {
+      "type": "string",
+      "description": "Icon identifier for UI"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether this situation is currently active"
+    }
+  },
+  "required": [
+    "title",
+    "category",
+    "difficulty",
+    "context",
+    "key_phrases",
+    "expected_elements",
+    "languages"
+  ],
+  "rls": {
+    "read": {},
+    "write": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

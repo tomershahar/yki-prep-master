@@ -1,0 +1,220 @@
+{
+  "type": "object",
+  "name": "User",
+  "properties": {
+    "target_language": {
+      "type": "string",
+      "enum": [
+        "finnish",
+        "swedish",
+        "danish"
+      ],
+      "description": "The target language the user is learning."
+    },
+    "target_test": {
+      "type": "string",
+      "enum": [
+        "YKI",
+        "Swedex",
+        "TISUS",
+        "SFI",
+        "PD3",
+        "PD2"
+      ],
+      "description": "The specific test the user is preparing for"
+    },
+    "country_code": {
+      "type": "string",
+      "enum": [
+        "FI",
+        "SE",
+        "DK"
+      ],
+      "description": "Country code for the test"
+    },
+    "target_level": {
+      "type": "string",
+      "enum": [
+        "A1",
+        "A2",
+        "B1",
+        "B2"
+      ],
+      "default": "A1",
+      "description": "The CEFR level the user is targeting."
+    },
+    "exam_date": {
+      "type": "string",
+      "format": "date",
+      "description": "The user's planned exam date."
+    },
+    "total_hours": {
+      "type": "number",
+      "default": 0,
+      "description": "Total practice hours accumulated."
+    },
+    "current_streak": {
+      "type": "number",
+      "default": 0,
+      "description": "Current daily practice streak."
+    },
+    "unlocked_achievements": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": [],
+      "description": "List of achievement IDs the user has unlocked."
+    },
+    "reading_level": {
+      "type": "string",
+      "enum": [
+        "A1",
+        "A2",
+        "B1",
+        "B2"
+      ],
+      "default": "A1"
+    },
+    "listening_level": {
+      "type": "string",
+      "enum": [
+        "A1",
+        "A2",
+        "B1",
+        "B2"
+      ],
+      "default": "A1"
+    },
+    "speaking_level": {
+      "type": "string",
+      "enum": [
+        "A1",
+        "A2",
+        "B1",
+        "B2"
+      ],
+      "default": "A1"
+    },
+    "writing_level": {
+      "type": "string",
+      "enum": [
+        "A1",
+        "A2",
+        "B1",
+        "B2"
+      ],
+      "default": "A1"
+    },
+    "reading_hours": {
+      "type": "number",
+      "default": 0
+    },
+    "listening_hours": {
+      "type": "number",
+      "default": 0
+    },
+    "speaking_hours": {
+      "type": "number",
+      "default": 0
+    },
+    "writing_hours": {
+      "type": "number",
+      "default": 0
+    },
+    "dark_mode": {
+      "type": "boolean",
+      "default": false,
+      "description": "User's dark mode preference"
+    },
+    "onboarding_completed": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether user has completed onboarding"
+    },
+    "beta_opt_in": {
+      "type": "boolean",
+      "default": true,
+      "description": "User has opted into beta features"
+    },
+    "practiced_situations": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "count": {
+            "type": "number"
+          },
+          "best_score": {
+            "type": "number"
+          },
+          "last_practiced": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "default": {},
+      "description": "Tracks which speaking situations user has practiced"
+    },
+    "used_content_pool_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": [],
+      "description": "IDs of ContentPool items already served to this user"
+    },
+    "reading_cefr_level": {
+      "type": "string",
+      "enum": [
+        "A1",
+        "A2",
+        "B1",
+        "B2"
+      ],
+      "description": "CEFR level determined by level assessment (reading)"
+    },
+    "listening_cefr_level": {
+      "type": "string",
+      "enum": [
+        "A1",
+        "A2",
+        "B1",
+        "B2"
+      ],
+      "description": "CEFR level determined by level assessment (listening)"
+    },
+    "writing_cefr_level": {
+      "type": "string",
+      "enum": [
+        "A1",
+        "A2",
+        "B1",
+        "B2"
+      ],
+      "description": "CEFR level determined by level assessment (writing)"
+    },
+    "speaking_cefr_level": {
+      "type": "string",
+      "enum": [
+        "A1",
+        "A2",
+        "B1",
+        "B2"
+      ],
+      "description": "CEFR level set after first speaking practice session"
+    },
+    "has_dismissed_assessment_nudge": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether user has dismissed the level assessment nudge banner"
+    }
+  },
+  "required": [
+    "target_language",
+    "target_test",
+    "country_code",
+    "exam_date"
+  ]
+}

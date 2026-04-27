@@ -1,0 +1,46 @@
+{
+  "name": "AIUsageLog",
+  "type": "object",
+  "properties": {
+    "function_name": {
+      "type": "string",
+      "description": "Name of the AI function called (e.g., gradeWriting, gradeSpeaking)"
+    },
+    "user_email": {
+      "type": "string",
+      "description": "Email of the user who made the call"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the call was made"
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 1000,
+      "description": "Optional description or notes about this AI usage log entry"
+    }
+  },
+  "required": [
+    "function_name",
+    "user_email",
+    "timestamp"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "user_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "write": {
+      "user_email": "{{user.email}}"
+    }
+  }
+}

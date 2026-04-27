@@ -1,0 +1,37 @@
+{
+  "name": "SystemConfig",
+  "type": "object",
+  "properties": {
+    "key": {
+      "type": "string",
+      "description": "The configuration key (e.g., 'last_visit_processing_timestamp')."
+    },
+    "value": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "The configuration value."
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 1000,
+      "description": "Optional description explaining the purpose of this configuration entry"
+    }
+  },
+  "required": [
+    "key",
+    "value"
+  ],
+  "rls": {
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "write": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  },
+  "description": "Stores system-level configuration, like timestamps for batch jobs."
+}

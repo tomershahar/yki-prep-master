@@ -68,6 +68,11 @@
       "type": "object",
       "additionalProperties": true,
       "description": "Detailed task-by-task feedback for writing/speaking"
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 1000,
+      "description": "Optional short description or notes for this practice session"
     }
   },
   "required": [

@@ -1,0 +1,70 @@
+{
+  "name": "KnowledgeBaseContent",
+  "type": "object",
+  "properties": {
+    "country_code": {
+      "type": "string",
+      "enum": [
+        "FI",
+        "SE",
+        "DK"
+      ],
+      "description": "Country this content is relevant for"
+    },
+    "test_name": {
+      "type": "string",
+      "enum": [
+        "YKI",
+        "Swedex",
+        "TISUS",
+        "SFI",
+        "PD3",
+        "PD2"
+      ],
+      "description": "Specific test this content relates to"
+    },
+    "content_category": {
+      "type": "string",
+      "enum": [
+        "cultural_topic",
+        "grammar_guide",
+        "vocabulary_list",
+        "exam_strategy",
+        "sample_content"
+      ],
+      "description": "Type of knowledge base content"
+    },
+    "file_name": {
+      "type": "string",
+      "description": "Name of the uploaded file"
+    },
+    "file_url": {
+      "type": "string",
+      "format": "uri",
+      "description": "URL of the uploaded file"
+    },
+    "description": {
+      "type": "string",
+      "description": "Description of the content"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Tags for categorization and search"
+    }
+  },
+  "required": [
+    "file_name",
+    "file_url"
+  ],
+  "rls": {
+    "read": {},
+    "write": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

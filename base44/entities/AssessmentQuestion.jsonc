@@ -53,6 +53,11 @@
     "correct_answer": {
       "type": "string",
       "description": "Must match one of the options exactly"
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 1000,
+      "description": "Optional notes or context about this assessment question"
     }
   },
   "required": [
