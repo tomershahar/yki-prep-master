@@ -129,6 +129,11 @@
       "type": "boolean",
       "default": true,
       "description": "Whether this test configuration is currently active"
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 1000,
+      "description": "Optional description of this test configuration."
     }
   },
   "required": [

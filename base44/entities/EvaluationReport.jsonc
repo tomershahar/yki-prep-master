@@ -68,6 +68,11 @@
       "type": "object",
       "additionalProperties": true,
       "description": "The actual AI-generated content that was evaluated."
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 1000,
+      "description": "Optional short description or notes about this evaluation report."
     }
   },
   "required": [
