@@ -837,13 +837,21 @@ Would you like to advance to level ${newLevel}?`)) {
           }
 
           {!practiceReady &&
-            <div className="bg-white/50 backdrop-blur-sm rounded-lg p-4 border border-white/20">
+            <div className="bg-white/50 backdrop-blur-sm rounded-lg p-4 border border-white/20 space-y-3">
               <p className="text-sm text-gray-500">
                 {activeSection?.id === 'listening' ?
                   "We're generating unique audio content with natural speech..." :
                   "Creating personalized practice content for your level..."
                 }
               </p>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => { setIsLoadingExam(false); setActiveSection(null); }}
+                className="text-gray-500"
+              >
+                Cancel
+              </Button>
             </div>
           }
         </div>

@@ -797,9 +797,9 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
                     console.log('Showing summary for writing (last question)');
                     setShowSummary(true);
                 } else {
-                    // For writing, continue to next question
-                    console.log('Moving to next writing question');
-                    setCurrentQuestion(prev => prev + 1);
+                    // For writing, show feedback for current task first, then user clicks Next
+                    console.log('Showing feedback for writing task before advancing');
+                    setShowResults(true);
                 }
             } else { // For reading
                 if (isLastQuestion) {
@@ -1246,8 +1246,8 @@ export default function QuickPracticeSession({ section, exam, onComplete, onCanc
                                     Continue to Summary
                                 </Button>
                             ) : (
-                                <Button onClick={handleNext} disabled={isGrading || isSubmitting}>
-                                    Next
+                                <Button onClick={() => { setCurrentQuestion(prev => prev + 1); setShowResults(false); }} disabled={isGrading || isSubmitting}>
+                                    Next Task
                                     <ArrowRight className="w-4 h-4 ml-2" />
                                 </Button>
                             )
