@@ -557,6 +557,20 @@ export default function Dashboard() {
   return (
     <ErrorBoundary>
       <SafeRender>
+        {/* Shutdown Notice */}
+        <div className="bg-amber-50 border-b-2 border-amber-400 px-4 py-4">
+          <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-start sm:items-center gap-3">
+            <div className="flex items-center gap-2 shrink-0">
+              <span className="text-2xl">⚠️</span>
+              <span className="font-bold text-amber-800 text-sm uppercase tracking-wide">Platform Closing</span>
+            </div>
+            <p className="text-amber-900 text-sm flex-1">
+              <strong>Nordic Test Prep will be shut down on June 25, 2026.</strong> Thank you for using the platform. If you believe this service is still needed and why, please{" "}
+              <a href="/Contact" className="underline font-semibold hover:text-amber-700">leave us your feedback here</a>
+              {" "}— we read every message.
+            </p>
+          </div>
+        </div>
         <div className="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
           <div className="max-w-7xl mx-auto p-4 md:p-8 space-y-8">
             {/* Welcome Banner - Speech & Listening Fix */}
